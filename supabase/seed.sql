@@ -21,6 +21,7 @@ declare
   fam_ids uuid[] := '{}'; f uuid; p uuid; i int; n int := 0; s_idx int;
   periods_ids uuid[] := '{}'; per uuid; start_min int; k int;
   st public.attendance_status; r float;
+  v_today date := (now() at time zone 'Asia/Karachi')::date;   -- school days follow Pakistan time
 begin
   perform setseed(0.42);
   -- the ledger normally refuses deletes; switch that off only while wiping the demo school
@@ -185,7 +186,7 @@ begin
   update public.students set profile_id = p where full_name = 'Hamza Tariq' and campus_id = v_campus;
 
   -- Attendance for the last 20 school days (Mon–Fri), about 92% present
-  for d in select x::date from generate_series(current_date - 28, current_date - 1, interval '1 day') x
+  for d in select x::date from generate_series(v_today - 28, v_today - 1, interval '1 day') x
            where extract(isodow from x) between 1 and 5 loop
     for stu in select id, section_id from public.students where campus_id = v_campus loop
       r := random();
@@ -202,7 +203,7 @@ begin
       insert into public.homework (campus_id, section_id, subject_id, teacher_id, title, instructions, due_on, total_marks)
       select v_campus, sec.id, ss.subject_id, ss.teacher_id,
              (array['Exercise 5.3, questions 1 to 10','Essay: My favourite season','Chapter 4 short questions'])[k],
-             'Solve in your copy and show every step.', current_date + (k - 2), 10
+             'Solve in your copy and show every step.', v_today + (k - 2), 10
       from public.section_subjects ss
       where ss.section_id = sec.id and ss.subject_id = subjects_ids[(array[3,1,5])[k]]
       returning id into hw;
@@ -215,7 +216,7 @@ begin
 
   -- Lesson diary and behaviour notes
   insert into public.lesson_diary (campus_id, section_id, subject_id, teacher_id, date, topic, notes)
-  select v_campus, ss.section_id, ss.subject_id, ss.teacher_id, current_date - 1, 'Chapter 5: factorisation', 'Covered exercise 5.2; 5.3 given as homework.'
+  select v_campus, ss.section_id, ss.subject_id, ss.teacher_id, v_today - 1, 'Chapter 5: factorisation', 'Covered exercise 5.2; 5.3 given as homework.'
   from public.section_subjects ss where ss.campus_id = v_campus and ss.subject_id = subjects_ids[3];
   insert into public.behaviour_notes (campus_id, student_id, teacher_id, kind, note, share_with_parents)
   select v_campus, s.id, v_ayesha, 'praise', 'Helped classmates during the maths test review.', true
@@ -247,13 +248,13 @@ begin
 
   -- Leave, substitutions, admissions, notices
   insert into public.leave_requests (campus_id, profile_id, from_on, to_on, reason, status) values
-    (v_campus, v_bilal, current_date + 3, current_date + 4, 'Family wedding in Gujranwala', 'pending'),
-    (v_campus, v_sadia, current_date - 6, current_date - 6, 'Doctor appointment', 'approved');
+    (v_campus, v_bilal, v_today + 3, v_today + 4, 'Family wedding in Gujranwala', 'pending'),
+    (v_campus, v_sadia, v_today - 6, v_today - 6, 'Doctor appointment', 'approved');
   insert into public.admissions (campus_id, child_name, guardian_name, phone, applying_class_id, status, test_on, notes)
     select v_campus, x.child, x.guardian, x.phone, c.id, x.st::public.admission_status, x.test_on, x.notes
     from (values ('Areeba Khalid', 'Khalid Mehmood', '03214445566', 'Class 8', 'inquiry', null::date, 'Walk-in, sibling at another school'),
-                 ('Muhammad Ahmad', 'Shahid Iqbal', '03335556677', 'Class 9', 'test', current_date + 5, 'Entry test booked'),
-                 ('Eman Fatima', 'Rizwan Ali', '03016667788', 'Class 8', 'offered', current_date - 3, 'Passed test, 82%')) as x(child, guardian, phone, cls, st, test_on, notes)
+                 ('Muhammad Ahmad', 'Shahid Iqbal', '03335556677', 'Class 9', 'test', v_today + 5, 'Entry test booked'),
+                 ('Eman Fatima', 'Rizwan Ali', '03016667788', 'Class 8', 'offered', v_today - 3, 'Passed test, 82%')) as x(child, guardian, phone, cls, st, test_on, notes)
     join public.classes c on c.name = x.cls and c.campus_id = v_campus;
   insert into public.notices (campus_id, title, body, audience, created_by) values
     (v_campus, 'Mid-term exams start 2 November', 'The date sheet is in the app. Students should arrive by 8:15 am on exam days.', 'parents', v_principal),
@@ -274,8 +275,8 @@ begin
              from public.families fm where fm.campus_id = v_campus loop
     n := n + 1;
     insert into public.invoices (campus_id, family_id, billing_month, due_on, challan_no)
-      values (v_campus, fam.id, date_trunc('month', current_date)::date, date_trunc('month', current_date)::date + 9,
-              'JT-' || to_char(current_date, 'YYMM') || '-' || lpad(n::text, 4, '0'))
+      values (v_campus, fam.id, date_trunc('month', v_today)::date, date_trunc('month', v_today)::date + 9,
+              'JT-' || to_char(v_today, 'YYMM') || '-' || lpad(n::text, 4, '0'))
       returning id into inv;
     insert into public.invoice_lines (campus_id, invoice_id, student_id, fee_head_id, description, amount_paisa)
       select v_campus, inv, s.id, fs.fee_head_id, h.name || ', ' || s.full_name, fs.amount_paisa
@@ -297,7 +298,7 @@ begin
       select v_campus, fam.id, inv, sum(amount_paisa),
              (array['onebill','onebill','raast','jazzcash','easypaisa','cash','cash','bank_deposit'])[1 + floor(random() * 8)::int]::public.payment_mode,
              'DEMO-' || n, 'R-' || lpad(n::text, 5, '0'), v_accountant,
-             date_trunc('month', current_date) + (floor(random() * least(extract(day from current_date), 20)) || ' days')::interval + interval '10 hours',
+             date_trunc('month', v_today) + (floor(random() * least(extract(day from v_today), 20)) || ' days')::interval + interval '10 hours',
              'seed-' || inv
       from public.invoice_lines where invoice_id = inv;
     end if;
