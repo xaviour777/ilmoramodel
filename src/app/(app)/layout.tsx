@@ -1,0 +1,55 @@
+import { getMe, type Role } from "@/lib/me";
+import { Nav, type NavItem } from "@/components/nav";
+import { signOut } from "@/app/login/actions";
+
+const NAV: Record<Role, NavItem[]> = {
+  principal: [
+    { href: "/principal", label: "Today", icon: "home" },
+    { href: "/principal/classes", label: "Classes", icon: "classes" },
+    { href: "/principal/exams", label: "Exams", icon: "star" },
+    { href: "/principal/staff", label: "Staff & leave", icon: "people" },
+    { href: "/principal/admissions", label: "Admissions", icon: "door" },
+    { href: "/principal/notices", label: "Notices", icon: "bell" },
+    { href: "/accounts", label: "Fees", icon: "coin" },
+  ],
+  owner: [],
+  accountant: [
+    { href: "/accounts", label: "Fee desk", icon: "coin" },
+    { href: "/principal/admissions", label: "Admissions", icon: "door" },
+  ],
+  teacher: [
+    { href: "/teacher", label: "Attendance", icon: "check" },
+    { href: "/teacher/homework", label: "Homework", icon: "book" },
+    { href: "/teacher/marks", label: "Marks", icon: "star" },
+    { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
+    { href: "/teacher/leave", label: "Leave", icon: "clock" },
+  ],
+  parent: [{ href: "/parent", label: "My children", icon: "home" }],
+  student: [{ href: "/student", label: "Home", icon: "home" }],
+};
+NAV.owner = NAV.principal;
+
+const ROLE_LABEL: Record<Role, string> = {
+  owner: "Owner", principal: "Principal", accountant: "Accountant",
+  teacher: "Teacher", parent: "Parent", student: "Student",
+};
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const me = await getMe();
+  return (
+    <div className="mx-auto flex max-w-[1440px] flex-col gap-6 p-4 lg:flex-row lg:items-start lg:p-6">
+      <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
+        <div className="flex items-center justify-between lg:block">
+          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>ilmora</div>
+          <form action={signOut} className="lg:hidden"><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
+        </div>
+        <Nav items={NAV[me.role]} />
+        <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
+          {me.full_name}<br />{ROLE_LABEL[me.role]} · {me.campus_name}
+          <form action={signOut}><button className="mt-2 underline" type="submit">Sign out</button></form>
+        </div>
+      </aside>
+      <main className="flex min-w-0 flex-1 flex-col gap-5">{children}</main>
+    </div>
+  );
+}

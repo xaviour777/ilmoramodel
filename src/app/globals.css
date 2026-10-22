@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* Ilmora look: bright, chunky and friendly, in the spirit of Duolingo. */
+:root {
+  --green: #58cc02;
+  --green-lip: #46a302;
+  --green-deep: #3b8a00;
+  --green-soft: #d7ffb8;
+  --green-ink: #2b6600;
+  --blue: #1cb0f6;
+  --blue-soft: #ddf4ff;
+  --blue-ring: #84d8ff;
+  --blue-ink: #0b78b0;
+  --orange: #ff9600;
+  --orange-soft: #fff1d6;
+  --orange-ink: #8a4b00;
+  --red: #ff4b4b;
+  --red-soft: #ffdfe0;
+  --red-ink: #a1161b;
+  --purple: #ce82ff;
+  --purple-soft: #eee7ff;
+  --purple-ink: #5b2da8;
+  --yellow: #ffc800;
+  --ink: #3c3c3c;
+  --muted: #6f6f6f;
+  --line: #e5e5e5;
+  --page: #f7f7f7;
+  --panel: #ffffff;
+}
+
+@theme inline {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+  .card { @apply flex flex-col gap-3.5 rounded-2xl border-2 p-5 min-w-0; background: var(--panel); border-color: var(--line); }
+  .h1 { @apply text-3xl font-black tracking-tight; }
+  .h2 { @apply text-xl font-black; }
+  .muted { color: var(--muted); @apply text-sm font-bold; }
+  .eyebrow { color: var(--blue-ink); @apply text-xs font-black uppercase tracking-wider; }
+  .btn {
+    @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl px-5 text-[15px] font-extrabold uppercase tracking-wider text-white transition-transform active:translate-y-1;
+    background: var(--green-deep); box-shadow: 0 4px 0 #2b6600;
+  }
+  .btn:active { box-shadow: none; }
+  .btn-ghost {
+    @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 bg-white px-5 text-[15px] font-extrabold uppercase tracking-wider transition-transform active:translate-y-1;
+    color: var(--blue-ink); border-color: var(--line); box-shadow: 0 4px 0 var(--line);
+  }
+  .field { @apply flex min-w-0 flex-col gap-1.5 text-[13px] font-extrabold; }
+  .input {
+    @apply min-h-12 w-full rounded-xl border-2 px-3.5 text-[15px] font-bold outline-none;
+    background: var(--page); border-color: var(--line); color: var(--ink);
+  }
+  .input:focus { border-color: var(--blue-ring); background: #fff; }
+  .chip { @apply inline-flex items-center gap-2 rounded-xl border-2 bg-white px-3.5 py-2 text-base font-extrabold; border-color: var(--line); }
+  .pill { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-black uppercase tracking-wide; }
+  .pill-green { background: var(--green-soft); color: var(--green-ink); }
+  .pill-blue { background: var(--blue-soft); color: var(--blue-ink); }
+  .pill-orange { background: var(--orange-soft); color: var(--orange-ink); }
+  .pill-red { background: var(--red-soft); color: var(--red-ink); }
+  .pill-purple { background: var(--purple-soft); color: var(--purple-ink); }
+  .pill-gray { background: #f2f2f2; color: #4b4b4b; }
+  .track { @apply relative h-4 overflow-hidden rounded-full; background: var(--line); }
+  .track > i { @apply absolute inset-y-0 left-0 rounded-full; background: var(--green); }
+  .row-box { @apply flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5; border-color: var(--line); }
+  .tile { @apply flex flex-col gap-0.5 rounded-2xl border-2 bg-white p-3.5; border-color: var(--line); }
+  .tile b { @apply text-2xl font-black tabular-nums; }
+  .notice-ok { @apply rounded-2xl px-4 py-3 font-extrabold; background: var(--green-soft); color: var(--green-ink); }
+  .notice-warn { @apply rounded-2xl px-4 py-3 font-extrabold; background: var(--orange-soft); color: var(--orange-ink); }
+  .notice-bad { @apply rounded-2xl px-4 py-3 font-extrabold; background: var(--red-soft); color: var(--red-ink); }
+  .tbl { @apply w-full text-sm; border-collapse: separate; border-spacing: 0 6px; }
+  .tbl th { @apply px-2.5 text-left text-[11px] font-black uppercase tracking-wider; color: var(--muted); }
+  .tbl td { @apply px-2.5 py-2.5 font-bold; background: var(--page); }
+  .tbl td:first-child { @apply rounded-l-xl; }
+  .tbl td:last-child { @apply rounded-r-xl; }
+
+  /* P / A / L / LV attendance buttons: radio inputs drawn as chunky toggles */
+  .seg { @apply relative; }
+  .seg input { @apply absolute opacity-0 pointer-events-none; }
+  .seg span {
+    @apply grid h-11 min-w-11 cursor-pointer place-items-center rounded-xl border-2 bg-white px-2 text-[15px] font-black;
+    border-color: var(--line); color: var(--muted);
+  }
+  .seg input:focus-visible + span { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .seg.p input:checked + span { background: var(--green); border-color: var(--green-lip); color: #fff; box-shadow: 0 3px 0 var(--green-lip); }
+  .seg.a input:checked + span { background: var(--red); border-color: #d33131; color: #fff; box-shadow: 0 3px 0 #d33131; }
+  .seg.l input:checked + span { background: var(--orange); border-color: #cd7900; color: #fff; box-shadow: 0 3px 0 #cd7900; }
+  .seg.v input:checked + span { background: var(--purple); border-color: #a568cc; color: #fff; box-shadow: 0 3px 0 #a568cc; }
+
+  .nav-item {
+    @apply flex min-h-[46px] items-center gap-3 rounded-xl border-2 border-transparent px-3 py-1.5 text-sm font-extrabold uppercase tracking-wide whitespace-nowrap;
+    color: var(--ink);
+  }
+  .nav-item:hover { background: var(--blue-soft); }
+  .nav-item[aria-current="page"] { border-color: var(--blue-ring); background: var(--blue-soft); color: var(--blue-ink); }
+}
