@@ -31,11 +31,14 @@ The rules live in `supabase/migrations/`.
 2. Paste and run each file in order:
    1. `supabase/migrations/20261023000001_core_schema.sql`
    2. `supabase/migrations/20261023000002_security_and_logic.sql`
-   3. `supabase/seed.sql` (dummy school: 6 sections, 7 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   3. `supabase/migrations/20261023000003_pin_search_paths.sql`
+   4. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 
 ### 2. Create the demo logins
+
+Easiest: run `supabase/demo_users.sql` in the SQL Editor. Or with the script:
 
 ```bash
 cp .env.example .env.local        # fill in URL and anon key from Project Settings → API

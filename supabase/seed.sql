@@ -1,5 +1,5 @@
 -- Ilmora demo data: one fictional campus with 3 classes, 6 sections, 6 staff,
--- 30 families, 42 students, four weeks of attendance, homework, exams and fees.
+-- 29 families, 42 students, four weeks of attendance, homework, exams and fees.
 -- Every name and number here is made up. Safe to re-run: it wipes the demo school first.
 
 do $$
@@ -133,10 +133,10 @@ begin
     end if;
   end loop;
 
-  -- Families, parents and students
-  for i in 1..30 loop
+  -- Families, parents and students (family 1 is the demo family: Zainab in 8-A, Hamza in 10-A)
+  for i in 1..29 loop
     insert into public.families (campus_id, name, phone, address)
-      values (v_campus, first_names[(i % 24) + 1] || ' ' || surnames[i] || ' family',
+      values (v_campus, case when i = 1 then 'Tariq Mehmood family' else first_names[(i % 24) + 1] || ' ' || surnames[i] || ' family' end,
               '0300' || lpad((2000000 + i * 3571)::text, 7, '0'), 'Johar Town, Lahore')
       returning id into f;
     fam_ids := fam_ids || f;
@@ -148,37 +148,24 @@ begin
     insert into public.family_guardians (campus_id, family_id, profile_id, relation, is_fee_contact)
       values (v_campus, f, p, case when i = 1 then 'mother' else 'father' end, true);
   end loop;
-  update public.families set name = 'Tariq Mehmood family' where id = fam_ids[1];
 
   i := 0;
   for sec in select s.id, s.name, c.name as cname from public.sections s join public.classes c on c.id = s.class_id
              where s.campus_id = v_campus order by c.sort, s.name loop
     for k in 1..7 loop
       i := i + 1;
-      -- first 24 students fill families 1..24; the rest are siblings in families 1..12... except the demo family
-      f := case when i <= 30 then fam_ids[i] else fam_ids[((i - 30) % 11) + 2] end;
+      -- student 1 (8-A) and student 29 (10-A) belong to the demo family; the last 12 are siblings
+      f := case when i = 29 then fam_ids[1] when i <= 28 then fam_ids[i] when i = 30 then fam_ids[29]
+                else fam_ids[((i - 31) % 11) + 2] end;
       insert into public.students (campus_id, family_id, section_id, full_name, roll_no, admission_no, gender, admitted_on)
       values (v_campus, f, sec.id,
-              first_names[((i * 7) % 24) + 1] || ' ' || (select split_part(name, ' ', 2) from public.families where id = f),
+              case when i = 1 then 'Zainab Tariq' when i = 29 then 'Hamza Tariq'
+                   else first_names[((i * 7) % 24) + 1] || ' ' || (select split_part(name, ' ', 2) from public.families where id = f) end,
               (case sec.cname when 'Class 8' then 800 when 'Class 9' then 900 else 1000 end + (case sec.name when 'A' then 0 else 50 end) + k)::text,
               'JT-' || lpad(i::text, 4, '0'),
-              case when ((i * 7) % 24) % 2 = 0 then 'M' else 'F' end, '2022-04-01');
+              case when i = 1 then 'F' when i = 29 then 'M' when ((i * 7) % 24) % 2 = 0 then 'M' else 'F' end, '2022-04-01');
     end loop;
   end loop;
-  -- Demo family: Hamza in 10-A and Zainab in 8-A
-  update public.students set full_name = 'Hamza Tariq', family_id = fam_ids[1]
-    where id = (select st2.id from public.students st2 join public.sections s on s.id = st2.section_id
-                join public.classes c on c.id = s.class_id where c.name = 'Class 10' and s.name = 'A' and st2.campus_id = v_campus
-                order by roll_no limit 1);
-  update public.students set full_name = 'Zainab Tariq', family_id = fam_ids[1], gender = 'F'
-    where id = (select st2.id from public.students st2 join public.sections s on s.id = st2.section_id
-                join public.classes c on c.id = s.class_id where c.name = 'Class 8' and s.name = 'A' and st2.campus_id = v_campus
-                order by roll_no limit 1);
-  -- drop any family left without a child after the swap above
-  delete from public.profiles where id in (select fg.profile_id from public.family_guardians fg
-    where fg.campus_id = v_campus and not exists (select 1 from public.students s where s.family_id = fg.family_id));
-  delete from public.families fm where fm.campus_id = v_campus
-    and not exists (select 1 from public.students s where s.family_id = fm.id);
 
   -- Student login for Hamza
   insert into public.profiles (campus_id, role, full_name, email) values (v_campus, 'student', 'Hamza Tariq', 'student@demo.ilmora.pk')
@@ -188,7 +175,7 @@ begin
   -- Attendance for the last 20 school days (Mon–Fri), about 92% present
   for d in select x::date from generate_series(v_today - 28, v_today - 1, interval '1 day') x
            where extract(isodow from x) between 1 and 5 loop
-    for stu in select id, section_id from public.students where campus_id = v_campus loop
+    for stu in select id, section_id from public.students where campus_id = v_campus order by admission_no loop
       r := random();
       st := case when r < 0.88 then 'present' when r < 0.93 then 'late' when r < 0.98 then 'absent' else 'leave' end;
       insert into public.attendance (campus_id, section_id, student_id, date, status, marked_by)
@@ -293,7 +280,7 @@ begin
       join public.fee_structures fs on fs.class_id = sec2.class_id and fs.fee_head_id = v_tuition
       where s.rn > 1;
     -- about 70% have paid, through a mix of channels (the demo family has not)
-    if fam.rn > 1 and random() < 0.72 then
+    if fam.id <> fam_ids[1] and random() < 0.72 then
       insert into public.payments (campus_id, family_id, invoice_id, amount_paisa, mode, reference, receipt_no, received_by, received_at, idempotency_key)
       select v_campus, fam.id, inv, sum(amount_paisa),
              (array['onebill','onebill','raast','jazzcash','easypaisa','cash','cash','bank_deposit'])[1 + floor(random() * 8)::int]::public.payment_mode,
