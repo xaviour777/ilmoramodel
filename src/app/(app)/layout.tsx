@@ -7,6 +7,8 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/principal", label: "Today", icon: "home" },
     { href: "/principal/classes", label: "Classes", icon: "classes" },
     { href: "/principal/exams", label: "Exams", icon: "star" },
+    { href: "/teacher/paper-check", label: "Paper checking", icon: "pencil" },
+    { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
@@ -21,11 +23,19 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher", label: "Attendance", icon: "check" },
     { href: "/teacher/homework", label: "Homework", icon: "book" },
     { href: "/teacher/marks", label: "Marks", icon: "star" },
+    { href: "/teacher/paper-check", label: "Paper checking", icon: "check" },
+    { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
     { href: "/teacher/leave", label: "Leave", icon: "clock" },
   ],
-  parent: [{ href: "/parent", label: "My children", icon: "home" }],
-  student: [{ href: "/student", label: "Home", icon: "home" }],
+  parent: [
+    { href: "/parent", label: "My children", icon: "home" },
+    { href: "/parent/tutor", label: "Homework tutor", icon: "chat" },
+  ],
+  student: [
+    { href: "/student", label: "Home", icon: "home" },
+    { href: "/student/tutor", label: "Homework tutor", icon: "chat" },
+  ],
 };
 NAV.owner = NAV.principal;
 
