@@ -62,7 +62,7 @@ export async function startTutor(formData: FormData) {
   const content = [hw.title, hw.instructions].filter(Boolean).join(". ");
   const subject = (hw.subjects as unknown as { name: string } | null)?.name ?? "General";
   const question = redactPersonalData((str(formData, "question") || content).slice(0, 600));
-  const reply = await getLearningAi().tutorReply({
+  const reply = await (await getLearningAi(supabase)).tutorReply({
     stage: "HINT",
     subject,
     classLevel: kid.sections?.classes.name ?? "school",
@@ -128,7 +128,7 @@ export async function sendTutorMessage(formData: FormData) {
     return save(s.id, s.student_id, { stage: "PRACTICE", attempts: next.attempts, messages, practice });
   }
 
-  const reply = await getLearningAi().tutorReply({
+  const reply = await (await getLearningAi(await createClient())).tutorReply({
     stage: next.stage,
     subject: s.subject_name,
     classLevel: "school",

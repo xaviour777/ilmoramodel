@@ -37,6 +37,7 @@ The rules live in `supabase/migrations/`.
    6. `supabase/migrations/20261030000002_settings_and_profiles.sql` (Settings for WhatsApp and SMS, profile photos)
    7. `supabase/migrations/20261030000003_profiles_board_payroll.sql` (board form fields, staff records, salaries and advances, photos bucket)
    8. `supabase/migrations/20261030000004_absent_dayclose_calls_expenses.sql` (absent alerts, day close, defaulter calls, expense ledger)
+   9. `supabase/migrations/20261030000005_ai_settings_budget.sql` (AI company, key and daily spending limit)
    7. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
@@ -71,7 +72,7 @@ npm run dev
 
 Open http://localhost:3000.
 
-The paper checker and homework tutor use a simple demo AI until you add a key. For real AI marking and tutoring, add `ANTHROPIC_API_KEY=<your key>` to `.env.local` and restart `npm run dev`.
+The paper checker, homework tutor and notice writer use a simple demo AI until AI is turned on in **Settings → AI**. There the principal picks the AI company (Claude, ChatGPT, Gemini, DeepSeek, Qwen, Mistral, Grok or OpenRouter), pastes its key, and sets a daily spending limit. Calls go through the `ai` edge function (`supabase/functions/ai`), which keeps the key away from teachers, students and parents and stops AI for the day once the limit is reached. Deploy it once with `supabase functions deploy ai`.
 
 ### 4. Turn on live updates
 
@@ -125,4 +126,4 @@ src/lib/               Supabase clients, signed-in user, formatting
 - Sending in the background on a schedule (messages go out when someone presses a button: queue, publish or Send waiting)
 - JazzCash / Easypaisa payment callbacks (payments are entered at the desk for now)
 - Urdu interface, offline mode on phones
-- AI notice writer and paper checking use the Demo AI until `ANTHROPIC_API_KEY` is set on the server
+- AI notice writer and paper checking use the Demo AI until AI is turned on in Settings → AI

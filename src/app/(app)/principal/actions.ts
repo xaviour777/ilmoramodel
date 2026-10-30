@@ -447,7 +447,7 @@ export async function draftNotice(idea: string, lang: string): Promise<NoticeDra
   const words = idea.trim().slice(0, 400);
   if (words.length < 4) return { error: "Write a few words about the notice first." };
   try {
-    return await writeNotice(words, lang === "roman_urdu" ? "roman_urdu" : "en", me.campus_name);
+    return await writeNotice(await createClient(), words, lang === "roman_urdu" ? "roman_urdu" : "en", me.campus_name);
   } catch {
     return { error: "The AI could not write it just now. Try again, or write it yourself." };
   }

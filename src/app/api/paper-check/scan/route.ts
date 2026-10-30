@@ -38,14 +38,14 @@ export async function POST(req: Request) {
   const mcq = scoreMcq(test.mcq_key, answers, Number(test.mcq_marks_each));
   const flags = sheetFlags(mcq, { qrMissing: !body.qrRead, blurry: body.blurry });
 
-  const ai = getLearningAi();
+  const ai = await getLearningAi(supabase);
   const written: WrittenAnswer[] = [];
   for (const q of test.questions) {
     const crop = body.crops?.find((c) => c.no === q.no && c.dataUrl.startsWith("data:image/jpeg;base64,") && c.dataUrl.length < MAX_CROP);
     let suggestion: AiSuggestion;
     try {
       suggestion = await ai.suggestWrittenMarks(q, {
-        imageBase64: crop && ai.name === "claude" ? crop.dataUrl.split(",")[1] : null,
+        imageBase64: crop && ai.vision ? crop.dataUrl.split(",")[1] : null,
         transcript: null,
       });
     } catch (err) {

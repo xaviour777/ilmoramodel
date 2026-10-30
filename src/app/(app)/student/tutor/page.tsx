@@ -27,7 +27,7 @@ export default async function TutorPage({ searchParams }: { searchParams: Promis
   ]);
   const session = open && open.student_id === kid.id ? open : null;
   const used = messagesToday(sessions, tutorToday());
-  const demo = getLearningAi().name === "demo";
+  const demo = (await getLearningAi(supabase)).name === "demo";
   const tasks = (homework ?? []) as unknown as { id: string; title: string; instructions: string | null; due_on: string; subjects: { name: string } | null }[];
 
   return (
