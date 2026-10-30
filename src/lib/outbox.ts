@@ -21,7 +21,7 @@ export async function withRecommendations(supabase: Supabase, families: FamilyCo
   for (let i = 0; fees && i < ids.length; i += 150) {
     const batch = ids.slice(i, i + 150);
     const [{ data: msgs }, { data: pays }] = await Promise.all([
-      supabase.from("messages").select("family_id, channel, created_at").in("family_id", batch).eq("kind", "fee_reminder").neq("status", "failed").order("created_at", { ascending: false }),
+      supabase.from("messages").select("family_id, channel, created_at").in("family_id", batch).eq("kind", "fee_reminder").in("status", ["queued", "sent"]).order("created_at", { ascending: false }),
       supabase.from("payments").select("family_id, received_at").in("family_id", batch).order("received_at", { ascending: false }),
     ]);
     for (const m of msgs ?? []) if (!lastReminder.has(m.family_id)) lastReminder.set(m.family_id, m);

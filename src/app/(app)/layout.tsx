@@ -1,6 +1,8 @@
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
+import { Avatar } from "@/components/avatar";
+import Link from "next/link";
 
 const NAV: Record<Role, NavItem[]> = {
   principal: [
@@ -14,6 +16,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin" },
     { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
+    { href: "/settings", label: "Settings", icon: "gear" },
   ],
   owner: [],
   accountant: [
@@ -53,12 +56,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
         <div className="flex items-center justify-between lg:block">
           <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>ilmora</div>
-          <form action={signOut} className="lg:hidden"><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
+          <div className="flex items-center gap-1 lg:hidden">
+            <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
+            <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
+          </div>
         </div>
         <Nav items={NAV[me.role]} />
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
-          {me.full_name}<br />{ROLE_LABEL[me.role]} · {me.campus_name}
-          <form action={signOut}><button className="mt-2 underline" type="submit">Sign out</button></form>
+          <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
+            <Avatar name={me.full_name} url={me.avatar_url} size={40} />
+            <span>{me.full_name}<br />{ROLE_LABEL[me.role]} · {me.campus_name}</span>
+          </Link>
+          <div className="mt-2 flex gap-3"><Link href="/profile" className="underline">My profile</Link><form action={signOut}><button className="underline" type="submit">Sign out</button></form></div>
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col gap-5">{children}</main>
