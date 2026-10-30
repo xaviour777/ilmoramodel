@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Tabs } from "@/components/tabs";
 import { time } from "@/lib/format";
 import {
-  activateTiming, addPeriod, addSection, assignSubjectTeacher, createClass, createSubject,
+  activateTiming, addPeriod, addSection, addStandardClasses, assignSubjectTeacher, createClass, createSubject,
   createTimingProfile, deletePeriod, setClassTeacher, setSlot,
 } from "../actions";
 
@@ -85,6 +85,11 @@ async function ClassesTab() {
         </div>
       </section>
       <div className="flex flex-1 flex-col gap-5">
+        <form action={addStandardClasses} className="card">
+          <h2 className="h2">Class 1 to Class 10</h2>
+          <p className="muted">Adds the classes from 1 to 10 that aren&apos;t here yet, each with section A. Classes you already have stay as they are.</p>
+          <button className="btn-ghost" type="submit">Add Class 1 to 10</button>
+        </form>
         <form action={createClass} className="card">
           <h2 className="h2">Add a class</h2>
           <label className="field">Class name<input className="input" name="name" required placeholder="Class 11 (FSc Pre-Medical)" /></label>
