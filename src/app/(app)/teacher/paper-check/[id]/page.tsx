@@ -67,12 +67,13 @@ export default async function PaperTestPage({ params, searchParams }: { params: 
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href={`/print/paper-check/${id}`} target="_blank" className="btn btn-ghost">Print answer sheets</Link>
+          {(test.mcq_questions.length > 0 || test.questions.length > 0) && <Link href={`/print/paper-check/${id}/questions`} target="_blank" className="btn btn-ghost">Print question paper</Link>}
           {open && <Link href={`${base}/scan`} className="btn">Scan papers</Link>}
           {open && (
             <form action={submitTest}>
               <input type="hidden" name="test_id" value={id} />
               <button className="btn btn-ghost" type="submit" disabled={counts.done < counts.total}>
-                {counts.done < counts.total ? `${counts.total - counts.done} papers left` : "Send to principal"}
+                {counts.done < counts.total ? `${counts.total - counts.done} papers left` : test.auto_publish && !test.exam_id ? "Publish result" : "Send to principal"}
               </button>
             </form>
           )}

@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { mobilePK } from "@/lib/messages";
-import { BOARD_GROUPS, cnic } from "@/lib/board-form";
+import { BOARD_GROUPS, BOARD_ROW_COLS, boardMissing, cnic, missingForParent, type BoardRow } from "@/lib/board-form";
+import { allRows, queueForFamilies, type FamilyContact } from "@/lib/outbox";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const office = () => requireRole("principal", "owner", "accountant");
@@ -102,4 +103,68 @@ export async function savePhoto(kind: string, id: string, url: string | null) {
     ? await supabase.from("profiles").update({ avatar_url: url }).eq("id", id)
     : await supabase.from("students").update({ photo_url: url }).eq("id", id);
   return { error: error?.message ?? null };
+}
+
+// ---------- Board registration for a whole class ----------
+const boardPage = (classId: string, q: string) => redirect(`/principal/students/board?class=${classId}&${q}`);
+
+async function classForBoard(supabase: Awaited<ReturnType<typeof createClient>>, classId: string) {
+  const { data: secs } = await supabase.from("sections").select("id").eq("class_id", classId);
+  const ids = (secs ?? []).map((s) => s.id);
+  if (!ids.length) return [];
+  return allRows<BoardRow>((a, b) => supabase.from("students").select(BOARD_ROW_COLS)
+    .in("section_id", ids).eq("status", "enrolled").order("full_name").order("id").range(a, b) as never);
+}
+
+// One WhatsApp/SMS to each family whose child's board form is incomplete, listing what to send.
+export async function askParentsForMissing(f: FormData) {
+  const me = await requireRole("principal", "owner");
+  const supabase = await createClient();
+  const classId = str(f, "class_id");
+  const rows = await classForBoard(supabase, classId);
+  const need = new Map<string, { fam: FamilyContact; lines: string[] }>();
+  for (const r of rows) {
+    const miss = boardMissing(r, r.families?.phone ?? null).filter((m) => m !== "mobile number");
+    if (!miss.length || !r.families) continue;
+    const entry = need.get(r.family_id) ?? {
+      fam: { id: r.family_id, name: r.families.name, phone: r.families.phone, reminder_phone: r.families.reminder_phone, reminder_channel: r.families.reminder_channel as FamilyContact["reminder_channel"] },
+      lines: [],
+    };
+    entry.lines.push(`${r.full_name}: ${missingForParent(miss)}`);
+    need.set(r.family_id, entry);
+  }
+  if (!need.size) boardPage(classId, "saved=nothing");
+  const res = await queueForFamilies(supabase, {
+    campusId: me.campus_id, kind: "notice", families: [...need.values()].map((v) => v.fam),
+    text: (fam) => `Assalam-o-Alaikum. Board registration ke liye ye cheezein school office mein jama karwa dein:\n${need.get(fam.id)!.lines.join("\n")}\n${me.campus_name}`,
+  });
+  if (res.error) boardPage(classId, `error=${encodeURIComponent(res.error)}`);
+  revalidatePath("/principal/students/board");
+  boardPage(classId, `asked=${res.queued}&skipped=${res.skipped}`);
+}
+
+// Board registration numbers back from the board: one line per student, "B-form or roll no, registration no".
+export async function importRegNumbers(f: FormData) {
+  await requireRole("principal", "owner");
+  const supabase = await createClient();
+  const classId = str(f, "class_id");
+  const rows = await classForBoard(supabase, classId);
+  const byKey = new Map<string, string>();
+  for (const r of rows) {
+    if (r.b_form) byKey.set(r.b_form.replace(/\D/g, ""), r.id);
+    if (r.roll_no) byKey.set(`roll:${r.roll_no.trim().toLowerCase()}`, r.id);
+  }
+  let saved = 0;
+  const unknown: string[] = [];
+  for (const line of str(f, "lines").split(/\r?\n/)) {
+    const [who, reg] = line.split(/[,\t;]/).map((x) => x.trim());
+    if (!who || !reg) continue;
+    const id = byKey.get(who.replace(/\D/g, "").length === 13 ? who.replace(/\D/g, "") : `roll:${who.toLowerCase()}`);
+    if (!id) { unknown.push(who); continue; }
+    const { error } = await supabase.from("students").update({ board_reg_no: reg }).eq("id", id);
+    if (error) boardPage(classId, `error=${encodeURIComponent(error.message)}`);
+    saved++;
+  }
+  revalidatePath("/principal/students/board");
+  boardPage(classId, `imported=${saved}${unknown.length ? `&error=${encodeURIComponent(`Not found in this class: ${unknown.slice(0, 10).join(", ")}`)}` : ""}`);
 }

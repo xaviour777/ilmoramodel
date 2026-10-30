@@ -5,6 +5,7 @@ import { checkableSections } from "@/lib/paper-check/data";
 import { MAX_WRITTEN } from "@/lib/paper-check/layout";
 import { todayPK } from "@/lib/format";
 import { createPaperTest } from "../actions";
+import { AiQuizHelper } from "@/components/ai-quiz-helper";
 
 type Search = { section?: string; error?: string };
 
@@ -30,7 +31,7 @@ export default async function NewPaperTestPage({ searchParams }: { searchParams:
       <div>
         <Link href="/teacher/paper-check" className="muted text-sm underline">Paper checking</Link>
         <h1 className="h1">New test</h1>
-        <p className="muted text-base">Type the MCQ answer key and, for written questions, what earns marks. Each student gets a sheet with their own QR code.</p>
+        <p className="muted text-base">Let AI draft the questions, or type them yourself: the MCQ answer key and, for written questions, what earns marks. Each student gets a sheet with their own QR code.</p>
       </div>
       <section className="card">
         <div className="flex flex-wrap gap-2">{sections.map((s) => (
@@ -41,7 +42,9 @@ export default async function NewPaperTestPage({ searchParams }: { searchParams:
         ) : subjects.length === 0 ? (
           <p className="muted">{section.label} has no subjects yet. Ask the principal to add subjects on the Classes page.</p>
         ) : (
-          <form action={createPaperTest} className="flex flex-col gap-3">
+          <>
+          <AiQuizHelper formId="new-test" className={section.label} />
+          <form id="new-test" action={createPaperTest} className="flex flex-col gap-3">
             <input type="hidden" name="section_id" value={section.id} />
             {sp.error && <div className="notice-bad">{sp.error}</div>}
             <div className="grid gap-3 sm:grid-cols-2">
@@ -64,6 +67,9 @@ export default async function NewPaperTestPage({ searchParams }: { searchParams:
             <label className="field">Answer key, one letter per question
               <input className="input font-mono uppercase tracking-widest" name="mcq_key" placeholder="ACBDA BCDAB" autoComplete="off" />
             </label>
+            <label className="field">MCQ questions (optional, to print the question paper): the question on one line, then one line per option
+              <textarea className="input min-h-40 font-mono text-sm" name="mcq_questions" placeholder={"1. What is the SI unit of force?\nA) Joule\nB) Newton\nC) Watt\nD) Pascal"} />
+            </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="field">Options per MCQ
                 <select className="input" name="options_per_mcq" defaultValue="4">
@@ -83,8 +89,10 @@ export default async function NewPaperTestPage({ searchParams }: { searchParams:
                 <label className="field">Topic<input className="input" name={`q${n}_topic`} placeholder={n === 1 ? "Ch 3" : ""} /></label>
               </div>
             ))}
+            <label className="flex items-center gap-2.5 text-sm font-extrabold"><input type="checkbox" name="auto_publish" className="h-5 w-5" defaultChecked /> Quick quiz: show the result to students and parents as soon as I finish checking (not for tests that add marks to an exam)</label>
             <button className="btn self-end" type="submit">Create test</button>
           </form>
+          </>
         )}
       </section>
     </>

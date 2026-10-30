@@ -80,7 +80,7 @@ const MARKING_SCHEMA = {
 };
 
 export type AiRequest = {
-  feature: "tutor" | "marks" | "notice";
+  feature: "tutor" | "marks" | "notice" | "quiz";
   system?: string;
   messages: { role: "user" | "assistant"; text: string }[];
   image?: string | null;

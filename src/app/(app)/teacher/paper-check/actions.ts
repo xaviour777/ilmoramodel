@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getMe } from "@/lib/me";
+import { getMe, requireRole } from "@/lib/me";
 import { MAX_MCQ, MAX_WRITTEN, OPTION_LETTERS } from "@/lib/paper-check/layout";
 import { scoreMcq, type McqAnswer } from "@/lib/paper-check/omr";
 import { decideAnswer, parseRubricLine, validateQuestions, type WrittenAnswer, type WrittenQuestion } from "@/lib/paper-check/rubric";
 import { loadSheets, loadTest, maxMarksOf, settleSheet } from "@/lib/paper-check/data";
+import { draftQuiz, parseMcqText, type QuizAsk, type QuizDraft } from "@/lib/paper-check/quiz";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
+const checked = (f: FormData, k: string) => f.get(k) === "on";
 const back = (path: string, msg: string): never => redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
 
 export async function createPaperTest(formData: FormData) {
@@ -40,6 +42,12 @@ export async function createPaperTest(formData: FormData) {
       rubric: rubricLine ? parseRubricLine(rubricLine) : [{ point: "Correct answer", marks: maxMarks }],
     });
   }
+  const mcqQuestions = parseMcqText(str(formData, "mcq_questions"));
+  if (mcqQuestions.length && mcqQuestions.length !== key.length) {
+    back(here, `There are ${mcqQuestions.length} MCQ questions but ${key.length} answers in the key. Make them the same.`);
+  }
+  const badOptions = mcqQuestions.findIndex((m) => m.options.length !== options);
+  if (badOptions >= 0) back(here, `MCQ ${badOptions + 1} needs ${options} options (${allowed.join(", ")}), one per line.`);
   const errors = validateQuestions(questions);
   if (errors.length) back(here, errors.join(" "));
   if (key.length === 0 && questions.length === 0) back(here, "Add MCQ answers or at least one written question.");
@@ -67,6 +75,9 @@ export async function createPaperTest(formData: FormData) {
       mcq_marks_each: marksEach,
       options_per_mcq: options,
       questions,
+      mcq_questions: mcqQuestions,
+      // a quiz that adds no marks to an exam may show its result to families as soon as it is checked
+      auto_publish: checked(formData, "auto_publish") && !examId,
       created_by: me.id,
     })
     .select("id")
@@ -173,10 +184,13 @@ export async function markAbsent(formData: FormData) {
 export async function submitTest(formData: FormData) {
   const supabase = await createClient();
   const id = str(formData, "test_id");
-  const { error } = await supabase.from("paper_tests").update({ status: "submitted" }).eq("id", id).eq("status", "checking");
+  const { data: t } = await supabase.from("paper_tests").select("auto_publish, exam_id").eq("id", id).maybeSingle();
+  // a quick quiz goes straight to students and parents; anything else waits for the principal
+  const publish = !!t?.auto_publish && !t.exam_id;
+  const { error } = await supabase.from("paper_tests").update({ status: publish ? "approved" : "submitted" }).eq("id", id).eq("status", "checking");
   if (error) back(`/teacher/paper-check/${id}`, error.message);
   revalidatePath(`/teacher/paper-check/${id}`);
-  redirect(`/teacher/paper-check/${id}?saved=submitted`);
+  redirect(`/teacher/paper-check/${id}?saved=${publish ? "approved" : "submitted"}`);
 }
 
 /** Principal approves: students and parents can now see the result, and a linked exam gets the marks. */
@@ -207,4 +221,25 @@ export async function approveTest(formData: FormData) {
   }
   revalidatePath(page);
   redirect(`${page}?saved=approved`);
+}
+
+/** Drafts a quiz with the school's AI for the teacher to read and edit before saving. */
+export async function suggestQuiz(a: QuizAsk): Promise<QuizDraft | { error: string }> {
+  await requireRole("teacher", "principal", "owner");
+  const ask: QuizAsk = {
+    subject: String(a.subject).slice(0, 80),
+    className: String(a.className).slice(0, 40),
+    topic: String(a.topic).trim().slice(0, 300),
+    mcqCount: Math.max(0, Math.min(MAX_MCQ, Math.floor(Number(a.mcqCount) || 0))),
+    writtenCount: Math.max(0, Math.min(MAX_WRITTEN, Math.floor(Number(a.writtenCount) || 0))),
+    options: Math.max(3, Math.min(5, Math.floor(Number(a.options) || 4))),
+    language: a.language === "ur" ? "ur" : "en",
+  };
+  if (ask.topic.length < 3) return { error: "Write the chapter or topic first." };
+  if (!ask.mcqCount && !ask.writtenCount) return { error: "Ask for at least one question." };
+  try {
+    return await draftQuiz(await createClient(), ask);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "The AI could not make the quiz just now." };
+  }
 }
