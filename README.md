@@ -8,9 +8,9 @@ Built with **Next.js 15** (App Router, server actions) and **Supabase** (Postgre
 
 | Role | Screens |
 | --- | --- |
-| Principal / owner | Live "Today" dashboard · classes, sections, subjects, class and subject teachers · bell timings (summer, winter, Ramadan) · weekly timetable with clash check · terms, tests and exams, date sheets, publish results · leave approvals and substitutes · admissions pipeline (with each family's reminder number and WhatsApp or SMS choice) · notices sent in the app and to parents' WhatsApp or SMS · holiday calendar · Class 1 to 10 in one tap · fee desk |
+| Principal / owner | Live "Today" dashboard with a "Do these first" list · student list and profiles (search by name, roll, B-form or parent phone) · classes, sections, subjects, class and subject teachers · bell timings (summer, winter, Ramadan) · weekly timetable with clash check · terms, tests and exams, date sheets, publish results · staff attendance, leave approvals and substitutes · school year: session, terms, grade bands, moving classes up · printable report cards (one student or a whole section) · AI notice writer · admissions pipeline (with each family's reminder number and WhatsApp or SMS choice) · notices sent in the app and to parents' WhatsApp or SMS · holiday calendar · Class 1 to 10 in one tap · fee desk |
 | Teacher | Mark attendance (P / A / L / leave) · homework tasks with submission progress · marks entry · lesson diary · praise and concern notes · leave requests · AI paper checking · homework tutor report |
-| Accountant | Fee desk: find a family, see the challan, take payment by Cash, JazzCash or Easypaisa · fee reminders on WhatsApp or SMS, with the channel Ilmora suggests for each family · largest balances · admissions |
+| Accountant | Fee setup per class and head, monthly challans for every family in one tap (sibling concession, earlier dues carried), 3-copy A4 challan print · fee desk: find a family, see the challan, take payment by Cash, JazzCash or Easypaisa · fee reminders on WhatsApp or SMS, with the channel Ilmora suggests for each family · largest balances · admissions |
 | Parent | Each child's attendance today and last 30 days · homework due · published results · teacher notes · fee balance · notices · homework tutor and weekly tutor summary |
 | Student | Own attendance, homework, results and notices · homework tutor ("Samjhao") |
 
@@ -122,4 +122,5 @@ src/lib/               Supabase clients, signed-in user, formatting
 - Phone OTP login (email and password for now; Supabase supports SMS OTP once an SMS provider is connected)
 - Sending in the background on a schedule (messages go out when someone presses a button: queue, publish or Send waiting)
 - JazzCash / Easypaisa payment callbacks (payments are entered at the desk for now)
-- Report card PDFs, Urdu interface, offline mode on phones, monthly challan generation screen
+- Urdu interface, offline mode on phones
+- AI notice writer and paper checking use the Demo AI until `ANTHROPIC_API_KEY` is set on the server

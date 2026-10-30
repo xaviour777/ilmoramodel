@@ -14,7 +14,8 @@ export default async function PrincipalToday() {
   const monthStart = today.slice(0, 8) + "01";
   const since = new Date(Date.parse(today) - 20 * 86400000).toISOString().slice(0, 10);
 
-  const [days, sections, sectionToday, students, invoices, leave, admissions, absences, notices] = await Promise.all([
+  const weekAhead = new Date(Date.parse(today) + 7 * 86400000).toISOString().slice(0, 10);
+  const [days, sections, sectionToday, students, invoices, leave, admissions, absences, notices, staffMarked, nextHoliday, owing] = await Promise.all([
     supabase.from("attendance_by_day").select("date, rate, marked, present").gte("date", since).order("date"),
     supabase.from("sections").select("id, name, classes(name, sort)"),
     supabase.from("attendance_by_section_day").select("section_id, present, marked").eq("date", today),
@@ -24,6 +25,9 @@ export default async function PrincipalToday() {
     supabase.from("admissions").select("id", { count: "exact", head: true }).in("status", ["inquiry", "test", "offered"]),
     supabase.from("attendance").select("student_id, students(full_name, sections(name, classes(name)))").eq("status", "absent").gte("date", since),
     supabase.from("notices").select("id, title, created_at").order("created_at", { ascending: false }).limit(3),
+    supabase.from("staff_attendance").select("id", { count: "exact", head: true }).eq("date", today),
+    supabase.from("holidays").select("title, starts_on").gt("starts_on", today).lte("starts_on", weekAhead).order("starts_on").limit(1).maybeSingle(),
+    supabase.from("family_balances").select("family_id", { count: "exact", head: true }).gt("balance_paisa", 0),
   ]);
 
   // attendance
@@ -71,6 +75,17 @@ export default async function PrincipalToday() {
     ? `No class has marked attendance yet today. ${pct(feeRate)} of this month's fees are in.`
     : `Attendance is ${pct(rateToday, 1)} so far, with ${unmarked} section${unmarked === 1 ? "" : "s"} still to mark. ${pct(feeRate)} of this month's fees are in.`;
 
+  // the morning list: what needs the principal first, most urgent on top
+  const todo: { text: string; href: string }[] = [];
+  if (markedToday > 0 && unmarked > 0) todo.push({ text: `${unmarked} section${unmarked === 1 ? " hasn't" : "s haven't"} marked attendance yet`, href: "/principal" });
+  if (!staffMarked.count) todo.push({ text: "Staff attendance isn't marked for today", href: "/principal/staff" });
+  if (leave.count) todo.push({ text: `${leave.count} leave request${leave.count === 1 ? "" : "s"} waiting`, href: "/principal/staff" });
+  if (atRisk.length) todo.push({ text: `Call the parents of ${atRisk.length} student${atRisk.length === 1 ? "" : "s"} absent 3 or more times`, href: "/principal/students" });
+  if ((invoices.data ?? []).length === 0) todo.push({ text: "This month's fee challans aren't made yet", href: "/accounts/setup" });
+  else if (owing.count) todo.push({ text: `${owing.count} famil${owing.count === 1 ? "y owes" : "ies owe"} fees: send reminders`, href: "/accounts/messages" });
+  if (nextHoliday.data) todo.push({ text: `${nextHoliday.data.title} on ${shortDate(nextHoliday.data.starts_on)}: tell parents`, href: "/principal/notices" });
+  if (admissions.count) todo.push({ text: `${admissions.count} admission${admissions.count === 1 ? "" : "s"} in progress`, href: "/principal/admissions" });
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-2.5">
@@ -84,6 +99,16 @@ export default async function PrincipalToday() {
         <span className="pill pill-gray self-start">{shortDate(today)} · {me.campus_name}</span>
         <h1 className="h1">Assalam-o-Alaikum, {me.full_name.split(" ")[0]}</h1>
         <p className="text-lg">{take}</p>
+        {todo.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <span className="eyebrow">Do these first</span>
+            <ol className="flex flex-col gap-1">
+              {todo.slice(0, 5).map((t, i) => (
+                <li key={t.text}><Link href={t.href} className="flex items-baseline gap-2 font-extrabold hover:underline"><span className="muted tabular-nums">{i + 1}.</span>{t.text}</Link></li>
+              ))}
+            </ol>
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-sm font-extrabold"><span>Daily goal: 90% attendance</span><span>{markedToday ? pct(rateToday, 1) : "—"}</span></div>
           <div className="track h-[18px]"><i style={{ width: `${Math.min(100, rateToday * 100)}%`, background: rateToday && rateToday < GOAL ? "var(--orange)" : undefined }} />

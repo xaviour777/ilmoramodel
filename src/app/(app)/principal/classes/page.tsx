@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
+import { ClassesTabs } from "@/components/classes-tabs";
 import { Tabs } from "@/components/tabs";
 import { time } from "@/lib/format";
 import {
@@ -22,11 +23,7 @@ export default async function ClassesPage({ searchParams }: { searchParams: Prom
           <h1 className="h1">Classes, timings and timetable</h1>
           <p className="muted text-base">Set up the school once a year. Teachers and parents see the changes straight away.</p>
         </div>
-        <Tabs current={tab} tabs={[
-          { id: "classes", label: "Classes", href: "/principal/classes" },
-          { id: "timings", label: "Timings", href: "/principal/classes?tab=timings" },
-          { id: "timetable", label: "Timetable", href: "/principal/classes?tab=timetable" },
-        ]} />
+        <ClassesTabs current={tab} />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}

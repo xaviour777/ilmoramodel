@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, todayPK } from "@/lib/format";
+import { NoticeWriter } from "@/components/notice-writer";
 import { addHoliday, addPublicHolidays, createNotice, deleteHoliday, deleteNotice } from "../actions";
 
 const AUD: Record<string, string> = { everyone: "Everyone", staff: "Staff only", parents: "Parents and students", class: "One class", section: "One section" };
@@ -135,6 +136,7 @@ export default async function NoticesPage({ searchParams }: { searchParams: Prom
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         <form action={createNotice} className="card xl:w-[420px]">
           <h2 className="h2">New notice</h2>
+          <NoticeWriter />
           <label className="field">Title<input className="input" name="title" required placeholder="School closed tomorrow due to smog" /></label>
           <label className="field">Message<textarea className="input min-h-28 py-3" name="body" required /></label>
           <label className="field">Who sees it<select className="input" name="audience">{Object.entries(AUD).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>

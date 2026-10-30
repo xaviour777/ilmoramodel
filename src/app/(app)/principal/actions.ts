@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/me";
 import { mobilePK, noticeText } from "@/lib/messages";
 import { familiesForAudience, queueForFamilies } from "@/lib/outbox";
 import { deliverQueued } from "@/lib/deliver";
+import { writeNotice, type NoticeDraft } from "@/lib/notice-writer";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const back = (path: string, error?: string, ok?: string): never => {
@@ -186,6 +187,19 @@ export async function assignSubstitute(f: FormData) {
     absent_teacher_id: str(f, "absent_teacher_id") || null, substitute_id: str(f, "substitute_id") || null, created_by: me.id,
   }, { onConflict: "date,timetable_slot_id" });
   back("/principal/staff", error?.message, "sub");
+}
+
+// One tap per staff member: present, late, absent or on leave for the day.
+export async function saveStaffAttendance(f: FormData) {
+  const me = await admin();
+  const supabase = await createClient();
+  const date = str(f, "date");
+  const rows = [...f.entries()]
+    .filter(([k, v]) => k.startsWith("st:") && ["present", "absent", "late", "leave"].includes(String(v)))
+    .map(([k, v]) => ({ campus_id: me.campus_id, profile_id: k.slice(3), date, status: String(v) }));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || rows.length === 0) back("/principal/staff", "Mark at least one person.");
+  const { error } = await supabase.from("staff_attendance").upsert(rows, { onConflict: "profile_id,date" });
+  back(`/principal/staff?date=${date}`, error?.message, "attendance");
 }
 
 export async function addStaff(f: FormData) {
@@ -369,4 +383,16 @@ export async function addStandardClasses(f: FormData) {
   if (error) return back(path, error.message);
   const { error: e2 } = await supabase.from("sections").insert((made ?? []).map((c) => ({ campus_id: me.campus_id, class_id: c.id, name: "A", capacity: 40 })));
   back(path, e2?.message, "classes");
+}
+
+// ---------- AI notice writer ----------
+export async function draftNotice(idea: string, lang: string): Promise<NoticeDraft | { error: string }> {
+  const me = await admin();
+  const words = idea.trim().slice(0, 400);
+  if (words.length < 4) return { error: "Write a few words about the notice first." };
+  try {
+    return await writeNotice(words, lang === "roman_urdu" ? "roman_urdu" : "en", me.campus_name);
+  } catch {
+    return { error: "The AI could not write it just now. Try again, or write it yourself." };
+  }
 }

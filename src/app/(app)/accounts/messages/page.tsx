@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { SendButton } from "@/components/send-button";
+import { FeesTabs } from "@/components/fees-tabs";
 import { SettingsTabs } from "@/components/settings-tabs";
 import { CHANNEL_LABEL, SWITCH_AFTER_DAYS, showPhone, type Channel } from "@/lib/messages";
 import { allRows, familiesByIds, withRecommendations } from "@/lib/outbox";
@@ -39,7 +40,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
           <h1 className="h1">WhatsApp and SMS</h1>
           <p className="muted text-base">Fee reminders and notices that go to parents&apos; phones, so they get them even if they never open the app.</p>
         </div>
-        {admin && <SettingsTabs current="messages" />}
+        {admin ? <SettingsTabs current="messages" /> : <FeesTabs current="messages" />}
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.queued && <div className="notice-ok">{sp.queued} reminders are in the outbox.{Number(sp.skipped) > 0 ? ` ${sp.skipped} families were skipped: no mobile number, or reminded in the last ${SWITCH_AFTER_DAYS} days.` : ""}</div>}
