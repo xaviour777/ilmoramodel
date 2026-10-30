@@ -41,3 +41,22 @@ export function boardMissing(s: BoardStudent, phone: string | null) {
 }
 
 export const BOARD_COLS = "id, full_name, roll_no, admission_no, father_name, father_cnic, mother_name, b_form, date_of_birth, gender, religion, nationality, address, photo_url, board_group, board_reg_no, hafiz_quran, disability, identification_mark, previous_school, families(phone)";
+
+// Every studying student of one class (all its sections), with the board fields, for the board tab.
+export type BoardRow = BoardStudent & {
+  id: string; roll_no: string | null; admission_no: string | null; board_reg_no: string | null; family_id: string;
+  families: { name: string; phone: string | null; reminder_phone: string | null; reminder_channel: string } | null;
+  sections: { name: string } | null;
+};
+export const BOARD_ROW_COLS = "id, full_name, roll_no, admission_no, father_name, father_cnic, b_form, date_of_birth, gender, religion, nationality, address, photo_url, board_group, board_reg_no, family_id, families(name, phone, reminder_phone, reminder_channel), sections(name)";
+
+// The words a parent reads in the "please send" message.
+export function missingForParent(m: string[]) {
+  const ur: Record<string, string> = {
+    "father's name": "walid ka naam", "father's CNIC": "walid ka CNIC", "father's CNIC (13 digits)": "walid ka sahi CNIC (13 hindsay)",
+    "B-form": "bachay ka B-form number", "B-form (13 digits)": "sahi B-form number (13 hindsay)", "date of birth": "tareekh-e-paidaish",
+    gender: "jins", religion: "mazhab", nationality: "qaumiyat", "mobile number": "mobile number", address: "ghar ka pata",
+    photo: "passport size photo (neela background)", group: "group (Biology ya Computer)", name: "poora naam",
+  };
+  return m.map((x) => ur[x] ?? x).join(", ");
+}
