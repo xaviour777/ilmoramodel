@@ -48,7 +48,8 @@ export function BoardPhotosZip({ photos, fileName }: { photos: { name: string; u
       try {
         const res = await fetch(p.url);
         if (!res.ok) throw new Error();
-        const ext = (res.headers.get("content-type") ?? "").includes("png") ? "png" : "jpg";
+        const type = res.headers.get("content-type") ?? "";
+        const ext = type.includes("png") ? "png" : type.includes("svg") ? "svg" : "jpg";
         files.push({ name: `${p.name}.${ext}`, data: new Uint8Array(await res.arrayBuffer()) });
       } catch {
         failed++;

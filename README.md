@@ -38,7 +38,9 @@ The rules live in `supabase/migrations/`.
    7. `supabase/migrations/20261030000003_profiles_board_payroll.sql` (board form fields, staff records, salaries and advances, photos bucket)
    8. `supabase/migrations/20261030000004_absent_dayclose_calls_expenses.sql` (absent alerts, day close, defaulter calls, expense ledger)
    9. `supabase/migrations/20261030000005_ai_settings_budget.sql` (AI company, key and daily spending limit)
-   7. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   10. `supabase/migrations/20261031000001_quiz_questions_auto_publish.sql` (quiz questions for the printed paper, quick quizzes published straight to families)
+   11. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   12. optional: `supabase/seed_journey.sql` (adds Class 5 to 7 and a full Class 9 of 200 for board registration, and Ali Raza's story from admission into Class 9 to Class 10; runs once)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 
@@ -114,6 +116,7 @@ Everyone has **My profile** (click your name in the sidebar): photo (cropped and
 ```
 supabase/migrations/   tables, security rules, money triggers, report views
 supabase/seed.sql      dummy school data (safe to re-run)
+supabase/seed_journey.sql  bigger demo on top of seed.sql (runs once)
 scripts/               demo login creator
 src/app/(app)/         pages for each role (principal, teacher, accounts, parent, student)
 src/components/        navigation, live refresh, shared pieces
