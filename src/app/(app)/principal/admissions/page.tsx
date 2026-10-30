@@ -54,8 +54,10 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                       <button className="btn-ghost min-h-10 px-3 text-xs" type="submit">{c.next[1]}</button>
                     </form>
                   )}
-                  {c.id === "offered" && (
-                    <form action={admitStudent} className="flex flex-col gap-2">
+                  {c.id !== "admitted" && (
+                    <details className="flex flex-col gap-2" open={c.id === "offered"}>
+                      <summary className="eyebrow cursor-pointer">{c.id === "offered" ? "Admit" : "Admit now"}</summary>
+                      <form action={admitStudent} className="mt-2 flex flex-col gap-2">
                       <input type="hidden" name="admission_id" value={a.id} />
                       <div className="flex gap-2">
                         <select className="input min-h-10 flex-1 py-1 text-sm" name="section_id" required aria-label="Section">
@@ -63,8 +65,11 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                         </select>
                         <input className="input min-h-10 w-20 py-1 text-sm" name="roll_no" placeholder="Roll" aria-label="Roll number" />
                       </div>
+                      <input className="input min-h-10 py-1 text-sm" name="admission_no" placeholder="Admission no" aria-label="Admission number" />
+                      <label className="flex items-center gap-2 text-xs font-extrabold"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
                       <button className="btn min-h-10 text-sm" type="submit">Admit</button>
-                    </form>
+                      </form>
+                    </details>
                   )}
                   {c.id !== "admitted" && (
                     <form action={moveAdmission}><input type="hidden" name="admission_id" value={a.id} /><input type="hidden" name="status" value="declined" />
@@ -82,7 +87,8 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
           <label className="field">Child&apos;s name<input className="input" name="child_name" required /></label>
           <label className="field">Parent or guardian<input className="input" name="guardian_name" required /></label>
           <label className="field">Phone<input className="input" name="phone" required inputMode="tel" placeholder="03001234567" /></label>
-          <label className="field">Class applying for<select className="input" name="class_id"><option value="">Not sure yet</option>{(classes ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+          <label className="field">Class applying for<select className="input" name="class_id"><option value="">Not sure yet</option>{(classes ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+            <span className="muted text-xs font-semibold">Class missing? Add it in <a href="/principal/classes" className="underline">Classes</a>.</span></label>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="field">Number for fee reminders and notices<input className="input" name="reminder_phone" inputMode="tel" placeholder="Leave empty to use the phone above" /></label>
@@ -93,6 +99,18 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
           </label>
         </div>
         <label className="field">Notes<input className="input" name="notes" placeholder="Walk-in, sibling already here" /></label>
+        <details>
+          <summary className="eyebrow cursor-pointer">More details (fills the student record and the board form)</summary>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <label className="field">Child&apos;s B-form no<input className="input" name="b_form" placeholder="35202-1234567-1" /></label>
+            <label className="field">Father&apos;s CNIC<input className="input" name="father_cnic" placeholder="35202-1234567-1" /></label>
+            <label className="field">Date of birth<input className="input" type="date" name="date_of_birth" /></label>
+            <label className="field">Gender<select className="input" name="gender" defaultValue=""><option value="">Not set</option><option value="male">Boy</option><option value="female">Girl</option></select></label>
+            <label className="field">Previous school<input className="input" name="previous_school" /></label>
+            <label className="field">Last class passed<input className="input" name="last_class_passed" placeholder="Class 5" /></label>
+          </div>
+          <label className="field mt-3">Home address<input className="input" name="address" /></label>
+        </details>
         <button className="btn self-start" type="submit">Add inquiry</button>
       </form>
     </>

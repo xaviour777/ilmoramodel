@@ -36,7 +36,7 @@ export default async function FeeSetupPage({ searchParams }: { searchParams: Pro
           <h1 className="h1">Fees and challans</h1>
           <p className="muted text-base">Set each class&apos;s fee once, then make every family&apos;s challan for the month with one button.</p>
         </div>
-        <FeesTabs current="setup" />
+        <FeesTabs current="setup" salaries={me.role === "accountant"} />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}

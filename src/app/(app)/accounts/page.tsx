@@ -14,7 +14,7 @@ import { recordPayment, setReminderContact } from "./actions";
 const MODES = [["cash", "Cash"], ["jazzcash", "JazzCash"], ["easypaisa", "Easypaisa"]];
 const MODE_LABEL: Record<string, string> = { cash: "Cash", jazzcash: "JazzCash", easypaisa: "Easypaisa", cheque: "Cheque", bank_deposit: "Bank deposit", onebill: "1Bill", raast: "Raast", card: "Card" };
 
-export default async function FeeDesk({ searchParams }: { searchParams: Promise<{ q?: string; family?: string; saved?: string; error?: string }> }) {
+export default async function FeeDesk({ searchParams }: { searchParams: Promise<{ q?: string; family?: string; saved?: string; error?: string; receipt?: string }> }) {
   const me = await requireRole("accountant", "principal", "owner");
   const sp = await searchParams;
   const supabase = await createClient();
@@ -49,6 +49,10 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
   }
   const { data: kids } = family ? await supabase.from("students").select("full_name, sections(name, classes(name))").eq("family_id", family.id) : { data: [] };
   const rec = family ? (await withRecommendations(supabase, [family], true))[0].rec : null;
+  const justPaid = sp.receipt ? history.find((p) => p.id === sp.receipt) : undefined;
+  const receiptText = justPaid && family
+    ? `${me.campus_name}: received ${rupees(Number(justPaid.amount_paisa))} from ${family.name} by ${MODE_LABEL[justPaid.mode] ?? justPaid.mode} on ${new Date(justPaid.received_at).toLocaleDateString("en-GB", { timeZone: "Asia/Karachi" })}. Receipt ${justPaid.receipt_no ?? ""}. ${balance > 0 ? `Still due: ${rupees(balance)}.` : "Nothing is due now."} Thank you.`
+    : null;
   const reminder = family && balance > 0
     ? feeReminderText({ familyName: family.name, balancePaisa: balance, dueOn: invoice?.due_on ?? null, campus: me.campus_name })
     : "";
@@ -58,7 +62,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
         <div className="flex items-center gap-3">
-          <FeesTabs current="desk" />
+          <FeesTabs current="desk" salaries={me.role === "accountant"} />
           <LiveRefresh tables={["payments"]} />
         </div>
       </div>
@@ -78,7 +82,13 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
             <Link key={r.id} href={`/accounts?family=${r.id}`} className="row-box hover:border-[var(--blue-ring)]"><b className="flex-1">{r.name}</b><span className="muted">{r.phone}</span></Link>
           ))}
           {sp.saved === "contact" && <div className="notice-ok">Reminder number saved.</div>}
-          {sp.saved && sp.saved !== "contact" && <div className="notice-ok">Payment saved.</div>}
+          {sp.saved && sp.saved !== "contact" && (
+            <div className="notice-ok flex flex-wrap items-center gap-2">
+              <span className="flex-1">Payment saved.</span>
+              {sp.receipt && <Link href={`/print/receipt/${sp.receipt}`} target="_blank" className="btn-ghost min-h-10 px-3 text-sm">Print receipt</Link>}
+              {sp.receipt && receiptText && rec?.phone && <SendButton channel="whatsapp" phone={rec.phone} body={receiptText} kind="receipt" familyId={family?.id} label="Receipt on WhatsApp" />}
+            </div>
+          )}
           {sp.error && <div className="notice-bad">{sp.error}</div>}
           {family && (
             <>
@@ -153,7 +163,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
               )}
               {history.length > 0 && <h3 className="font-black">Recent payments</h3>}
               {history.map((p) => (
-                <div key={p.id} className="flex justify-between text-sm font-bold"><span>{new Date(p.received_at).toLocaleDateString("en-GB", { timeZone: "Asia/Karachi" })} · {MODE_LABEL[p.mode] ?? p.mode} {p.receipt_no ?? ""}</span><span>{rupees(Number(p.amount_paisa))}</span></div>
+                <div key={p.id} className="flex justify-between text-sm font-bold"><span>{new Date(p.received_at).toLocaleDateString("en-GB", { timeZone: "Asia/Karachi" })} · {MODE_LABEL[p.mode] ?? p.mode} {p.receipt_no ?? ""} · <Link href={`/print/receipt/${p.id}`} target="_blank" className="underline">receipt</Link></span><span>{rupees(Number(p.amount_paisa))}</span></div>
               ))}
             </>
           )}

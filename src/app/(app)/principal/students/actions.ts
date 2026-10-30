@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { mobilePK } from "@/lib/messages";
+import { BOARD_GROUPS, cnic } from "@/lib/board-form";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const office = () => requireRole("principal", "owner", "accountant");
@@ -43,7 +44,7 @@ export async function saveStudent(f: FormData) {
   const status = STATUSES.includes(str(f, "status")) ? str(f, "status") : "enrolled";
   const { error } = await supabase.from("students").update({
     full_name: str(f, "full_name"), roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null,
-    b_form: str(f, "b_form") || null, gender: str(f, "gender") || null, date_of_birth: str(f, "date_of_birth") || null,
+    gender: str(f, "gender") || null, date_of_birth: str(f, "date_of_birth") || null,
     section_id: str(f, "section_id") || null, status,
   }).eq("id", id);
   if (error) redirect(`${back}?error=${encodeURIComponent(error.message)}`);
@@ -66,4 +67,39 @@ export async function saveFamily(f: FormData) {
   if (error) redirect(`${back}?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/principal/students");
   redirect(`${back}?saved=family`);
+}
+
+// Everything the board form and the school record need beyond the basics.
+export async function saveStudentDetails(f: FormData) {
+  await office();
+  const supabase = await createClient();
+  const id = str(f, "student_id");
+  const back = `/principal/students/${id}`;
+  for (const k of ["father_cnic", "b_form"]) {
+    if (str(f, k) && !cnic(str(f, k))) redirect(`${back}?error=${encodeURIComponent(`${k === "b_form" ? "B-form" : "Father's CNIC"} must have 13 digits, like 35202-1234567-1.`)}`);
+  }
+  const { error } = await supabase.from("students").update({
+    father_name: str(f, "father_name") || null, father_cnic: cnic(str(f, "father_cnic")),
+    mother_name: str(f, "mother_name") || null, guardian_occupation: str(f, "guardian_occupation") || null,
+    b_form: cnic(str(f, "b_form")), religion: str(f, "religion") || null, nationality: str(f, "nationality") || "Pakistani",
+    address: str(f, "address") || null, previous_school: str(f, "previous_school") || null,
+    last_class_passed: str(f, "last_class_passed") || null, blood_group: str(f, "blood_group") || null,
+    identification_mark: str(f, "identification_mark") || null, disability: str(f, "disability") || null,
+    hafiz_quran: f.get("hafiz_quran") === "on",
+    board_group: BOARD_GROUPS[str(f, "board_group")] ? str(f, "board_group") : null,
+    board_reg_no: str(f, "board_reg_no") || null,
+  }).eq("id", id);
+  if (error) redirect(`${back}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath(back);
+  redirect(`${back}?saved=details`);
+}
+
+// The office took a photo: kind is "student" or "staff".
+export async function savePhoto(kind: string, id: string, url: string | null) {
+  await office();
+  const supabase = await createClient();
+  const { error } = kind === "staff"
+    ? await supabase.from("profiles").update({ avatar_url: url }).eq("id", id)
+    : await supabase.from("students").update({ photo_url: url }).eq("id", id);
+  return { error: error?.message ?? null };
 }

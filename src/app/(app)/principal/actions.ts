@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/me";
 import { mobilePK, noticeText } from "@/lib/messages";
 import { familiesForAudience, queueForFamilies } from "@/lib/outbox";
 import { deliverQueued } from "@/lib/deliver";
+import { firstChallan } from "@/lib/challan";
 import { writeNotice, type NoticeDraft } from "@/lib/notice-writer";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -42,6 +43,40 @@ export async function addSection(f: FormData) {
   const { error } = await supabase.from("sections").insert({
     campus_id: me.campus_id, class_id: str(f, "class_id"), name: str(f, "name"), capacity: Number(str(f, "capacity")) || 40,
   });
+  back("/principal/classes", error?.message, "section");
+}
+
+export async function editClass(f: FormData) {
+  await admin();
+  const supabase = await createClient();
+  const id = str(f, "class_id");
+  if (f.get("remove") === "1") {
+    const { data: secs } = await supabase.from("sections").select("id").eq("class_id", id);
+    const ids = (secs ?? []).map((x) => x.id);
+    const { count } = ids.length ? await supabase.from("students").select("id", { count: "exact", head: true }).in("section_id", ids) : { count: 0 };
+    if (count) return back("/principal/classes", `This class still has ${count} students. Move them first.`);
+    const { error } = await supabase.from("classes").delete().eq("id", id);
+    return back("/principal/classes", error?.message, "class");
+  }
+  if (!str(f, "name")) return back("/principal/classes", "Give the class a name.");
+  const { error } = await supabase.from("classes")
+    .update({ name: str(f, "name"), board: str(f, "board") || null, sort: Number(str(f, "sort")) || 0 }).eq("id", id);
+  back("/principal/classes", error?.message, "class");
+}
+
+export async function editSection(f: FormData) {
+  await admin();
+  const supabase = await createClient();
+  const id = str(f, "section_id");
+  if (f.get("remove") === "1") {
+    const { count } = await supabase.from("students").select("id", { count: "exact", head: true }).eq("section_id", id);
+    if (count) return back("/principal/classes", `This section still has ${count} students. Move them first.`);
+    const { error } = await supabase.from("sections").delete().eq("id", id);
+    return back("/principal/classes", error?.message, "section");
+  }
+  if (!str(f, "name")) return back("/principal/classes", "Give the section a name.");
+  const { error } = await supabase.from("sections")
+    .update({ name: str(f, "name"), capacity: Number(str(f, "capacity")) || 40 }).eq("id", id);
   back("/principal/classes", error?.message, "section");
 }
 
@@ -205,15 +240,26 @@ export async function saveStaffAttendance(f: FormData) {
 export async function addStaff(f: FormData) {
   const me = await admin();
   const supabase = await createClient();
-  const { error } = await supabase.from("profiles").insert({
+  const { data, error } = await supabase.from("profiles").insert({
     campus_id: me.campus_id, role: str(f, "role"), full_name: str(f, "full_name"),
     phone: str(f, "phone") || null, email: str(f, "email") || null,
-  });
-  back("/principal/staff", error?.message, "staff");
+  }).select("id").single();
+  if (error || !data) return back("/principal/staff", error?.message ?? "Could not add.");
+  // straight to their record, to fill CNIC, education and salary
+  revalidatePath("/principal/staff");
+  redirect(`/principal/staff/${data.id}?saved=new`);
 }
 
 // ---------- Admissions (principal and front office) ----------
 const channelChoice = (f: FormData) => (["whatsapp", "sms"].includes(str(f, "reminder_channel")) ? str(f, "reminder_channel") : "auto");
+
+// Details asked at the first visit; admitting the child copies them to the student record.
+const childDetails = (f: FormData) => ({
+  b_form: str(f, "b_form") || null, father_cnic: str(f, "father_cnic") || null,
+  gender: ["male", "female"].includes(str(f, "gender")) ? str(f, "gender") : null,
+  date_of_birth: str(f, "date_of_birth") || null, address: str(f, "address") || null,
+  previous_school: str(f, "previous_school") || null, last_class_passed: str(f, "last_class_passed") || null,
+});
 
 export async function addInquiry(f: FormData) {
   const me = await requireRole("principal", "owner", "accountant");
@@ -223,7 +269,7 @@ export async function addInquiry(f: FormData) {
   const { error } = await supabase.from("admissions").insert({
     campus_id: me.campus_id, child_name: str(f, "child_name"), guardian_name: str(f, "guardian_name"),
     phone: str(f, "phone"), applying_class_id: str(f, "class_id") || null, notes: str(f, "notes") || null,
-    reminder_phone: reminder || null, reminder_channel: channelChoice(f),
+    reminder_phone: reminder || null, reminder_channel: channelChoice(f), ...childDetails(f),
   });
   back("/principal/admissions", error?.message, "inquiry");
 }
@@ -258,13 +304,23 @@ export async function admitStudent(f: FormData) {
       ...(a.reminder_channel !== "auto" ? { reminder_channel: a.reminder_channel } : {}),
     }).eq("id", fam.id);
   }
+  if (a.address) await supabase.from("families").update({ address: a.address }).eq("id", fam.id).is("address", null);
   const { data: stu, error: e2 } = await supabase.from("students").insert({
     campus_id: me.campus_id, family_id: fam.id, section_id: str(f, "section_id"), full_name: a.child_name,
-    roll_no: str(f, "roll_no") || null,
+    roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null,
+    father_name: a.guardian_name, father_cnic: a.father_cnic, b_form: a.b_form, gender: a.gender, date_of_birth: a.date_of_birth,
+    address: a.address, previous_school: a.previous_school, last_class_passed: a.last_class_passed,
   }).select("id").single();
   if (e2) return back("/principal/admissions", e2.message);
   const { error: e3 } = await supabase.from("admissions").update({ status: "admitted", student_id: stu.id }).eq("id", a.id);
-  back("/principal/admissions", e3?.message, "admitted");
+  if (e3) return back("/principal/admissions", e3.message);
+  if (f.get("first_challan") === "on") {
+    const c = await firstChallan(supabase, me, { familyId: fam.id, studentId: stu.id, studentName: a.child_name, sectionId: str(f, "section_id") });
+    if (c.error) redirect(`/principal/students/${stu.id}?saved=admitted&error=${encodeURIComponent(c.error)}`);
+    redirect(`/principal/students/${stu.id}?saved=admitted&challan=${fam.id}`);
+  }
+  revalidatePath("/principal/admissions");
+  redirect(`/principal/students/${stu.id}?saved=admitted`);
 }
 
 // ---------- Notices ----------
