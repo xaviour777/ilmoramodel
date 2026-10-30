@@ -37,7 +37,7 @@ export default async function ParentHome({ searchParams }: { searchParams: Promi
       <section className="card">
         <div className="flex items-center justify-between"><h2 className="h2">Fees</h2><span className={`pill ${due > 0 ? "pill-orange" : "pill-green"}`}>{due > 0 ? "Due" : "All paid"}</span></div>
         <div className="text-3xl font-black tabular-nums">{rupees(due)}</div>
-        {invoice && <div className="muted">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)} · pay from any banking app with 1Bill, or at the school counter</div>}
+        {invoice && <div className="muted">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)} · pay with JazzCash or Easypaisa, or in cash at the school counter</div>}
       </section>
       {child ? <ChildOverview child={child} /> : <p className="muted">No children linked to your account yet. Please contact the school office.</p>}
       <NoticesList />

@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
+import { mobilePK, noticeText } from "@/lib/messages";
+import { familiesForAudience, queueForFamilies } from "@/lib/outbox";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const back = (path: string, error?: string, ok?: string): never => {
@@ -196,12 +198,17 @@ export async function addStaff(f: FormData) {
 }
 
 // ---------- Admissions (principal and front office) ----------
+const channelChoice = (f: FormData) => (["whatsapp", "sms"].includes(str(f, "reminder_channel")) ? str(f, "reminder_channel") : "auto");
+
 export async function addInquiry(f: FormData) {
   const me = await requireRole("principal", "owner", "accountant");
   const supabase = await createClient();
+  const reminder = str(f, "reminder_phone");
+  if (reminder && !mobilePK(reminder)) return back("/principal/admissions", "The reminder number is not a mobile number. Write it like 03001234567.");
   const { error } = await supabase.from("admissions").insert({
     campus_id: me.campus_id, child_name: str(f, "child_name"), guardian_name: str(f, "guardian_name"),
     phone: str(f, "phone"), applying_class_id: str(f, "class_id") || null, notes: str(f, "notes") || null,
+    reminder_phone: reminder || null, reminder_channel: channelChoice(f),
   });
   back("/principal/admissions", error?.message, "inquiry");
 }
@@ -223,9 +230,18 @@ export async function admitStudent(f: FormData) {
   if (error || !a) return back("/principal/admissions", error?.message ?? "Admission not found");
   let { data: fam } = await supabase.from("families").select("id").eq("phone", a.phone).maybeSingle();
   if (!fam) {
-    const res = await supabase.from("families").insert({ campus_id: me.campus_id, name: `${a.guardian_name} family`, phone: a.phone }).select("id").single();
+    const res = await supabase.from("families").insert({
+      campus_id: me.campus_id, name: `${a.guardian_name} family`, phone: a.phone,
+      reminder_phone: a.reminder_phone, reminder_channel: a.reminder_channel ?? "auto",
+    }).select("id").single();
     if (res.error) return back("/principal/admissions", res.error.message);
     fam = res.data;
+  } else if (a.reminder_phone || (a.reminder_channel && a.reminder_channel !== "auto")) {
+    // a sibling's family is already here: the newest choice the parent gave wins
+    await supabase.from("families").update({
+      ...(a.reminder_phone ? { reminder_phone: a.reminder_phone } : {}),
+      ...(a.reminder_channel !== "auto" ? { reminder_channel: a.reminder_channel } : {}),
+    }).eq("id", fam.id);
   }
   const { data: stu, error: e2 } = await supabase.from("students").insert({
     campus_id: me.campus_id, family_id: fam.id, section_id: str(f, "section_id"), full_name: a.child_name,
@@ -242,13 +258,32 @@ export async function createNotice(f: FormData) {
   const supabase = await createClient();
   const audience = str(f, "audience");
   const target = str(f, "target");
-  const { error } = await supabase.from("notices").insert({
-    campus_id: me.campus_id, title: str(f, "title"), body: str(f, "body"), audience,
-    class_id: audience === "class" ? target || null : null,
-    section_id: audience === "section" ? target || null : null,
-    created_by: me.id,
+  const res = await publishNotice(supabase, me, {
+    title: str(f, "title"), body: str(f, "body"), audience,
+    classId: audience === "class" ? target || null : null,
+    sectionId: audience === "section" ? target || null : null,
+    toPhones: f.get("send_phone") === "on", kind: "notice",
   });
-  back("/principal/notices", error?.message, "notice");
+  back("/principal/notices", res.error ?? undefined, res.saved);
+}
+
+type Me = Awaited<ReturnType<typeof admin>>;
+// Saves the notice for the app and, when asked, puts a WhatsApp or SMS for each family in the outbox.
+async function publishNotice(supabase: Awaited<ReturnType<typeof createClient>>, me: Me, n: {
+  title: string; body: string; audience: string; classId: string | null; sectionId: string | null; toPhones: boolean; kind: "notice" | "holiday";
+}) {
+  const { data: notice, error } = await supabase.from("notices").insert({
+    campus_id: me.campus_id, title: n.title, body: n.body, audience: n.audience,
+    class_id: n.classId, section_id: n.sectionId, created_by: me.id,
+  }).select("id").single();
+  if (error) return { error: error.message, saved: "" };
+  if (!n.toPhones) return { error: null, saved: "notice" };
+  const families = await familiesForAudience(supabase, n.audience, n.classId, n.sectionId);
+  const q = await queueForFamilies(supabase, {
+    campusId: me.campus_id, families, kind: n.kind, noticeId: notice.id,
+    text: () => noticeText({ title: n.title, body: n.body, campus: me.campus_name }),
+  });
+  return { error: q.error, saved: `phones-${q.queued}-${q.skipped}` };
 }
 
 export async function deleteNotice(f: FormData) {
@@ -256,4 +291,79 @@ export async function deleteNotice(f: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("notices").delete().eq("id", str(f, "notice_id"));
   back("/principal/notices", error?.message);
+}
+
+// ---------- Holiday calendar ----------
+const HOLIDAY_KINDS = ["holiday", "vacation", "event"];
+
+export async function addHoliday(f: FormData) {
+  const me = await admin();
+  const supabase = await createClient();
+  const title = str(f, "title");
+  const starts = str(f, "starts_on");
+  const ends = str(f, "ends_on") || starts;
+  const month = `/principal/notices?month=${starts.slice(0, 7)}`;
+  if (ends < starts) return back(month, "The last day can't be before the first day.");
+  const { error } = await supabase.from("holidays").insert({
+    campus_id: me.campus_id, title, starts_on: starts, ends_on: ends,
+    kind: HOLIDAY_KINDS.includes(str(f, "kind")) ? str(f, "kind") : "holiday", note: str(f, "note") || null, created_by: me.id,
+  });
+  if (error) return back(month, error.message);
+  if (f.get("announce") !== "on") return back(month, undefined, "holiday");
+  const day = (d: string) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+  const res = await publishNotice(supabase, me, {
+    title: `Holiday: ${title}`,
+    body: (starts === ends ? `School will stay closed on ${day(starts)}.` : `School will stay closed from ${day(starts)} to ${day(ends)}.`)
+      + (str(f, "note") ? ` ${str(f, "note")}` : ""),
+    audience: "everyone", classId: null, sectionId: null, toPhones: f.get("send_phone") === "on", kind: "holiday",
+  });
+  back(month, res.error ?? undefined, res.saved);
+}
+
+export async function deleteHoliday(f: FormData) {
+  await admin();
+  const supabase = await createClient();
+  const { error } = await supabase.from("holidays").delete().eq("id", str(f, "holiday_id"));
+  back(`/principal/notices?month=${str(f, "month")}`, error?.message);
+}
+
+// Pakistan's public holidays that fall on the same date every year. Eid, Muharram and
+// 12 Rabi-ul-Awwal follow the moon, so the principal adds them once the dates are announced.
+const FIXED_HOLIDAYS: [string, string][] = [
+  ["02-05", "Kashmir Solidarity Day"], ["03-23", "Pakistan Day"], ["05-01", "Labour Day"],
+  ["05-28", "Youm-e-Takbeer"], ["08-14", "Independence Day"], ["11-09", "Iqbal Day"], ["12-25", "Quaid-e-Azam Day"],
+];
+
+export async function addPublicHolidays() {
+  const me = await admin();
+  const supabase = await createClient();
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Karachi" }).format(new Date());
+  const year = Number(today.slice(0, 4));
+  // the next 12 months
+  const dates = [year, year + 1].flatMap((y) => FIXED_HOLIDAYS.map(([md, t]) => [`${y}-${md}`, t] as const))
+    .filter(([d]) => d >= today && d < `${year + 1}${today.slice(4)}`);
+  const { data: have } = await supabase.from("holidays").select("starts_on").in("starts_on", dates.map(([d]) => d));
+  const taken = new Set((have ?? []).map((h) => h.starts_on));
+  const rows = dates.filter(([d]) => !taken.has(d))
+    .map(([d, t]) => ({ campus_id: me.campus_id, title: t, starts_on: d, ends_on: d, kind: "holiday", created_by: me.id }));
+  const { error } = rows.length ? await supabase.from("holidays").insert(rows) : { error: null };
+  back("/principal/notices", error?.message, "public");
+}
+
+// ---------- Standard classes ----------
+// Adds whichever of Class 1 to Class 10 the school doesn't have yet, each with section A.
+export async function addStandardClasses(f: FormData) {
+  const me = await admin();
+  const path = str(f, "back") === "exams" ? "/principal/exams" : "/principal/classes";
+  const supabase = await createClient();
+  const { data: have } = await supabase.from("classes").select("name");
+  const taken = new Set((have ?? []).map((c) => c.name.trim().toLowerCase()));
+  const missing = Array.from({ length: 10 }, (_, i) => i + 1).filter((n) => !taken.has(`class ${n}`));
+  if (!missing.length) return back(path, undefined, "classes");
+  const { data: made, error } = await supabase.from("classes")
+    .insert(missing.map((n) => ({ campus_id: me.campus_id, name: `Class ${n}`, sort: n, board: n >= 9 ? "BISE" : null })))
+    .select("id");
+  if (error) return back(path, error.message);
+  const { error: e2 } = await supabase.from("sections").insert((made ?? []).map((c) => ({ campus_id: me.campus_id, class_id: c.id, name: "A", capacity: 40 })));
+  back(path, e2?.message, "classes");
 }

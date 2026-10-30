@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate } from "@/lib/format";
+import { CHANNEL_LABEL, CHOICE_LABEL } from "@/lib/messages";
 import { addInquiry, admitStudent, moveAdmission } from "../actions";
 
 const COLS = [
@@ -40,6 +41,9 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                 <div key={a.id} className="flex flex-col gap-2 rounded-2xl border-2 p-3" style={{ borderColor: "var(--line)" }}>
                   <div className="font-black">{a.child_name}</div>
                   <div className="muted text-xs">{a.classes?.name ?? "Class not set"} · {a.guardian_name} · {a.phone}</div>
+                  {(a.reminder_phone || a.reminder_channel !== "auto") && (
+                    <div className="muted text-xs">Reminders: {a.reminder_phone ?? a.phone}{a.reminder_channel !== "auto" ? ` on ${CHANNEL_LABEL[a.reminder_channel as "whatsapp" | "sms"]}` : ""}</div>
+                  )}
                   {a.test_on && <div className="muted text-xs">Test {shortDate(a.test_on)}</div>}
                   {a.notes && <div className="text-xs font-bold">{a.notes}</div>}
                   {c.next && (
@@ -79,6 +83,14 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
           <label className="field">Parent or guardian<input className="input" name="guardian_name" required /></label>
           <label className="field">Phone<input className="input" name="phone" required inputMode="tel" placeholder="03001234567" /></label>
           <label className="field">Class applying for<select className="input" name="class_id"><option value="">Not sure yet</option>{(classes ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="field">Number for fee reminders and notices<input className="input" name="reminder_phone" inputMode="tel" placeholder="Leave empty to use the phone above" /></label>
+          <label className="field">Send them by
+            <select className="input" name="reminder_channel" defaultValue="auto">
+              {Object.entries(CHOICE_LABEL).map(([k, v]) => <option key={k} value={k}>{k === "auto" ? `${v} (WhatsApp first, SMS if no reply)` : v}</option>)}
+            </select>
+          </label>
         </div>
         <label className="field">Notes<input className="input" name="notes" placeholder="Walk-in, sibling already here" /></label>
         <button className="btn self-start" type="submit">Add inquiry</button>

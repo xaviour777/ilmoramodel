@@ -8,9 +8,9 @@ Built with **Next.js 15** (App Router, server actions) and **Supabase** (Postgre
 
 | Role | Screens |
 | --- | --- |
-| Principal / owner | Live "Today" dashboard · classes, sections, subjects, class and subject teachers · bell timings (summer, winter, Ramadan) · weekly timetable with clash check · terms, tests and exams, date sheets, publish results · leave approvals and substitutes · admissions pipeline · notices · fee desk |
+| Principal / owner | Live "Today" dashboard · classes, sections, subjects, class and subject teachers · bell timings (summer, winter, Ramadan) · weekly timetable with clash check · terms, tests and exams, date sheets, publish results · leave approvals and substitutes · admissions pipeline (with each family's reminder number and WhatsApp or SMS choice) · notices sent in the app and to parents' WhatsApp or SMS · holiday calendar · Class 1 to 10 in one tap · fee desk |
 | Teacher | Mark attendance (P / A / L / leave) · homework tasks with submission progress · marks entry · lesson diary · praise and concern notes · leave requests · AI paper checking · homework tutor report |
-| Accountant | Fee desk: find a family, see the challan, take payment by cash, cheque, bank, 1Bill, Raast, JazzCash or Easypaisa · largest balances · admissions |
+| Accountant | Fee desk: find a family, see the challan, take payment by Cash, JazzCash or Easypaisa · fee reminders on WhatsApp or SMS, with the channel Ilmora suggests for each family · largest balances · admissions |
 | Parent | Each child's attendance today and last 30 days · homework due · published results · teacher notes · fee balance · notices · homework tutor and weekly tutor summary |
 | Student | Own attendance, homework, results and notices · homework tutor ("Samjhao") |
 
@@ -33,7 +33,8 @@ The rules live in `supabase/migrations/`.
    2. `supabase/migrations/20261023000002_security_and_logic.sql`
    3. `supabase/migrations/20261023000003_pin_search_paths.sql`
    4. `supabase/migrations/20261027000001_ai_paper_check_and_tutor.sql` (paper checking and homework tutor)
-   5. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   5. `supabase/migrations/20261030000001_reminders_exams_holidays.sql` (WhatsApp and SMS reminders, holiday calendar, custom exams)
+   6. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 
@@ -85,6 +86,21 @@ The migration adds attendance, payments, homework, notices, leave and marks to S
 
 **Homework tutor** (Student or Parent → Homework tutor): press **Samjhao** on a homework task. The tutor gives a hint first, then a step, and the full method only after two tries, then 5 practice questions (maths for now). It only talks about school work, hides phone numbers and addresses, and allows 40 messages a day. Parents can read every chat, and the teacher's **Tutor report** shows which topics students got stuck on this week.
 
+## WhatsApp and SMS
+
+**Fee reminders** (Fees → WhatsApp & SMS, or the reminder box on the fee desk): Ilmora suggests a channel for each family:
+
+1. No mobile number: nothing is sent, the desk asks for one.
+2. The family chose WhatsApp or SMS at admission: that one.
+3. A WhatsApp reminder went 3 or more days ago and nothing was paid since: SMS, which reaches every phone.
+4. Otherwise WhatsApp, which is free for the school.
+
+The reminder number and the choice are taken at admission (New inquiry form) and can be changed on the fee desk.
+
+**Notices and holidays** can also go to parents' phones: tick "Also send to parents on WhatsApp or SMS" and one message per family is put in the outbox.
+
+**Sending**: tapping Send opens WhatsApp (wa.me link) or the phone's SMS app with the message typed in, and Ilmora marks it sent. Sending without a tap needs a WhatsApp Business API or SMS gateway account; the outbox (`messages` table, status `queued`) is ready for it.
+
 ## Project layout
 
 ```
@@ -99,6 +115,6 @@ src/lib/               Supabase clients, signed-in user, formatting
 ## Not built yet
 
 - Phone OTP login (email and password for now; Supabase supports SMS OTP once an SMS provider is connected)
-- WhatsApp and SMS sending (messages are recorded, not yet delivered)
-- 1Bill / Raast / wallet payment callbacks (payments are entered at the desk for now)
+- Automatic WhatsApp and SMS sending through a gateway (for now staff send each message with one tap from the outbox)
+- JazzCash / Easypaisa payment callbacks (payments are entered at the desk for now)
 - Report card PDFs, Urdu interface, offline mode on phones, monthly challan generation screen

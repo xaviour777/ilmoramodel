@@ -247,6 +247,12 @@ begin
     (v_campus, 'Mid-term exams start 2 November', 'The date sheet is in the app. Students should arrive by 8:15 am on exam days.', 'parents', v_principal),
     (v_campus, 'Winter timing from 1 November', 'School starts at 8:00 am with assembly at 7:45 am.', 'everyone', v_principal),
     (v_campus, 'Staff meeting Saturday 10 am', 'Agenda: mid-term papers and report cards.', 'staff', v_principal);
+  insert into public.holidays (campus_id, title, starts_on, ends_on, kind, created_by) values
+    (v_campus, 'Iqbal Day', '2026-11-09', '2026-11-09', 'holiday', v_principal),
+    (v_campus, 'Annual sports day', '2026-11-28', '2026-11-28', 'event', v_principal),
+    (v_campus, 'Quaid-e-Azam Day', '2026-12-25', '2026-12-25', 'holiday', v_principal),
+    (v_campus, 'Winter vacation', '2026-12-22', '2026-12-31', 'vacation', v_principal),
+    (v_campus, 'Kashmir Solidarity Day', '2027-02-05', '2027-02-05', 'holiday', v_principal);
 
   -- Fees: heads, class structures, this month's challans and payments
   insert into public.fee_heads (campus_id, name, priority) values (v_campus, 'Tuition', 10) returning id into v_tuition;
@@ -283,7 +289,7 @@ begin
     if fam.id <> fam_ids[1] and random() < 0.72 then
       insert into public.payments (campus_id, family_id, invoice_id, amount_paisa, mode, reference, receipt_no, received_by, received_at, idempotency_key)
       select v_campus, fam.id, inv, sum(amount_paisa),
-             (array['onebill','onebill','raast','jazzcash','easypaisa','cash','cash','bank_deposit'])[1 + floor(random() * 8)::int]::public.payment_mode,
+             (array['cash','cash','cash','jazzcash','jazzcash','easypaisa','easypaisa','cash'])[1 + floor(random() * 8)::int]::public.payment_mode,
              'DEMO-' || n, 'R-' || lpad(n::text, 5, '0'), v_accountant,
              date_trunc('month', v_today) + (floor(random() * least(extract(day from v_today), 20)) || ' days')::interval + interval '10 hours',
              'seed-' || inv

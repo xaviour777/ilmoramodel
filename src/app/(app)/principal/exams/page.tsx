@@ -2,10 +2,12 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, time, todayPK } from "@/lib/format";
-import { addPaper, createExam, setExamStatus } from "../actions";
+import { addPaper, addStandardClasses, createExam, setExamStatus } from "../actions";
 
 type Search = { term?: string; exam?: string; saved?: string; error?: string };
-const KIND: Record<string, string> = { class_test: "Class test", monthly: "Monthly test", term: "Term exam", sendup: "Send-up", final: "Final" };
+const KIND: Record<string, string> = { class_test: "Class test", monthly: "Monthly test", term: "Term exam", sendup: "Send-up", final: "Final", other: "Other" };
+// Ideas for the name box; the principal can type any name instead.
+const NAME_IDEAS = ["Weekly test", "Monthly test · November", "December test", "Mid-term exam", "Pre-board test", "Send-up exam", "Final exam", "Surprise quiz", "Chapter 3 test", "Summer homework test"];
 const STATUS: Record<string, [string, string, string]> = {
   draft: ["Draft", "pill-gray", "var(--line)"],
   date_sheet: ["Date sheet out", "pill-blue", "var(--blue)"],
@@ -133,11 +135,14 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
 
         <form action={createExam} className="card flex-1">
           <h2 className="h2">Create a test or exam</h2>
-          <input type="hidden" name="term_id" value={term?.id ?? ""} />
-          <label className="field">Type
+          <input type="hidden" name="term_id" value={term?.id ?? ""} /><input type="hidden" name="back" value="exams" />
+          <label className="field">Name (write any name you like)
+            <input className="input" name="name" required list="exam-name-ideas" placeholder="December test, Pre-board, Chapter 3 quiz" />
+            <datalist id="exam-name-ideas">{NAME_IDEAS.map((n) => <option key={n} value={n} />)}</datalist>
+          </label>
+          <label className="field">Kind (for the report card)
             <select className="input" name="kind">{Object.entries(KIND).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           </label>
-          <label className="field">Name<input className="input" name="name" required placeholder="Monthly test · November" /></label>
           <fieldset className="field">
             <legend className="mb-1.5">Classes</legend>
             <div className="flex flex-wrap gap-2">
@@ -148,6 +153,9 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
               ))}
             </div>
           </fieldset>
+          {(classes ?? []).length < 10 && (
+            <p className="muted">Only {(classes ?? []).length} classes are set up. <button formAction={addStandardClasses} formNoValidate className="underline" type="submit">Add Class 1 to Class 10</button></p>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <label className="field">Starts<input className="input" type="date" name="starts_on" /></label>
             <label className="field">Ends<input className="input" type="date" name="ends_on" /></label>
