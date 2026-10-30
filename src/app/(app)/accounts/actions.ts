@@ -4,13 +4,23 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
+import { todayPK } from "@/lib/format";
 import { feeReminderText, mobilePK } from "@/lib/messages";
 import { allRows, familiesByIds, queueForFamilies } from "@/lib/outbox";
 import { deliverQueued } from "@/lib/deliver";
+import { challanTag } from "@/lib/challan";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 // The school takes fees only in cash or through the two wallets.
 const PAYMENT_MODES = ["cash", "jazzcash", "easypaisa"];
+
+// R-YYMM-00001, continuing from the highest number this month
+async function nextReceiptNo(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const tag = `R-${todayPK().slice(2, 4)}${todayPK().slice(5, 7)}-`;
+  const { data } = await supabase.from("payments").select("receipt_no").like("receipt_no", `${tag}%`).order("receipt_no", { ascending: false }).limit(1);
+  const n = Number(data?.[0]?.receipt_no?.slice(tag.length)) || 0;
+  return `${tag}${String(n + 1).padStart(5, "0")}`;
+}
 
 export async function recordPayment(f: FormData) {
   const me = await requireRole("accountant", "principal", "owner");
@@ -20,6 +30,7 @@ export async function recordPayment(f: FormData) {
   if (!rupees || rupees <= 0) redirect(`/accounts?family=${family}&error=${encodeURIComponent("Enter the amount received.")}`);
   const mode = str(f, "mode");
   if (!PAYMENT_MODES.includes(mode)) redirect(`/accounts?family=${family}&error=${encodeURIComponent("Choose Cash, JazzCash or Easypaisa.")}`);
+  const key = str(f, "idempotency_key"); // same form submitted twice = one payment
   const { error } = await supabase.from("payments").insert({
     campus_id: me.campus_id,
     family_id: family,
@@ -27,15 +38,16 @@ export async function recordPayment(f: FormData) {
     amount_paisa: Math.round(rupees * 100),
     mode,
     reference: str(f, "reference") || null,
-    receipt_no: str(f, "receipt_no") || null,
+    receipt_no: str(f, "receipt_no") || (await nextReceiptNo(supabase)),
     received_by: me.id,
-    idempotency_key: str(f, "idempotency_key"), // same form submitted twice = one payment
+    idempotency_key: key,
   });
   if (error && !error.message.includes("payments_idempotency_key_key")) {
     redirect(`/accounts?family=${family}&error=${encodeURIComponent(error.message)}`);
   }
+  const { data: paid } = await supabase.from("payments").select("id").eq("idempotency_key", key).maybeSingle();
   revalidatePath("/accounts");
-  redirect(`/accounts?family=${family}&saved=1`);
+  redirect(`/accounts?family=${family}&saved=1${paid ? `&receipt=${paid.id}` : ""}`);
 }
 
 // ---------- WhatsApp and SMS ----------
@@ -182,9 +194,8 @@ export async function generateChallans(f: FormData) {
   if (!byFamily.size) redirect(`/accounts/setup?error=${encodeURIComponent(done.size ? "Every family already has this month's challan." : "No enrolled students with a class.")}`);
 
   // challan numbers continue from the highest one this month: <campus initials>-<YYMM>-0001
-  const prefix = me.campus_name.split(/\s+/).filter((w) => /^[A-Za-z]/.test(w) && !/campus/i.test(w)).map((w) => w[0]!.toUpperCase()).join("").slice(0, 3) || "CH";
   let n = existing.reduce((m, e) => Math.max(m, Number(e.challan_no.split("-").pop()) || 0), 0);
-  const tag = `${prefix}-${month.slice(2, 4)}${month.slice(5, 7)}`;
+  const tag = challanTag(me.campus_name, month);
 
   const families = [...byFamily.entries()];
   for (let i = 0; i < families.length; i += 300) {

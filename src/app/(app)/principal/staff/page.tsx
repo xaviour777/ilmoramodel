@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/me";
+import { StaffTabs } from "@/components/staff-tabs";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, time, todayPK } from "@/lib/format";
 import { addStaff, assignSubstitute, decideLeave, saveStaffAttendance } from "../actions";
@@ -40,9 +42,12 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <div>
-        <h1 className="h1">Staff, leave and substitutes</h1>
-        <p className="muted text-base">Approve leave, then cover the periods of anyone away today.</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="h1">Staff, leave and substitutes</h1>
+          <p className="muted text-base">Approve leave, then cover the periods of anyone away today.</p>
+        </div>
+        <StaffTabs current="staff" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
@@ -128,10 +133,11 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
 
         <section className="card">
           <h2 className="h2">Staff</h2>
+          <p className="muted">Open a name for the full record: CNIC, education, previous schools, bank, salary and advances.</p>
           {(staff ?? []).map((s) => (
             <div key={s.id} className="flex items-center gap-3">
               <span className={`pill ${s.role === "teacher" ? "pill-blue" : s.role === "principal" ? "pill-purple" : "pill-orange"}`}>{s.role}</span>
-              <span className="flex-1 font-extrabold">{s.full_name}</span>
+              <Link href={`/principal/staff/${s.id}`} className="flex-1 font-extrabold hover:underline">{s.full_name}</Link>
               <span className="muted text-xs">{s.user_id ? "can log in" : "no login yet"}</span>
             </div>
           ))}

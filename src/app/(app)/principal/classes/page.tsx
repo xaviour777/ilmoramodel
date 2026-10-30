@@ -5,7 +5,7 @@ import { ClassesTabs } from "@/components/classes-tabs";
 import { Tabs } from "@/components/tabs";
 import { time } from "@/lib/format";
 import {
-  activateTiming, addPeriod, addSection, addStandardClasses, assignSubjectTeacher, createClass, createSubject,
+  activateTiming, addPeriod, addSection, addStandardClasses, assignSubjectTeacher, createClass, createSubject, editClass, editSection,
   createTimingProfile, deletePeriod, setClassTeacher, setSlot,
 } from "../actions";
 
@@ -77,6 +77,29 @@ async function ClassesTab() {
                 <input className="input min-h-10 w-20 py-1 text-sm" name="capacity" type="number" placeholder="40" aria-label="Seats" />
                 <button className="eyebrow" type="submit">Add section</button>
               </form>
+              <details>
+                <summary className="muted cursor-pointer text-xs font-extrabold underline">Rename or remove</summary>
+                <div className="mt-2 flex flex-col gap-2">
+                  <form action={editClass} className="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="class_id" value={c.id} />
+                    <input className="input min-h-10 flex-1 py-1 text-sm" name="name" defaultValue={c.name} required aria-label="Class name" />
+                    <input className="input min-h-10 w-28 py-1 text-sm" name="board" defaultValue={c.board ?? ""} placeholder="Board" aria-label="Board" />
+                    <input className="input min-h-10 w-16 py-1 text-sm" name="sort" type="number" defaultValue={c.sort} aria-label="Order on lists" />
+                    <button className="eyebrow" type="submit">Save</button>
+                    <button className="muted text-xs underline" type="submit" name="remove" value="1">Remove class</button>
+                  </form>
+                  {c.sections.map((s) => (
+                    <form key={s.id} action={editSection} className="flex flex-wrap items-center gap-2">
+                      <input type="hidden" name="section_id" value={s.id} />
+                      <input className="input min-h-10 w-20 py-1 text-sm" name="name" defaultValue={s.name} required aria-label="Section name" />
+                      <input className="input min-h-10 w-20 py-1 text-sm" name="capacity" type="number" defaultValue={s.capacity} aria-label="Seats" />
+                      <button className="eyebrow" type="submit">Save</button>
+                      <button className="muted text-xs underline" type="submit" name="remove" value="1">Remove {s.name}</button>
+                    </form>
+                  ))}
+                  <p className="muted text-xs">A class or section can be removed only when no student is in it.</p>
+                </div>
+              </details>
             </div>
           ))}
         </div>

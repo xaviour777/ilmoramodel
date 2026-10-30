@@ -73,7 +73,10 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
             </label>
             <button className="btn-ghost" type="submit">Search</button>
           </form>
-          <p className="muted">{total} student{total === 1 ? "" : "s"}</p>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="muted">{total} student{total === 1 ? "" : "s"}</p>
+            {sp.section && <Link href={`/print/board-list?section=${sp.section}`} target="_blank" className="eyebrow">Board list (Class 9 registration)</Link>}
+          </div>
           <div className="overflow-x-auto">
             <table className="tbl">
               <thead><tr><th scope="col">Name</th><th scope="col">Class</th><th scope="col">Roll</th><th scope="col">Adm. no</th><th scope="col">Family</th><th scope="col">Phone</th></tr></thead>

@@ -11,7 +11,7 @@ const PRINT_CSS = `@page { size: A4; margin: 0; } @media print { .no-print { dis
 const COPIES = ["Bank / wallet copy", "School copy", "Parent copy"];
 
 type Inv = { id: string; family_id: string; challan_no: string; due_on: string; billing_month: string };
-type Line = { invoice_id: string; description: string; amount_paisa: number; students: { full_name: string } | null };
+type Line = { invoice_id: string; description: string; amount_paisa: number };
 
 // Three copies of each family's challan on one A4 page: one for the payment, one for the school, one for the parent.
 export default async function PrintChallans({ searchParams }: { searchParams: Promise<{ month?: string; family?: string }> }) {
@@ -48,7 +48,7 @@ export default async function PrintChallans({ searchParams }: { searchParams: Pr
   for (let i = 0; i < invIds.length; i += 150) {
     const ids = invIds.slice(i, i + 150);
     const rows = await allRows<Line>((a, b) =>
-      supabase.from("invoice_lines").select("invoice_id, description, amount_paisa, students(full_name)").in("invoice_id", ids).order("id").range(a, b) as never);
+      supabase.from("invoice_lines").select("invoice_id, description, amount_paisa").in("invoice_id", ids).order("id").range(a, b) as never);
     for (const l of rows) lines.set(l.invoice_id, [...(lines.get(l.invoice_id) ?? []), l]);
   }
   const monthName = ok ? new Date(`${month}-01T00:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }) : "";
@@ -84,7 +84,7 @@ export default async function PrintChallans({ searchParams }: { searchParams: Pr
                   <tbody>
                     {ls.map((l, i) => (
                       <tr key={i} style={{ borderBottom: "1px solid #ccc" }}>
-                        <td style={{ padding: "0.6mm 0" }}>{l.students?.full_name ? `${l.students.full_name}: ` : ""}{l.description}</td>
+                        <td style={{ padding: "0.6mm 0" }}>{l.description}</td>
                         <td style={{ textAlign: "right" }}>{rupees(Number(l.amount_paisa))}</td>
                       </tr>
                     ))}
