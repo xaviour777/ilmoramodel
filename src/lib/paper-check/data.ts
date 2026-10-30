@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { McqAnswer } from "./omr";
+import type { McqQuestion } from "./quiz";
 import { sheetTotals, testMaxMarks, type WrittenAnswer, type WrittenQuestion } from "./rubric";
 
 // Reading and saving paper-check rows. Every query runs as the signed-in person,
@@ -20,6 +21,8 @@ export type PaperTest = {
   mcq_marks_each: number;
   options_per_mcq: number;
   questions: WrittenQuestion[];
+  mcq_questions: McqQuestion[];
+  auto_publish: boolean;
   status: TestStatus;
   sections: { name: string; classes: { name: string } } | null;
   subjects: { name: string } | null;
@@ -45,7 +48,7 @@ export const hasBlockingFlag = (flags: string[]) => flags.some((f) => BLOCKING_F
 export { FLAG_LABEL } from "./data-labels";
 
 const TEST_COLS =
-  "id, campus_id, section_id, subject_id, exam_id, title, test_date, mcq_key, mcq_marks_each, options_per_mcq, questions, status, sections(name, classes(name)), subjects(name)";
+  "id, campus_id, section_id, subject_id, exam_id, title, test_date, mcq_key, mcq_marks_each, options_per_mcq, questions, mcq_questions, auto_publish, status, sections(name, classes(name)), subjects(name)";
 
 export function testLabel(t: PaperTest) {
   return `${t.sections?.classes.name ?? ""}-${t.sections?.name ?? ""} · ${t.subjects?.name ?? ""}`;

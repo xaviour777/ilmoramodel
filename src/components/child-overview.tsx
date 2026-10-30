@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { pct, shortDate, todayPK } from "@/lib/format";
+import { maxMarksOf } from "@/lib/paper-check/data";
+import type { WrittenQuestion } from "@/lib/paper-check/rubric";
 
 type Child = { id: string; full_name: string; section_id: string | null; sections: { name: string; classes: { name: string } } | null };
 
@@ -9,7 +11,7 @@ export async function ChildOverview({ child }: { child: Child }) {
   const supabase = await createClient();
   const today = todayPK();
   const since = new Date(Date.parse(today) - 30 * 86400000).toISOString().slice(0, 10);
-  const [{ data: att }, { data: homework }, { data: marks }, { data: notes }, { data: diary }] = await Promise.all([
+  const [{ data: att }, { data: homework }, { data: marks }, { data: notes }, { data: diary }, { data: tests }] = await Promise.all([
     supabase.from("attendance").select("date, status").eq("student_id", child.id).gte("date", since).order("date", { ascending: false }),
     child.section_id
       ? supabase.from("homework").select("id, title, due_on, subjects(name)").eq("section_id", child.section_id).gte("due_on", today).order("due_on").limit(6)
@@ -19,7 +21,13 @@ export async function ChildOverview({ child }: { child: Child }) {
     child.section_id
       ? supabase.from("lesson_diary").select("id, topic, date, subjects(name)").eq("section_id", child.section_id).order("date", { ascending: false }).limit(4)
       : Promise.resolve({ data: [] }),
+    // checked quizzes and tests; families only get rows of published tests
+    supabase.from("paper_sheets").select("id, total, status, paper_tests(title, test_date, mcq_key, mcq_marks_each, questions, subjects(name))")
+      .eq("student_id", child.id).in("status", ["reviewed", "absent"]).order("reviewed_at", { ascending: false }).limit(8),
   ]);
+  type TestRow = { id: string; total: number | null; status: string;
+    paper_tests: { title: string; test_date: string; mcq_key: string[]; mcq_marks_each: number; questions: WrittenQuestion[]; subjects: { name: string } | null } | null };
+  const testRows = ((tests ?? []) as unknown as TestRow[]).filter((t) => t.paper_tests);
   const todayMark = (att ?? []).find((a) => a.date === today);
   const present = (att ?? []).filter((a) => a.status === "present" || a.status === "late").length;
   const rate = (att ?? []).length ? present / (att ?? []).length : 0;
@@ -54,7 +62,22 @@ export async function ChildOverview({ child }: { child: Child }) {
         </section>
         <section className="card">
           <h2 className="h2">Results</h2>
-          {byExam.size === 0 && <p className="muted">Results show here once the school publishes them.</p>}
+          {byExam.size === 0 && testRows.length === 0 && <p className="muted">Results show here once the school publishes them.</p>}
+          {testRows.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <b>Tests and quizzes</b>
+              {testRows.map((t) => {
+                const p = t.paper_tests!;
+                const out = maxMarksOf(p);
+                return (
+                  <div key={t.id} className="flex justify-between gap-2 rounded-xl p-2 text-sm font-bold" style={{ background: "var(--page)" }}>
+                    <span>{p.subjects?.name} · {p.title}<span className="muted text-xs"> · {shortDate(p.test_date)}</span></span>
+                    <span className="font-black tabular-nums">{t.status === "absent" ? "Absent" : `${t.total ?? 0}/${out}`}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           {[...byExam.entries()].map(([exam, ms]) => {
             const got = ms.reduce((t, m) => t + Number(m.obtained ?? 0), 0);
             const out = ms.reduce((t, m) => t + m.exams.total_marks, 0);

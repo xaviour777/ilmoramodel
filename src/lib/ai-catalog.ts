@@ -68,6 +68,7 @@ export const AI_FEATURES: Record<string, string> = {
   tutor: "Homework tutor",
   marks: "Paper checking",
   notice: "Notice writer",
+  quiz: "Quiz maker",
 };
 
 // Dollars to rupees for showing the budget; only a guide.
