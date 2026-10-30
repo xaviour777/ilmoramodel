@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { feeReminderText, mobilePK } from "@/lib/messages";
 import { allRows, familiesByIds, queueForFamilies } from "@/lib/outbox";
+import { deliverQueued } from "@/lib/deliver";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 // The school takes fees only in cash or through the two wallets.
@@ -85,14 +86,33 @@ export async function queueFeeReminders() {
     text: (fam) => feeReminderText({ familyName: fam.name, balancePaisa: balance.get(fam.id) ?? 0, dueOn: inv?.due_on ?? null, campus: me.campus_name }),
   });
   if (res.error) redirect(`/accounts/messages?error=${encodeURIComponent(res.error)}`);
+  const d = await deliverQueued(supabase);
   revalidatePath("/accounts/messages");
-  redirect(`/accounts/messages?queued=${res.queued}&skipped=${res.skipped}`);
+  redirect(`/accounts/messages?queued=${res.queued}&skipped=${res.skipped}&sent=${d.sent}&failed=${d.failed}`);
+}
+
+// Sends what is waiting through the connected WhatsApp Business number or SMS gateway.
+export async function sendWaitingNow() {
+  await requireRole("accountant", "principal", "owner");
+  const supabase = await createClient();
+  const d = await deliverQueued(supabase);
+  revalidatePath("/accounts/messages");
+  redirect(`/accounts/messages?sent=${d.sent}&failed=${d.failed}&left=${d.left}`);
+}
+
+export async function retryFailed() {
+  await requireRole("accountant", "principal", "owner");
+  const supabase = await createClient();
+  const { error } = await supabase.from("messages").update({ status: "queued", error: null }).eq("status", "failed");
+  if (error) redirect(`/accounts/messages?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/accounts/messages");
+  redirect("/accounts/messages");
 }
 
 export async function cancelQueued(f: FormData) {
   await requireRole("accountant", "principal", "owner");
   const supabase = await createClient();
-  const { error } = await supabase.from("messages").update({ status: "failed" }).eq("id", str(f, "message_id")).eq("status", "queued");
+  const { error } = await supabase.from("messages").update({ status: "cancelled" }).eq("id", str(f, "message_id")).in("status", ["queued", "failed"]);
   if (error) redirect(`/accounts/messages?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/accounts/messages");
   redirect("/accounts/messages");

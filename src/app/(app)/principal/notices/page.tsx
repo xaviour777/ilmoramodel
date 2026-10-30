@@ -54,7 +54,8 @@ export default async function NoticesPage({ searchParams }: { searchParams: Prom
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {phones && (
         <div className="notice-ok">
-          Published. {phones[0]} WhatsApp or SMS messages are ready in the <Link href="/accounts/messages" className="underline">outbox</Link>.
+          Published. {phones[2] ? `${phones[2]} WhatsApp or SMS messages sent.` : ""}
+          {phones[0] - (phones[2] ?? 0) > 0 ? ` ${phones[0] - (phones[2] ?? 0)} are waiting in the ` : " See the "}<Link href="/accounts/messages" className="underline">outbox</Link>.
           {phones[1] > 0 ? ` ${phones[1]} families have no mobile number.` : ""}
         </div>
       )}

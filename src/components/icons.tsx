@@ -15,5 +15,6 @@ export const Icon = {
   bell: ({ size = 28 }: P) => (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4a8 8 0 0 1 8 8v6l3 4H5l3-4v-6a8 8 0 0 1 8-8z" fill="#CE82FF" /><circle cx="16" cy="26" r="3" fill="#A568CC" /></svg>),
   flame: ({ size = 22 }: P) => (<svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z" fill="#FF9600" /></svg>),
   pencil: ({ size = 28 }: P) => (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><path d="M6 22 21 7l4 4-15 15H6z" fill="#FF4B4B" /><path d="M19 9l4 4" stroke="#fff" strokeWidth="2" /></svg>),
+  gear: ({ size = 28 }: P) => (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><path d="M14 3h4l.8 3.6 2.6 1.1 3.1-2 2.8 2.8-2 3.1 1.1 2.6L30 14v4l-3.6.8-1.1 2.6 2 3.1-2.8 2.8-3.1-2-2.6 1.1L18 29h-4l-.8-3.6-2.6-1.1-3.1 2-2.8-2.8 2-3.1-1.1-2.6L2 18v-4l3.6-.8 1.1-2.6-2-3.1 2.8-2.8 3.1 2 2.6-1.1z" fill="#8F8F8F" /><circle cx="16" cy="16" r="4.5" fill="#fff" /></svg>),
 };
 export type IconName = keyof typeof Icon;

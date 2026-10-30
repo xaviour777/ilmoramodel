@@ -9,6 +9,7 @@ export type Me = {
   role: Role;
   campus_id: string;
   campus_name: string;
+  avatar_url: string | null;
 };
 
 // The signed-in person's profile. Sends them to /login when there is none.
@@ -18,7 +19,7 @@ export async function getMe(): Promise<Me> {
   if (!user) redirect("/login");
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, role, campus_id, campuses(name)")
+    .select("id, full_name, role, campus_id, avatar_url, campuses(name)")
     .eq("user_id", user.id)
     .eq("is_active", true)
     .maybeSingle();
@@ -30,6 +31,7 @@ export async function getMe(): Promise<Me> {
     role: data.role as Role,
     campus_id: data.campus_id,
     campus_name: campus?.name ?? "",
+    avatar_url: data.avatar_url ?? null,
   };
 }
 

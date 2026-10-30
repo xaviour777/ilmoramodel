@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { mobilePK, noticeText } from "@/lib/messages";
 import { familiesForAudience, queueForFamilies } from "@/lib/outbox";
+import { deliverQueued } from "@/lib/deliver";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const back = (path: string, error?: string, ok?: string): never => {
@@ -283,7 +284,9 @@ async function publishNotice(supabase: Awaited<ReturnType<typeof createClient>>,
     campusId: me.campus_id, families, kind: n.kind, noticeId: notice.id,
     text: () => noticeText({ title: n.title, body: n.body, campus: me.campus_name }),
   });
-  return { error: q.error, saved: `phones-${q.queued}-${q.skipped}` };
+  if (q.error) return { error: q.error, saved: "" };
+  const d = await deliverQueued(supabase);
+  return { error: null, saved: `phones-${q.queued}-${q.skipped}-${d.sent}-${d.failed}` };
 }
 
 export async function deleteNotice(f: FormData) {

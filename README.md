@@ -34,7 +34,8 @@ The rules live in `supabase/migrations/`.
    3. `supabase/migrations/20261023000003_pin_search_paths.sql`
    4. `supabase/migrations/20261027000001_ai_paper_check_and_tutor.sql` (paper checking and homework tutor)
    5. `supabase/migrations/20261030000001_reminders_exams_holidays.sql` (WhatsApp and SMS reminders, holiday calendar, custom exams)
-   6. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   6. `supabase/migrations/20261030000002_settings_and_profiles.sql` (Settings for WhatsApp and SMS, profile photos)
+   7. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 
@@ -99,7 +100,11 @@ The reminder number and the choice are taken at admission (New inquiry form) and
 
 **Notices and holidays** can also go to parents' phones: tick "Also send to parents on WhatsApp or SMS" and one message per family is put in the outbox.
 
-**Sending**: tapping Send opens WhatsApp (wa.me link) or the phone's SMS app with the message typed in, and Ilmora marks it sent. Sending without a tap needs a WhatsApp Business API or SMS gateway account; the outbox (`messages` table, status `queued`) is ready for it.
+**Sending**: once the principal connects WhatsApp Business (Meta Cloud API: phone number ID, access token, an approved template with one `{{1}}` body variable) or any HTTP SMS gateway in **Settings**, reminders and notices go out by themselves, with a test button for each. Without a connection, tapping Send opens WhatsApp (wa.me link) or the phone's SMS app with the message typed in. Tokens and keys are kept in `campus_secrets` and never sent back to the browser.
+
+## Profiles
+
+Everyone has **My profile** (click your name in the sidebar): photo (cropped and shrunk on the phone, stored in the `avatars` bucket), name, mobile number and password. People can't change their own role or campus; a database trigger blocks it. The shared demo logins can't change their password.
 
 ## Project layout
 
@@ -115,6 +120,6 @@ src/lib/               Supabase clients, signed-in user, formatting
 ## Not built yet
 
 - Phone OTP login (email and password for now; Supabase supports SMS OTP once an SMS provider is connected)
-- Automatic WhatsApp and SMS sending through a gateway (for now staff send each message with one tap from the outbox)
+- Sending in the background on a schedule (messages go out when someone presses a button: queue, publish or Send waiting)
 - JazzCash / Easypaisa payment callbacks (payments are entered at the desk for now)
 - Report card PDFs, Urdu interface, offline mode on phones, monthly challan generation screen
