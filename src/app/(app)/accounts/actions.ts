@@ -112,6 +112,15 @@ export async function sendWaitingNow() {
   redirect(`/accounts/messages?sent=${d.sent}&failed=${d.failed}&left=${d.left}`);
 }
 
+// Called by the office's pages on their own: sends what is waiting, without leaving the page.
+export async function sendWaitingQuietly() {
+  await requireRole("accountant", "principal", "owner");
+  const supabase = await createClient();
+  const d = await deliverQueued(supabase, 40);
+  if (d.sent || d.failed) revalidatePath("/accounts/messages");
+  return { sent: d.sent, failed: d.failed };
+}
+
 export async function retryFailed() {
   await requireRole("accountant", "principal", "owner");
   const supabase = await createClient();

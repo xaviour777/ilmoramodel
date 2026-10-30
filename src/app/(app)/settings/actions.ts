@@ -56,3 +56,14 @@ export async function sendTest(f: FormData) {
   }
   back(`tested=${which}`);
 }
+
+// Parents get a message when their child is marked absent (on by default).
+export async function saveAbsentAlerts(f: FormData) {
+  const me = await requireRole("principal", "owner");
+  const supabase = await createClient();
+  const { error } = await supabase.from("campus_settings")
+    .upsert({ campus_id: me.campus_id, absent_alerts: f.get("absent_alerts") === "on", updated_by: me.id, updated_at: new Date().toISOString() }, { onConflict: "campus_id" });
+  if (error) back(`error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/settings");
+  back("saved=1");
+}

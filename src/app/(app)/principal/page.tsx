@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { LiveRefresh } from "@/components/live-refresh";
 import { Icon } from "@/components/icons";
 import { pct, rupees, shortDate, todayPK } from "@/lib/format";
+import { AutoSend } from "@/components/auto-send";
+import { loadMessagingConfig, readyChannels } from "@/lib/deliver";
 
 const GOAL = 0.9;
 
@@ -15,7 +17,7 @@ export default async function PrincipalToday() {
   const since = new Date(Date.parse(today) - 20 * 86400000).toISOString().slice(0, 10);
 
   const weekAhead = new Date(Date.parse(today) + 7 * 86400000).toISOString().slice(0, 10);
-  const [days, sections, sectionToday, students, invoices, leave, admissions, absences, notices, staffMarked, nextHoliday, owing] = await Promise.all([
+  const [days, sections, sectionToday, students, invoices, leave, admissions, absences, notices, staffMarked, nextHoliday, owing, waiting, absentWaiting, config] = await Promise.all([
     supabase.from("attendance_by_day").select("date, rate, marked, present").gte("date", since).order("date"),
     supabase.from("sections").select("id, name, classes(name, sort)"),
     supabase.from("attendance_by_section_day").select("section_id, present, marked").eq("date", today),
@@ -28,7 +30,11 @@ export default async function PrincipalToday() {
     supabase.from("staff_attendance").select("id", { count: "exact", head: true }).eq("date", today),
     supabase.from("holidays").select("title, starts_on").gt("starts_on", today).lte("starts_on", weekAhead).order("starts_on").limit(1).maybeSingle(),
     supabase.from("family_balances").select("family_id", { count: "exact", head: true }).gt("balance_paisa", 0),
+    supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued"),
+    supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued").eq("kind", "absent"),
+    loadMessagingConfig(supabase),
   ]);
+  const canSend = readyChannels(config).length > 0;
 
   // attendance
   const series = (days.data ?? []).map((d) => ({ date: d.date as string, rate: Number(d.rate) }));
@@ -84,6 +90,7 @@ export default async function PrincipalToday() {
   if ((invoices.data ?? []).length === 0) todo.push({ text: "This month's fee challans aren't made yet", href: "/accounts/setup" });
   else if (owing.count) todo.push({ text: `${owing.count} famil${owing.count === 1 ? "y owes" : "ies owe"} fees: send reminders`, href: "/accounts/messages" });
   if (nextHoliday.data) todo.push({ text: `${nextHoliday.data.title} on ${shortDate(nextHoliday.data.starts_on)}: tell parents`, href: "/principal/notices" });
+  if (absentWaiting.count && !canSend) todo.push({ text: `${absentWaiting.count} absent message${absentWaiting.count === 1 ? "" : "s"} to parents waiting: send with one tap`, href: "/accounts/messages" });
   if (admissions.count) todo.push({ text: `${admissions.count} admission${admissions.count === 1 ? "" : "s"} in progress`, href: "/principal/admissions" });
 
   return (
@@ -93,6 +100,7 @@ export default async function PrincipalToday() {
         <span className="chip"><Icon.coin size={22} /> {pct(feeRate)} <span className="muted">fees in</span></span>
         <span className="chip"><Icon.check size={22} /> {markedToday}/{total} <span className="muted">marked</span></span>
         <LiveRefresh tables={["attendance", "payments", "leave_requests"]} />
+        {canSend && <AutoSend waiting={waiting.count ?? 0} />}
       </div>
 
       <section className="card">

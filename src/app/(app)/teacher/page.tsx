@@ -6,7 +6,7 @@ import { Icon } from "@/components/icons";
 import { shortDate, time, todayPK } from "@/lib/format";
 import { saveAttendance } from "./actions";
 
-type Search = { section?: string; date?: string; saved?: string; error?: string };
+type Search = { section?: string; date?: string; saved?: string; error?: string; alerts?: string };
 
 const STATUS = [
   { v: "present", k: "p", label: "P", name: "Present" },
@@ -68,7 +68,7 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
               <div className="eyebrow">{already ? "Already marked · you can change it" : "Not marked yet"}</div>
               <h2 className="h2 text-2xl">Mark attendance · {section!.label}</h2>
             </div>
-            {sp.saved && <div className="notice-ok">Saved. Parents of absent students get a message in Urdu.</div>}
+            {sp.saved && <div className="notice-ok">Saved.{Number(sp.alerts) > 0 ? ` A message is going to the parents of ${sp.alerts} absent student${sp.alerts === "1" ? "" : "s"}.` : ""}</div>}
             {sp.error && <div className="notice-bad">{sp.error}</div>}
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <Count n={counts.present} label="Present" bg="var(--green-soft)" ink="var(--green-ink)" />
