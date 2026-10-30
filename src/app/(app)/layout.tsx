@@ -7,19 +7,19 @@ import Link from "next/link";
 const NAV: Record<Role, NavItem[]> = {
   principal: [
     { href: "/principal", label: "Today", icon: "home" },
-    { href: "/principal/classes", label: "Classes", icon: "classes" },
+    { href: "/principal/classes", label: "Classes", icon: "classes", also: ["/principal/students"] },
     { href: "/principal/exams", label: "Exams", icon: "star" },
     { href: "/teacher/paper-check", label: "Paper checking", icon: "pencil" },
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
-    { href: "/accounts", label: "Fees", icon: "coin" },
+    { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
     { href: "/settings", label: "Settings", icon: "gear", also: ["/accounts/messages", "/profile"] },
   ],
   owner: [],
   accountant: [
-    { href: "/accounts", label: "Fee desk", icon: "coin" },
+    { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup"] },
     { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],

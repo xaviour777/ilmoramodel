@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FeesTabs } from "@/components/fees-tabs";
 import { randomUUID } from "crypto";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -57,7 +58,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
         <div className="flex items-center gap-3">
-          <Link href="/accounts/messages" className="btn-ghost min-h-10 px-3 text-sm">Fee reminders</Link>
+          <FeesTabs current="desk" />
           <LiveRefresh tables={["payments"]} />
         </div>
       </div>

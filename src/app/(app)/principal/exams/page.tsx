@@ -25,12 +25,13 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const supabase = await createClient();
   const today = todayPK();
-  const [{ data: terms }, { data: classes }, { data: subjects }, { data: scales }, { data: staff }] = await Promise.all([
+  const [{ data: terms }, { data: classes }, { data: subjects }, { data: scales }, { data: staff }, { data: sectionList }] = await Promise.all([
     supabase.from("terms").select("id, name, starts_on, ends_on, academic_sessions!inner(is_current)").eq("academic_sessions.is_current", true).order("sort"),
     supabase.from("classes").select("id, name").order("sort"),
     supabase.from("subjects").select("id, name").order("name"),
     supabase.from("grading_scales").select("id, name"),
     supabase.from("profiles").select("id, full_name").in("role", ["teacher", "principal"]).order("full_name"),
+    supabase.from("sections").select("id, name, classes(name, sort)"),
   ]);
   const term = (terms ?? []).find((t) => t.id === sp.term)
     ?? (terms ?? []).find((t) => t.starts_on <= today && t.ends_on >= today) ?? (terms ?? [])[0];
@@ -169,6 +170,20 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
           <p className="muted">Subject teachers fill marks when you open marks entry. Publishing results locks them.</p>
         </form>
       </div>
+      <form action="/print/report-cards" target="_blank" className="card max-w-3xl">
+        <h2 className="h2">Report cards</h2>
+        <p className="muted">Every student&apos;s card for one section: marks of all published exams this session, grade, position in class and attendance. Print on A4.</p>
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="field flex-1">Section
+            <select className="input" name="section" required>
+              {((sectionList ?? []) as unknown as { id: string; name: string; classes: { name: string; sort: number } }[])
+                .sort((a, b) => a.classes.sort - b.classes.sort || a.name.localeCompare(b.name))
+                .map((s) => <option key={s.id} value={s.id}>{s.classes.name}-{s.name}</option>)}
+            </select>
+          </label>
+          <button className="btn" type="submit">Open report cards</button>
+        </div>
+      </form>
     </>
   );
 }

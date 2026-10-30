@@ -1,16 +1,18 @@
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, time, todayPK } from "@/lib/format";
-import { addStaff, assignSubstitute, decideLeave } from "../actions";
+import { addStaff, assignSubstitute, decideLeave, saveStaffAttendance } from "../actions";
 
-export default async function StaffPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
+export default async function StaffPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string; date?: string }> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
   const supabase = await createClient();
   const today = todayPK();
+  const day = sp.date && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) && sp.date <= today ? sp.date : today;
+  const monthStart = day.slice(0, 8) + "01";
   const weekday = ((new Date(today + "T00:00:00Z").getUTCDay() + 6) % 7) + 1;
 
-  const [{ data: pending }, { data: away }, { data: staff }, { data: slots }, { data: subs }] = await Promise.all([
+  const [{ data: pending }, { data: away }, { data: staff }, { data: slots }, { data: subs }, { data: marked }, { data: dayAway }] = await Promise.all([
     supabase.from("leave_requests").select("id, from_on, to_on, reason, profiles!leave_requests_profile_id_fkey(full_name)").eq("status", "pending").order("from_on"),
     supabase.from("leave_requests").select("profile_id, profiles!leave_requests_profile_id_fkey(full_name)").eq("status", "approved").lte("from_on", today).gte("to_on", today),
     supabase.from("profiles").select("id, full_name, role, phone, user_id").in("role", ["principal", "teacher", "accountant"]).order("role").order("full_name"),
@@ -18,7 +20,14 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
       ? supabase.from("timetable_slots").select("id, teacher_id, period_id, periods!inner(name, starts_at, sort, timing_profiles!inner(is_active)), subjects(name), sections(name, classes(name))").eq("weekday", weekday).eq("periods.timing_profiles.is_active", true)
       : Promise.resolve({ data: [] }),
     supabase.from("substitutions").select("timetable_slot_id, substitute_id").eq("date", today),
+    supabase.from("staff_attendance").select("profile_id, date, status").gte("date", monthStart).lte("date", day),
+    supabase.from("leave_requests").select("profile_id").eq("status", "approved").lte("from_on", day).gte("to_on", day),
   ]);
+  // what is already marked for the chosen day, and this month's absences per person
+  const onDay = new Map((marked ?? []).filter((m) => m.date === day).map((m) => [m.profile_id, m.status as string]));
+  const leaveOnDay = new Set((dayAway ?? []).map((a) => a.profile_id));
+  const absentDays = new Map<string, number>();
+  for (const m of marked ?? []) if (m.status === "absent") absentDays.set(m.profile_id, (absentDays.get(m.profile_id) ?? 0) + 1);
 
   type Slot = { id: string; teacher_id: string | null; period_id: string; periods: { name: string; starts_at: string; sort: number }; subjects: { name: string }; sections: { name: string; classes: { name: string } } };
   const all = (slots ?? []) as unknown as Slot[];
@@ -78,6 +87,43 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
               </form>
             );
           })}
+        </section>
+
+        <section className="card xl:col-span-2">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="h2">Staff attendance</h2>
+              <span className="muted">{shortDate(day)} · {onDay.size ? `${onDay.size} of ${(staff ?? []).length} marked` : "not marked yet"}. Anyone on approved leave is already set to Leave.</span>
+            </div>
+            <form className="flex items-end gap-2">
+              <input className="input min-h-10 py-1 text-sm" type="date" name="date" defaultValue={day} max={today} aria-label="Day" />
+              <button className="btn-ghost min-h-10 px-3 text-sm" type="submit">Show</button>
+            </form>
+          </div>
+          <form action={saveStaffAttendance} className="flex flex-col gap-3">
+          <input type="hidden" name="date" value={day} />
+          <div className="grid gap-2 md:grid-cols-2">
+            {(staff ?? []).map((s) => {
+              const cur = onDay.get(s.id) ?? (leaveOnDay.has(s.id) ? "leave" : "present");
+              return (
+                <fieldset key={s.id} className="row-box flex-wrap">
+                  <legend className="sr-only">{s.full_name}</legend>
+                  <div className="min-w-32 flex-1">
+                    <div className="font-extrabold">{s.full_name}</div>
+                    <div className="muted text-xs">{s.role}{absentDays.get(s.id) ? ` · absent ${absentDays.get(s.id)} day${absentDays.get(s.id) === 1 ? "" : "s"} this month` : ""}</div>
+                  </div>
+                  {[["present", "P"], ["late", "L"], ["absent", "A"], ["leave", "Lv"]].map(([v, l]) => (
+                    <label key={v} className="flex items-center gap-1 text-sm font-extrabold" title={v}>
+                      <input type="radio" name={`st:${s.id}`} value={v} defaultChecked={cur === v} /> {l}
+                    </label>
+                  ))}
+                </fieldset>
+              );
+            })}
+          </div>
+          <button className="btn self-start" type="submit">Save attendance</button>
+          <p className="muted">P present · L late · A absent · Lv leave</p>
+          </form>
         </section>
 
         <section className="card">
