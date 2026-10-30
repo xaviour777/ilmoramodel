@@ -9,6 +9,8 @@ import { SendButton } from "@/components/send-button";
 import { CHANNEL_LABEL, CHOICE_LABEL, feeReminderText, showPhone, type Channel } from "@/lib/messages";
 import { withRecommendations, type FamilyContact } from "@/lib/outbox";
 import { recordPayment, setReminderContact } from "./actions";
+import { AutoSend } from "@/components/auto-send";
+import { loadMessagingConfig, readyChannels } from "@/lib/deliver";
 
 // The school takes fees only in cash or through JazzCash and Easypaisa.
 const MODES = [["cash", "Cash"], ["jazzcash", "JazzCash"], ["easypaisa", "Easypaisa"]];
@@ -57,6 +59,11 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
     ? feeReminderText({ familyName: family.name, balancePaisa: balance, dueOn: invoice?.due_on ?? null, campus: me.campus_name })
     : "";
 
+  const [{ count: waiting }, config] = await Promise.all([
+    supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued"),
+    loadMessagingConfig(supabase),
+  ]);
+  const canSend = readyChannels(config).length > 0;
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -64,6 +71,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
         <div className="flex items-center gap-3">
           <FeesTabs current="desk" salaries={me.role === "accountant"} />
           <LiveRefresh tables={["payments"]} />
+          {canSend && <AutoSend waiting={waiting ?? 0} />}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

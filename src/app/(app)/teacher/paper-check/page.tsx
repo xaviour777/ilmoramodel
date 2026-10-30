@@ -19,7 +19,7 @@ export default async function PaperCheckPage() {
     ? await supabase.from("paper_sheets").select("test_id, status").in("test_id", tests.map((t) => t.id))
     : { data: [] };
   const count = (id: string, pred: (s: string) => boolean) => (sheets ?? []).filter((s) => s.test_id === id && pred(s.status)).length;
-  const demo = getLearningAi().name === "demo";
+  const demo = (await getLearningAi(supabase)).name === "demo";
 
   return (
     <>

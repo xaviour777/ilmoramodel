@@ -1,13 +1,13 @@
 /**
  * AI notice writer for the principal: a few words in, a ready notice out.
- * Uses Claude only when ANTHROPIC_API_KEY is set; otherwise a plain template ("Demo AI").
+ * Uses the AI chosen in Settings → AI when it is on and within budget; otherwise a plain template ("Demo AI").
  * Only the principal's few words and the school name are sent; never student or parent data.
  */
-import Anthropic from "@anthropic-ai/sdk";
-import { CLAUDE_MODEL } from "@/lib/ai";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { callAi } from "@/lib/ai";
 
 export type NoticeLanguage = "en" | "roman_urdu";
-export type NoticeDraft = { title: string; body: string; provider: "demo" | "claude" };
+export type NoticeDraft = { title: string; body: string; provider: string };
 
 const SCHEMA = {
   type: "object",
@@ -27,22 +27,19 @@ export function demoNotice(idea: string, lang: NoticeLanguage, school: string): 
   return { title, body, provider: "demo" };
 }
 
-export async function writeNotice(idea: string, lang: NoticeLanguage, school: string): Promise<NoticeDraft> {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key || process.env.NODE_ENV === "test") return demoNotice(idea, lang, school);
-  const client = new Anthropic({ apiKey: key });
-  const response = await client.messages.create({
-    model: CLAUDE_MODEL,
-    max_tokens: 1500,
-    output_config: { effort: "low", format: { type: "json_schema", schema: SCHEMA } },
+export async function writeNotice(supabase: SupabaseClient, idea: string, lang: NoticeLanguage, school: string): Promise<NoticeDraft> {
+  if (process.env.NODE_ENV === "test") return demoNotice(idea, lang, school);
+  const r = await callAi(supabase, {
+    feature: "notice",
+    maxTokens: 1500,
+    schema: SCHEMA,
     system: `You write short school notices for ${school}, a private school in Pakistan, sent to parents in the app and on WhatsApp/SMS. `
       + `Polite, clear, under 90 words, no emojis, no made-up dates, fees or names: use only what the principal gave. `
       + (lang === "roman_urdu" ? "Write in simple Roman Urdu (Urdu in English letters)." : "Write in simple English.")
       + " Sign off as Principal. The title is under 60 characters.",
-    messages: [{ role: "user", content: `What the notice is about: ${idea}` }],
+    messages: [{ role: "user", text: `What the notice is about: ${idea}` }],
   });
-  if (response.stop_reason === "refusal") return demoNotice(idea, lang, school);
-  const text = response.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "{}";
-  const parsed = JSON.parse(text) as { title: string; body: string };
-  return { title: parsed.title, body: parsed.body, provider: "claude" };
+  if (!r.ok) return demoNotice(idea, lang, school);
+  const parsed = JSON.parse(r.text) as { title: string; body: string };
+  return { title: parsed.title, body: parsed.body, provider: r.provider };
 }

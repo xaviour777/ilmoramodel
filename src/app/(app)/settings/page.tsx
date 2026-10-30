@@ -2,7 +2,7 @@ import { SettingsTabs } from "@/components/settings-tabs";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { SETTINGS_COLS, readyChannels, type MessagingConfig } from "@/lib/deliver";
-import { saveMessaging, sendTest } from "./actions";
+import { saveAbsentAlerts, saveMessaging, sendTest } from "./actions";
 
 type Search = { saved?: string; tested?: string; error?: string };
 
@@ -10,9 +10,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const me = await requireRole("principal", "owner");
   const sp = await searchParams;
   const supabase = await createClient();
-  const [{ data: s }, { data: k }] = await Promise.all([
+  const [{ data: s }, { data: k }, { data: alerts }] = await Promise.all([
     supabase.from("campus_settings").select(SETTINGS_COLS).maybeSingle(),
     supabase.from("campus_secrets").select("whatsapp_token, sms_api_key").maybeSingle(),
+    supabase.from("campus_settings").select("absent_alerts").maybeSingle(),
   ]);
   const c = s as Partial<MessagingConfig> | null;
   // only ever show the last 4 characters of a saved token or key
@@ -102,6 +103,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </form>
         </section>
       </div>
+      <form action={saveAbsentAlerts} className="card">
+        <h2 className="h2">Absent alerts</h2>
+        <label className="flex items-center gap-2.5 text-sm font-extrabold"><input type="checkbox" name="absent_alerts" defaultChecked={alerts?.absent_alerts ?? true} className="h-5 w-5" /> Message parents when their child is marked absent</label>
+        <p className="muted">When a teacher saves attendance, each absent child&apos;s parents get one message for that day. With WhatsApp or SMS connected above, it goes out as soon as the office opens Today or the fee desk; otherwise it waits in Messages sent for one tap.</p>
+        <button className="btn-ghost self-start" type="submit">Save</button>
+      </form>
       <p className="muted">Tokens and keys are never shown again after saving. Only the principal and owner can change them; fee reminders sent by the accounts office use them too.</p>
     </>
   );

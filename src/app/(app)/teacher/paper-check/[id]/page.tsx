@@ -145,7 +145,7 @@ export default async function PaperTestPage({ params, searchParams }: { params: 
                   : <p className="muted text-sm">No photo of this answer.</p>}
                 {a.ai && (
                   <div className="rounded-xl p-2.5 text-sm" style={{ background: "var(--purple-soft)", color: "var(--purple-ink)" }}>
-                    <b>{a.ai.provider === "claude" ? "AI suggests" : "Demo AI"}: {a.ai.marks == null ? "please mark this yourself" : `${a.ai.marks}/${q.maxMarks}`}</b>
+                    <b>{a.ai.provider !== "demo" ? "AI suggests" : "Demo AI"}: {a.ai.marks == null ? "please mark this yourself" : `${a.ai.marks}/${q.maxMarks}`}</b>
                     {a.ai.marks != null && ` (${Math.round(a.ai.confidence * 100)}% sure)`}. {a.ai.reason}
                     {a.ai.missingPoints.length > 0 && <div>Missing: {a.ai.missingPoints.join(", ")}</div>}
                   </div>

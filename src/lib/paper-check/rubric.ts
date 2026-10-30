@@ -28,7 +28,7 @@ export interface AiSuggestion {
   reason: string;
   confidence: number; // 0..1
   transcript?: string;
-  provider: "demo" | "claude";
+  provider: string; // "demo", or the AI company that suggested it
 }
 
 export interface WrittenAnswer {
