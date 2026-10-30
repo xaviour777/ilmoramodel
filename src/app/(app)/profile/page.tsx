@@ -1,6 +1,7 @@
 import { getMe } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { AvatarUpload } from "@/components/avatar-upload";
+import { SettingsTabs } from "@/components/settings-tabs";
 import { changePassword, saveProfile } from "./actions";
 
 const ROLE: Record<string, string> = { owner: "Owner", principal: "Principal", accountant: "Accountant", teacher: "Teacher", parent: "Parent", student: "Student" };
@@ -15,9 +16,12 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   ]);
   return (
     <>
-      <div>
-        <h1 className="h1">My profile</h1>
-        <p className="muted text-base">{ROLE[me.role]} · {me.campus_name}</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="h1">My profile</h1>
+          <p className="muted text-base">{ROLE[me.role]} · {me.campus_name}</p>
+        </div>
+        {(me.role === "principal" || me.role === "owner") && <SettingsTabs current="profile" />}
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved === "details" && <div className="notice-ok">Saved.</div>}
