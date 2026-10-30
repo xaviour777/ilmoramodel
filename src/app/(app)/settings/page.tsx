@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SettingsTabs } from "@/components/settings-tabs";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { SETTINGS_COLS, readyChannels, type MessagingConfig } from "@/lib/deliver";
@@ -26,7 +26,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <h1 className="h1">Settings</h1>
           <p className="muted text-base">{me.campus_name}: connect WhatsApp and SMS so fee reminders and notices reach parents by themselves.</p>
         </div>
-        <Link href="/profile" className="btn-ghost min-h-10 px-3 text-sm">My profile</Link>
+        <SettingsTabs current="connect" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}

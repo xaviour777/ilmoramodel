@@ -1,0 +1,12 @@
+import { Tabs } from "./tabs";
+
+// Settings, the WhatsApp & SMS outbox and My profile share one menu entry; these tabs move between them.
+export function SettingsTabs({ current }: { current: "connect" | "messages" | "profile" }) {
+  return (
+    <Tabs current={current} tabs={[
+      { id: "connect", label: "WhatsApp & SMS setup", href: "/settings" },
+      { id: "messages", label: "Messages sent", href: "/accounts/messages" },
+      { id: "profile", label: "My profile", href: "/profile" },
+    ]} />
+  );
+}
