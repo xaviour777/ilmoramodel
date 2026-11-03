@@ -112,3 +112,14 @@ export async function requestLeave(formData: FormData) {
   revalidatePath("/teacher/leave");
   redirect("/teacher/leave?saved=1");
 }
+
+// The teacher's answer to the timetable the principal sent: accept, or say what must change.
+export async function answerTimetable(f: FormData) {
+  await getMe();
+  const supabase = await createClient();
+  const status = str(f, "status");
+  const { data, error } = await supabase.rpc("answer_timetable", { p_round: str(f, "round_id"), p_status: status, p_note: str(f, "note") });
+  if (error) redirect(`/teacher/timetable?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/teacher");
+  redirect(`/teacher/timetable?saved=${data ? status : "closed"}`);
+}

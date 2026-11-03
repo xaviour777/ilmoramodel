@@ -9,7 +9,7 @@ const MODE: Record<string, string> = { cash: "Cash", jazzcash: "JazzCash", easyp
 
 // A fee receipt: a school copy and a parent copy on the top half of an A4 page.
 export default async function PrintReceipt({ params }: { params: Promise<{ id: string }> }) {
-  const me = await requireRole("accountant", "principal", "owner");
+  const me = await requireRole("accountant", "principal", "owner", "parent");  // parents only ever get their own payments back
   const { id } = await params;
   const supabase = await createClient();
   const { data: p } = await supabase.from("payments")

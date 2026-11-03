@@ -5,6 +5,8 @@ import { SectionPicker } from "@/components/section-picker";
 import { Icon } from "@/components/icons";
 import { shortDate, time, todayPK } from "@/lib/format";
 import { saveAttendance } from "./actions";
+import Link from "next/link";
+import { myTimetableAsk, TimetableAsk } from "@/components/timetable-ask";
 
 type Search = { section?: string; date?: string; saved?: string; error?: string; alerts?: string };
 
@@ -36,6 +38,7 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
       .eq("teacher_id", me.id).eq("weekday", weekday).eq("periods.timing_profiles.is_active", true),
   ]);
 
+  const ask = await myTimetableAsk(supabase, me.id);
   const mark = new Map((marks ?? []).map((m) => [m.student_id, m.status as string]));
   const already = (marks ?? []).length > 0;
   const counts = { present: 0, absent: 0, late: 0, leave: 0 } as Record<string, number>;
@@ -58,6 +61,7 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
         </form>
       </div>
 
+      {ask?.status === "pending" && <TimetableAsk ack={ask} compact />}
       {sections.length === 0 ? (
         <div className="card"><p className="muted">You aren&apos;t assigned to any section yet. Ask the principal to add you as a class or subject teacher.</p></div>
       ) : (
@@ -114,7 +118,7 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
           </section>
 
           <section className="card flex-1">
-            <h2 className="h2">Today&apos;s periods</h2>
+            <div className="flex items-center justify-between gap-2"><h2 className="h2">Today&apos;s periods</h2><Link href="/teacher/timetable" className="text-sm font-extrabold">Full week</Link></div>
             {today.length === 0 && <p className="muted">No periods on the timetable for you today.</p>}
             {today.map((t) => (
               <div key={t.id} className="row-box">

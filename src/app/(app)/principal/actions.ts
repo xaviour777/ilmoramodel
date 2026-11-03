@@ -9,6 +9,7 @@ import { familiesForAudience, queueForFamilies } from "@/lib/outbox";
 import { deliverQueued } from "@/lib/deliver";
 import { firstChallan } from "@/lib/challan";
 import { writeNotice, type NoticeDraft } from "@/lib/notice-writer";
+import { allWeeks } from "@/lib/timetable";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const back = (path: string, error?: string, ok?: string): never => {
@@ -451,4 +452,95 @@ export async function draftNotice(idea: string, lang: string): Promise<NoticeDra
   } catch {
     return { error: "The AI could not write it just now. Try again, or write it yourself." };
   }
+}
+
+// ---------- Timetable: fill, send to teachers, confirm ----------
+// Fills this section's free periods from its subject teachers: subjects share the week evenly,
+// no subject twice in a row, at most two of one subject a day, and never a teacher in two rooms.
+export async function autoFillSection(f: FormData) {
+  const me = await admin();
+  const supabase = await createClient();
+  const section = str(f, "section_id");
+  const path = `/principal/classes?tab=timetable&section=${section}`;
+  const lastDay = f.get("saturday") ? 6 : 5;
+  const [{ data: subs }, { data: periods }, { data: mine }, { data: busy }] = await Promise.all([
+    supabase.from("section_subjects").select("subject_id, teacher_id").eq("section_id", section),
+    supabase.from("periods").select("id, sort, timing_profiles!inner(is_active)").eq("timing_profiles.is_active", true).eq("kind", "class").order("sort"),
+    supabase.from("timetable_slots").select("weekday, period_id, subject_id").eq("section_id", section),
+    supabase.from("timetable_slots").select("weekday, period_id, teacher_id").not("teacher_id", "is", null).neq("section_id", section),
+  ]);
+  if (!(subs ?? []).length) return back(path, "Add this section's subject teachers first (below the timetable).");
+  if (!(periods ?? []).length) return back(path, "Add periods in the Timings tab first.");
+  const taken = new Set((busy ?? []).map((b) => `${b.teacher_id}-${b.weekday}-${b.period_id}`));
+  const placed = new Map<string, string>((mine ?? []).map((s) => [`${s.weekday}-${s.period_id}`, s.subject_id]));
+  const count = new Map((subs ?? []).map((s) => [s.subject_id, 0]));
+  for (const s of mine ?? []) count.set(s.subject_id, (count.get(s.subject_id) ?? 0) + 1);
+  const rows: { campus_id: string; section_id: string; weekday: number; period_id: string; subject_id: string; teacher_id: string | null }[] = [];
+  for (let day = 1; day <= lastDay; day++) {
+    const today = new Map<string, number>();
+    for (const [k, v] of placed) if (k.startsWith(`${day}-`)) today.set(v, (today.get(v) ?? 0) + 1);
+    let prev = "";
+    for (const p of periods ?? []) {
+      const here = placed.get(`${day}-${p.id}`);
+      if (here) { prev = here; continue; }
+      const pick = [...(subs ?? [])]
+        .filter((s) => s.subject_id !== prev && (today.get(s.subject_id) ?? 0) < 2 && !(s.teacher_id && taken.has(`${s.teacher_id}-${day}-${p.id}`)))
+        .sort((a, b) => (count.get(a.subject_id) ?? 0) - (count.get(b.subject_id) ?? 0))[0];
+      if (!pick) { prev = ""; continue; }
+      rows.push({ campus_id: me.campus_id, section_id: section, weekday: day, period_id: p.id, subject_id: pick.subject_id, teacher_id: pick.teacher_id });
+      placed.set(`${day}-${p.id}`, pick.subject_id);
+      count.set(pick.subject_id, (count.get(pick.subject_id) ?? 0) + 1);
+      today.set(pick.subject_id, (today.get(pick.subject_id) ?? 0) + 1);
+      if (pick.teacher_id) taken.add(`${pick.teacher_id}-${day}-${p.id}`);
+      prev = pick.subject_id;
+    }
+  }
+  if (!rows.length) return back(path, undefined, "full");
+  const { error } = await supabase.from("timetable_slots").insert(rows);
+  back(path, error?.message, `filled-${rows.length}`);
+}
+
+// Every teacher on the timetable gets a line to accept or report a problem on their dashboard.
+export async function sendTimetableForReview(f: FormData) {
+  const me = await admin();
+  const supabase = await createClient();
+  const path = "/principal/classes?tab=timetable&view=review";
+  const { data: slots } = await supabase.from("timetable_slots").select("teacher_id").not("teacher_id", "is", null);
+  const teachers = [...new Set((slots ?? []).map((s) => s.teacher_id as string))];
+  if (!teachers.length) return back(path, "Put teachers on the timetable first.");
+  await supabase.from("timetable_rounds").update({ status: "replaced" }).eq("status", "review");
+  const message = str(f, "message") || null;
+  const { data: round, error } = await supabase.from("timetable_rounds")
+    .insert({ campus_id: me.campus_id, message, sent_by: me.id }).select("id").single();
+  if (error) return back(path, error.message);
+  const { error: e2 } = await supabase.from("timetable_acks")
+    .insert(teachers.map((t) => ({ round_id: round.id, campus_id: me.campus_id, teacher_id: t })));
+  if (e2) return back(path, e2.message);
+  await supabase.from("notices").insert({
+    campus_id: me.campus_id, audience: "staff", created_by: me.id, title: "New timetable: please check your periods",
+    body: `Open your dashboard and tap Accept, or tell the principal what needs to change.${message ? ` ${message}` : ""}`,
+  });
+  back(path, undefined, "sent");
+}
+
+// Saves every section's week as parents and students will see it, and closes the review.
+export async function confirmTimetable() {
+  const me = await admin();
+  const supabase = await createClient();
+  const path = "/principal/classes?tab=timetable&view=review";
+  const [{ data: sections }, weeks] = await Promise.all([supabase.from("sections").select("id"), allWeeks(supabase)]);
+  const now = new Date().toISOString();
+  const rows = (sections ?? []).map((s) => ({ section_id: s.id, campus_id: me.campus_id, grid: weeks.get(s.id) ?? [], confirmed_at: now }));
+  for (let i = 0; i < rows.length; i += 200) {
+    const { error } = await supabase.from("published_timetables").upsert(rows.slice(i, i + 200), { onConflict: "section_id" });
+    if (error) return back(path, error.message);
+  }
+  const { data: open } = await supabase.from("timetable_rounds").select("id").eq("status", "review").maybeSingle();
+  if (open) await supabase.from("timetable_rounds").update({ status: "confirmed", confirmed_by: me.id, confirmed_at: now }).eq("id", open.id);
+  else await supabase.from("timetable_rounds").insert({ campus_id: me.campus_id, status: "confirmed", sent_by: me.id, confirmed_by: me.id, confirmed_at: now });
+  await supabase.from("notices").insert({
+    campus_id: me.campus_id, audience: "everyone", created_by: me.id, title: "New timetable",
+    body: "The timetable is updated. Parents and students can see each day's periods and teachers in the app.",
+  });
+  back(path, undefined, "confirmed");
 }
