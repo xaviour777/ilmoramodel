@@ -109,3 +109,59 @@ export async function draftQuiz(supabase: SupabaseClient, a: QuizAsk): Promise<Q
     written: (d.written ?? []).slice(0, a.writtenCount).filter((w) => w.prompt && w.marks > 0),
   };
 }
+
+// ---------- Question bank drafts ----------
+export type BankDraft = { kind: "mcq" | "short" | "long"; question: string; options: string[]; answer: string }[];
+export type BankAsk = { subject: string; className: string; chapter: string; mcq: number; short: number; long: number; language: "en" | "ur" };
+
+const BANK_SCHEMA = {
+  type: "object",
+  properties: {
+    questions: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          kind: { type: "string", enum: ["mcq", "short", "long"] },
+          question: { type: "string" },
+          options: { type: "array", items: { type: "string" } },
+          answer: { type: "string" },
+        },
+        required: ["kind", "question", "options", "answer"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["questions"],
+  additionalProperties: false,
+};
+
+/** Asks the school's AI for one chapter's questions for the bank. The teacher keeps only the good ones. */
+export async function draftBank(supabase: SupabaseClient, a: BankAsk): Promise<BankDraft> {
+  const r = await callAi(supabase, {
+    feature: "quiz",
+    maxTokens: 8000,
+    schema: BANK_SCHEMA,
+    system: [
+      `You write question-bank questions for ${a.className}, ${a.subject}, in Punjab, Pakistan: Punjab Curriculum and Textbook Board syllabus, Punjab board (BISE) paper style.`,
+      a.language === "ur" ? "Write in Urdu script." : "Write in simple English.",
+      "mcq: exactly 4 options, answer = the correct letter A, B, C or D; spread the correct letters; no \"all of the above\".",
+      "short: a board short question (2 marks), answer = a model answer in 2 to 4 lines.",
+      "long: a board long question (about 4 to 5 marks, or a part of a 9-mark question), answer = the main points a full answer needs.",
+      "Only this chapter's syllabus content, including its textbook exercise questions where they fit. No trick questions. Every question different.",
+      "For short and long questions, options = [].",
+    ].join("\n"),
+    messages: [{ role: "user", text: `Chapter: ${a.chapter}\nMake ${a.mcq} mcq, ${a.short} short and ${a.long} long questions.` }],
+  });
+  if (!r.ok) {
+    if (r.reason === "off") throw new Error("AI is off. The principal can turn it on in Settings → AI.");
+    if (r.reason === "budget") throw new Error("Today's AI limit is used up. Try tomorrow, or ask the principal to raise it.");
+    throw new Error(r.message ?? "The AI could not make questions just now.");
+  }
+  const d = JSON.parse(r.text) as { questions: BankDraft };
+  return (d.questions ?? []).map((q) => ({
+    kind: q.kind, question: String(q.question).trim(),
+    options: q.kind === "mcq" ? (q.options ?? []).slice(0, 4).map(String) : [],
+    answer: q.kind === "mcq" ? String(q.answer).trim().toUpperCase().slice(0, 1) : String(q.answer ?? "").trim(),
+  })).filter((q) => q.question && (q.kind !== "mcq" || (q.options.length === 4 && ["A", "B", "C", "D"].includes(q.answer))));
+}

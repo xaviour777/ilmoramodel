@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { listTests, testLabel } from "@/lib/paper-check/data";
 import { shortDate } from "@/lib/format";
 import { getLearningAi } from "@/lib/ai";
+import { PaperTabs } from "@/components/paper-tabs";
 
 const STATUS: Record<string, [string, string]> = {
   checking: ["Checking", "pill-blue"],
@@ -28,7 +29,7 @@ export default async function PaperCheckPage() {
           <h1 className="h1">Paper checking</h1>
           <p className="muted text-base">Print answer sheets, scan them with your phone, and check the whole class in minutes. MCQs are marked automatically. AI only suggests marks for written answers: you decide.</p>
         </div>
-        <Link href="/teacher/paper-check/new" className="btn">New test</Link>
+        <div className="flex flex-wrap items-center gap-2"><PaperTabs current="tests" /><Link href="/teacher/paper-check/new" className="btn">New test</Link></div>
       </div>
       {demo && <div className="notice-warn">Demo AI is on. MCQs are read from the photo, but you mark the written answers yourself until the real AI key is added.</div>}
       <section className="card">
