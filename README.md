@@ -39,8 +39,9 @@ The rules live in `supabase/migrations/`.
    8. `supabase/migrations/20261030000004_absent_dayclose_calls_expenses.sql` (absent alerts, day close, defaulter calls, expense ledger)
    9. `supabase/migrations/20261030000005_ai_settings_budget.sql` (AI company, key and daily spending limit)
    10. `supabase/migrations/20261031000001_quiz_questions_auto_publish.sql` (quiz questions for the printed paper, quick quizzes published straight to families)
-   11. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
-   12. optional: `supabase/seed_journey.sql` (adds Class 5 to 7 and a full Class 9 of 200 for board registration, and Ali Raza's story from admission into Class 9 to Class 10; runs once)
+   11. `supabase/migrations/20261103000001_timetable_review_parent_pay.sql` (timetable review by teachers and the copy parents see, parents paying by JazzCash or Easypaisa with a transaction ID)
+   12. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
+   13. optional: `supabase/seed_journey.sql` (adds Class 5 to 7 and a full Class 9 of 200 for board registration, and Ali Raza's story from admission into Class 9 to Class 10; runs once)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { todayPK } from "@/lib/format";
 import { feeReminderText, mobilePK } from "@/lib/messages";
-import { allRows, familiesByIds, queueForFamilies } from "@/lib/outbox";
+import { allRows, familiesByIds, queueForFamilies, type FamilyContact } from "@/lib/outbox";
 import { deliverQueued } from "@/lib/deliver";
 import { challanTag } from "@/lib/challan";
 
@@ -233,4 +233,61 @@ export async function generateChallans(f: FormData) {
   }
   revalidatePath("/accounts");
   redirect(`/accounts/setup?made=${families.length}&month=${month}`);
+}
+
+// ---------- Parents paying by wallet ----------
+export async function saveWallets(f: FormData) {
+  const me = await requireRole("accountant", "principal", "owner");
+  const supabase = await createClient();
+  const { error } = await supabase.from("school_wallets").upsert({
+    campus_id: me.campus_id,
+    jazzcash_number: str(f, "jazzcash_number") || null, jazzcash_title: str(f, "jazzcash_title") || null,
+    easypaisa_number: str(f, "easypaisa_number") || null, easypaisa_title: str(f, "easypaisa_title") || null,
+    note: str(f, "note") || null, updated_by: me.id, updated_at: new Date().toISOString(),
+  });
+  if (error) redirect(`/accounts/online?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/accounts/online");
+  redirect("/accounts/online?saved=wallets");
+}
+
+// The money is in the school's wallet: turn the parent's claim into a normal payment and receipt.
+export async function decideClaim(f: FormData) {
+  const me = await requireRole("accountant", "principal", "owner");
+  const supabase = await createClient();
+  const id = str(f, "claim_id");
+  const ok = str(f, "decision") === "confirm";
+  const fail = (m: string): never => redirect(`/accounts/online?error=${encodeURIComponent(m)}`);
+  // take the claim first, so two people can't confirm it twice
+  const { data: c } = await supabase.from("payment_claims")
+    .update({ status: ok ? "confirmed" : "rejected", reason: ok ? null : str(f, "reason") || "Payment not found in our account", decided_by: me.id, decided_at: new Date().toISOString() })
+    .eq("id", id).eq("status", "pending")
+    .select("id, family_id, invoice_id, amount_paisa, mode, txn_id, reason, families(id, name, phone, reminder_phone, reminder_channel)").maybeSingle();
+  if (!c) fail("Someone has already dealt with this one.");
+  const fam = c!.families as unknown as FamilyContact;
+  const mode = c!.mode === "jazzcash" ? "JazzCash" : "Easypaisa";
+  let receipt = "";
+  if (ok) {
+    const key = `claim-${id}`;
+    receipt = await nextReceiptNo(supabase);
+    const { error } = await supabase.from("payments").insert({
+      campus_id: me.campus_id, family_id: c!.family_id, invoice_id: c!.invoice_id, amount_paisa: c!.amount_paisa,
+      mode: c!.mode, reference: `TID ${c!.txn_id}`, receipt_no: receipt, received_by: me.id, idempotency_key: key,
+    });
+    if (error && !error.message.includes("payments_idempotency_key_key")) {
+      await supabase.from("payment_claims").update({ status: "pending", decided_by: null, decided_at: null }).eq("id", id);
+      fail(error.message);
+    }
+    const { data: p } = await supabase.from("payments").select("id").eq("idempotency_key", key).maybeSingle();
+    if (p) await supabase.from("payment_claims").update({ payment_id: p.id }).eq("id", id);
+  }
+  // tell the family on WhatsApp or SMS
+  const amount = `Rs ${Math.round(Number(c!.amount_paisa) / 100).toLocaleString("en-PK")}`;
+  await queueForFamilies(supabase, {
+    campusId: me.campus_id, families: [fam], kind: "notice",
+    text: () => ok
+      ? `${me.campus_name}: ${amount} fee received by ${mode} (TID ${c!.txn_id}). Receipt ${receipt}. Shukriya.`
+      : `${me.campus_name}: we could not find your ${mode} payment of ${amount} (TID ${c!.txn_id}). ${c!.reason}. Please call the school office.`,
+  });
+  revalidatePath("/accounts/online");
+  redirect(`/accounts/online?saved=${ok ? "confirmed" : "rejected"}`);
 }

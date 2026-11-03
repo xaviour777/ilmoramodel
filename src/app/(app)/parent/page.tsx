@@ -38,6 +38,10 @@ export default async function ParentHome({ searchParams }: { searchParams: Promi
         <div className="flex items-center justify-between"><h2 className="h2">Fees</h2><span className={`pill ${due > 0 ? "pill-orange" : "pill-green"}`}>{due > 0 ? "Due" : "All paid"}</span></div>
         <div className="text-3xl font-black tabular-nums">{rupees(due)}</div>
         {invoice && <div className="muted">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)} · pay with JazzCash or Easypaisa, or in cash at the school counter</div>}
+        <div className="flex flex-wrap gap-2">
+          {due > 0 && <Link href="/parent/fees#pay" className="btn">Pay now</Link>}
+          <Link href="/parent/fees" className="btn-ghost">Fee record and receipts</Link>
+        </div>
       </section>
       {child ? <ChildOverview child={child} /> : <p className="muted">No children linked to your account yet. Please contact the school office.</p>}
       <NoticesList />

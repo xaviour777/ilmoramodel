@@ -3,13 +3,15 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { ClassesTabs } from "@/components/classes-tabs";
 import { Tabs } from "@/components/tabs";
-import { time } from "@/lib/format";
+import { shortDate, time, todayPK } from "@/lib/format";
 import {
   activateTiming, addPeriod, addSection, addStandardClasses, assignSubjectTeacher, createClass, createSubject, editClass, editSection,
-  createTimingProfile, deletePeriod, setClassTeacher, setSlot,
+  createTimingProfile, deletePeriod, setClassTeacher, setSlot, autoFillSection, sendTimetableForReview, confirmTimetable,
 } from "../actions";
+import { WeekGrid } from "@/components/week-grid";
+import { liveWeek, weekdayOf } from "@/lib/timetable";
 
-type Search = { tab?: string; profile?: string; section?: string; saved?: string; error?: string };
+type Search = { tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default async function ClassesPage({ searchParams }: { searchParams: Promise<Search> }) {
@@ -26,10 +28,10 @@ export default async function ClassesPage({ searchParams }: { searchParams: Prom
         <ClassesTabs current={tab} />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
-      {sp.saved && <div className="notice-ok">Saved.</div>}
+      {sp.saved && <div className="notice-ok">{savedText(sp.saved)}</div>}
       {tab === "classes" && <ClassesTab />}
       {tab === "timings" && <TimingsTab profileId={sp.profile} />}
-      {tab === "timetable" && <TimetableTab sectionId={sp.section} />}
+      {tab === "timetable" && <TimetableViews sp={sp} />}
     </>
   );
 }
@@ -190,6 +192,159 @@ async function TimingsTab({ profileId }: { profileId?: string }) {
   );
 }
 
+function savedText(v: string) {
+  if (v.startsWith("filled-")) return `Filled ${v.slice(7)} free periods. Check them, then change any period below.`;
+  return ({ full: "No free periods left to fill.", sent: "Sent. Each teacher sees it on their dashboard and can accept it or report a problem.",
+    confirmed: "Confirmed. Parents and students now see the new timetable." } as Record<string, string>)[v] ?? "Saved.";
+}
+
+const VIEWS = [
+  { id: "class", label: "By class" },
+  { id: "teacher", label: "By teacher" },
+  { id: "school", label: "Whole school" },
+  { id: "review", label: "Send to teachers & confirm" },
+];
+
+async function TimetableViews({ sp }: { sp: Search }) {
+  const view = VIEWS.some((v) => v.id === sp.view) ? sp.view! : "class";
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap gap-2">
+        {VIEWS.map((v) => (
+          <Link key={v.id} href={`/principal/classes?tab=timetable&view=${v.id}`}
+            className="inline-flex min-h-10 items-center rounded-xl border-2 px-3.5 text-sm font-extrabold"
+            style={v.id === view ? { borderColor: "var(--blue-ring)", background: "var(--blue-soft)", color: "var(--blue-ink)" } : { borderColor: "var(--line)", background: "#fff" }}>
+            {v.label}
+          </Link>
+        ))}
+      </div>
+      {view === "class" && <TimetableTab sectionId={sp.section} />}
+      {view === "teacher" && <TeacherWeek teacherId={sp.teacher} />}
+      {view === "school" && <SchoolDay day={Number(sp.day) || 0} />}
+      {view === "review" && <ReviewRound />}
+    </div>
+  );
+}
+
+async function TeacherWeek({ teacherId }: { teacherId?: string }) {
+  const supabase = await createClient();
+  const teachers = await teachersList();
+  const t = teachers.find((x) => x.id === teacherId) ?? teachers[0];
+  if (!t) return <div className="card"><p className="muted">Add teachers first.</p></div>;
+  const cells = await liveWeek(supabase, { teacher: t.id });
+  return (
+    <section className="card">
+      <form className="flex flex-wrap items-end gap-2">
+        <input type="hidden" name="tab" value="timetable" /><input type="hidden" name="view" value="teacher" />
+        <label className="field">Teacher<select className="input" name="teacher" defaultValue={t.id}>{teachers.map((x) => <option key={x.id} value={x.id}>{x.full_name}</option>)}</select></label>
+        <button className="btn-ghost" type="submit">Show</button>
+      </form>
+      <h2 className="h2">{t.full_name} · {cells.length} periods a week</h2>
+      <WeekGrid cells={cells} show="section" today={weekdayOf(todayPK())} />
+    </section>
+  );
+}
+
+// Every section side by side for one day, so gaps and clashes are easy to spot.
+async function SchoolDay({ day }: { day: number }) {
+  const supabase = await createClient();
+  const d = day >= 1 && day <= 6 ? day : Math.min(weekdayOf(todayPK()), 6);
+  const [{ data: sections }, { data: periods }, { data: slots }] = await Promise.all([
+    supabase.from("sections").select("id, name, classes(name, sort)"),
+    supabase.from("periods").select("id, name, starts_at, sort, timing_profiles!inner(is_active)").eq("timing_profiles.is_active", true).eq("kind", "class").order("sort"),
+    supabase.from("timetable_slots").select("section_id, period_id, subjects(name), profiles(full_name)").eq("weekday", d),
+  ]);
+  type Sec = { id: string; name: string; classes: { name: string; sort: number } };
+  const list = ((sections ?? []) as unknown as Sec[]).sort((a, b) => a.classes.sort - b.classes.sort || a.name.localeCompare(b.name));
+  type S = { section_id: string; period_id: string; subjects: { name: string } | null; profiles: { full_name: string } | null };
+  const at = new Map(((slots ?? []) as unknown as S[]).map((s) => [`${s.section_id}-${s.period_id}`, s]));
+  const free = list.length * (periods ?? []).length - (slots ?? []).length;
+  return (
+    <section className="card">
+      <div className="flex flex-wrap gap-2">
+        {DAYS.map((x, i) => (
+          <Link key={x} href={`/principal/classes?tab=timetable&view=school&day=${i + 1}`} className={`pill ${i + 1 === d ? "pill-blue" : "pill-gray"}`}>{x}</Link>
+        ))}
+      </div>
+      <h2 className="h2">Whole school · {DAYS[d - 1]} · {free > 0 ? `${free} free periods` : "every period filled"}</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[720px] border-separate text-[12px]" style={{ borderSpacing: 4 }}>
+          <thead><tr><th className="muted text-left">Class</th>{(periods ?? []).map((p) => <th key={p.id} className="muted">{p.name}<div className="font-normal">{time(p.starts_at)}</div></th>)}</tr></thead>
+          <tbody>
+            {list.map((s) => (
+              <tr key={s.id}>
+                <td className="whitespace-nowrap font-black"><Link href={`/principal/classes?tab=timetable&section=${s.id}`}>{s.classes.name.replace("Class ", "")}-{s.name}</Link></td>
+                {(periods ?? []).map((p) => {
+                  const c = at.get(`${s.id}-${p.id}`);
+                  return (
+                    <td key={p.id} className="rounded-lg p-1 text-center font-extrabold" style={c ? { background: "var(--blue-soft)" } : { border: "2px dashed var(--line)", color: "var(--muted)" }}>
+                      {c ? <>{c.subjects?.name}<div className="font-bold opacity-75">{c.profiles?.full_name?.split(" ")[0] ?? "No teacher"}</div></> : "Free"}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+async function ReviewRound() {
+  const supabase = await createClient();
+  const { data: round } = await supabase.from("timetable_rounds").select("id, status, message, sent_at, confirmed_at")
+    .neq("status", "replaced").order("sent_at", { ascending: false }).limit(1).maybeSingle();
+  const { data: acks } = round
+    ? await supabase.from("timetable_acks").select("teacher_id, status, note, responded_at, profiles(full_name)").eq("round_id", round.id)
+    : { data: [] };
+  type Ack = { teacher_id: string; status: string; note: string | null; responded_at: string | null; profiles: { full_name: string } | null };
+  const list = ((acks ?? []) as unknown as Ack[]).sort((a, b) => (a.status === "issue" ? -1 : 0) - (b.status === "issue" ? -1 : 0) || (a.profiles?.full_name ?? "").localeCompare(b.profiles?.full_name ?? ""));
+  const n = (st: string) => list.filter((a) => a.status === st).length;
+  const reviewing = round?.status === "review";
+  return (
+    <div className="flex flex-col gap-5">
+      <section className="card">
+        <h2 className="h2">How it works</h2>
+        <p className="muted">1. Set each class&apos;s week. 2. Send it to the teachers: each one sees their own periods and taps Accept or reports a problem. 3. Fix what they report, then Confirm. Parents and students only see the timetable after you confirm.</p>
+        {round && (
+          <div className={reviewing ? "notice-ok" : "muted"}>
+            {reviewing
+              ? `Sent ${shortDate(round.sent_at.slice(0, 10))}: ${n("accepted")} accepted, ${n("issue")} reported a problem, ${n("pending")} not answered yet.`
+              : `Last confirmed ${shortDate((round.confirmed_at ?? round.sent_at).slice(0, 10))}.`}
+          </div>
+        )}
+        <div className="flex flex-wrap items-end gap-2">
+          <form action={sendTimetableForReview} className="flex flex-1 flex-wrap items-end gap-2">
+            <label className="field flex-1">Note for teachers (optional)<input className="input" name="message" placeholder="e.g. Winter timing from Monday" /></label>
+            <button className="btn-ghost" type="submit">{reviewing ? "Send again to all teachers" : "Send to teachers"}</button>
+          </form>
+          <form action={confirmTimetable}>
+            <button className="btn" type="submit">Confirm and show to parents</button>
+          </form>
+        </div>
+        {reviewing && n("pending") + n("issue") > 0 && <p className="muted">You can confirm before everyone answers; teachers who haven&apos;t answered still see their periods.</p>}
+      </section>
+      {list.length > 0 && (
+        <section className="card">
+          <h2 className="h2">Teachers&apos; answers</h2>
+          {list.map((a) => (
+            <div key={a.teacher_id} className="row-box">
+              <span className={`pill ${a.status === "accepted" ? "pill-green" : a.status === "issue" ? "pill-red" : "pill-gray"}`}>
+                {a.status === "accepted" ? "Accepted" : a.status === "issue" ? "Problem" : "Waiting"}
+              </span>
+              <div className="flex-1">
+                <Link href={`/principal/classes?tab=timetable&view=teacher&teacher=${a.teacher_id}`} className="font-extrabold">{a.profiles?.full_name}</Link>
+                {a.note && <div className="text-sm font-bold">{a.note}</div>}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
+  );
+}
+
 async function TimetableTab({ sectionId }: { sectionId?: string }) {
   const supabase = await createClient();
   const { data: sections } = await supabase.from("sections").select("id, name, classes(name, sort)");
@@ -250,6 +405,12 @@ async function TimetableTab({ sectionId }: { sectionId?: string }) {
           <button className="btn" type="submit">Set period</button>
         </form>
         <p className="muted">Ilmora stops you if a teacher is already booked in that period.</p>
+        <form action={autoFillSection} className="flex flex-wrap items-center gap-3 rounded-xl p-3" style={{ background: "var(--page)" }}>
+          <input type="hidden" name="section_id" value={section.id} />
+          <div className="flex-1 text-sm font-bold">Fill the free periods from this section&apos;s subject teachers, without clashes. Periods you already set stay as they are.</div>
+          <label className="flex items-center gap-1.5 text-sm font-bold"><input type="checkbox" name="saturday" /> Include Saturday</label>
+          <button className="btn-ghost" type="submit">Fill free periods</button>
+        </form>
       </section>
       <form action={assignSubjectTeacher} className="card">
         <input type="hidden" name="section_id" value={section.id} />

@@ -1,7 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { pct, shortDate, todayPK } from "@/lib/format";
+import { pct, shortDate, time, todayPK } from "@/lib/format";
 import { maxMarksOf } from "@/lib/paper-check/data";
 import type { WrittenQuestion } from "@/lib/paper-check/rubric";
+import { publishedWeek, weekdayOf } from "@/lib/timetable";
+import { WeekGrid } from "./week-grid";
 
 type Child = { id: string; full_name: string; section_id: string | null; sections: { name: string; classes: { name: string } } | null };
 
@@ -25,6 +27,9 @@ export async function ChildOverview({ child }: { child: Child }) {
     supabase.from("paper_sheets").select("id, total, status, paper_tests(title, test_date, mcq_key, mcq_marks_each, questions, subjects(name))")
       .eq("student_id", child.id).in("status", ["reviewed", "absent"]).order("reviewed_at", { ascending: false }).limit(8),
   ]);
+  const week = child.section_id ? await publishedWeek(supabase, child.section_id) : null;
+  const dayNo = weekdayOf(today);
+  const todays = (week?.cells ?? []).filter((c) => c.weekday === dayNo).sort((a, b) => a.sort - b.sort);
   type TestRow = { id: string; total: number | null; status: string;
     paper_tests: { title: string; test_date: string; mcq_key: string[]; mcq_marks_each: number; questions: WrittenQuestion[]; subjects: { name: string } | null } | null };
   const testRows = ((tests ?? []) as unknown as TestRow[]).filter((t) => t.paper_tests);
@@ -104,6 +109,28 @@ export async function ChildOverview({ child }: { child: Child }) {
             <div key={d.id} className="text-sm font-bold"><span className="eyebrow">{shortDate(d.date)} · {d.subjects?.name}</span><br />{d.topic}</div>
           ))}
           {(notes ?? []).length === 0 && (diary ?? []).length === 0 && <p className="muted">Nothing new.</p>}
+        </section>
+        <section className="card xl:col-span-2">
+          <h2 className="h2">Timetable</h2>
+          {!week || week.cells.length === 0 ? <p className="muted">The school hasn&apos;t published the timetable yet.</p> : (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <b>{dayNo <= 6 ? "Today" : "Monday"}</b>
+                {(dayNo <= 6 ? todays : week.cells.filter((c) => c.weekday === 1).sort((a, b) => a.sort - b.sort)).map((c) => (
+                  <div key={c.sort} className="flex items-center gap-3 rounded-xl p-2 text-sm font-bold" style={{ background: "var(--page)" }}>
+                    <span className="w-12 tabular-nums">{time(c.starts_at)}</span>
+                    <span className="flex-1">{c.subject}</span>
+                    <span className="muted text-xs">{c.teacher ?? ""}</span>
+                  </div>
+                ))}
+                {dayNo <= 6 && todays.length === 0 && <p className="muted">No classes today.</p>}
+              </div>
+              <details>
+                <summary className="cursor-pointer font-extrabold">Whole week</summary>
+                <div className="mt-2"><WeekGrid cells={week.cells} today={dayNo} /></div>
+              </details>
+            </>
+          )}
         </section>
         <section className="card">
           <h2 className="h2">Last 30 days</h2>
