@@ -28,6 +28,90 @@
   --panel: #ffffff;
 }
 
+
+/* Stitch "Ilmora OS" tokens (principal screens). Used as Tailwind classes:
+   bg-primary, text-on-surface-variant, text-headline-lg, p-space-md ... */
+@theme {
+  --color-primary: #002622;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #103d37;
+  --color-on-primary-container: #7da8a0;
+  --color-primary-fixed: #bfece2;
+  --color-primary-fixed-dim: #a3cfc7;
+  --color-secondary: #006d3b;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #71fda6;
+  --color-secondary-fixed: #71fda6;
+  --color-secondary-fixed-dim: #51df8d;
+  --color-on-secondary-fixed: #00210e;
+  --color-on-secondary-fixed-variant: #00522b;
+  --color-tertiary: #28006c;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #3f0f9a;
+  --color-tertiary-fixed: #e8ddff;
+  --color-tertiary-fixed-dim: #cebdff;
+  --color-on-tertiary-fixed: #21005d;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-surface: #e7fef9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #e1f8f3;
+  --color-surface-container: #dcf3ee;
+  --color-surface-container-high: #d6ede8;
+  --color-surface-container-highest: #d0e7e2;
+  --color-surface-variant: #d0e7e2;
+  --color-on-surface: #0a1f1c;
+  --color-on-surface-variant: #404846;
+  --color-outline: #717976;
+  --color-outline-variant: #c0c8c5;
+
+  --font-manrope: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display-lg: 36px;
+  --text-display-lg--line-height: 44px;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: 800;
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 36px;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 30px;
+  --text-headline-md--letter-spacing: -0.015em;
+  --text-headline-md--font-weight: 700;
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 26px;
+  --text-headline-sm--letter-spacing: -0.01em;
+  --text-headline-sm--font-weight: 600;
+  --text-title-md: 15px;
+  --text-title-md--line-height: 22px;
+  --text-title-md--font-weight: 600;
+  --text-body-lg: 15px;
+  --text-body-lg--line-height: 24px;
+  --text-body-md: 13px;
+  --text-body-md--line-height: 20px;
+  --text-body-sm: 12px;
+  --text-body-sm--line-height: 18px;
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.02em;
+  --text-label-md--font-weight: 600;
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.03em;
+  --text-label-sm--font-weight: 600;
+
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 0.75rem;
+  --spacing-space-lg: 1.25rem;
+  --spacing-space-xl: 2rem;
+  --spacing-gutter: 1rem;
+  --spacing-gutter-desktop: 1.5rem;
+}
+
 @theme inline {
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
 }
@@ -101,3 +185,30 @@ body {
   .nav-item:hover { background: var(--blue-soft); }
   .nav-item[aria-current="page"] { border-color: var(--blue-ring); background: var(--blue-soft); color: var(--blue-ink); }
 }
+
+/* Principal and owner screens use the Stitch look. The older pages under them
+   (classes, staff, fees...) pick up the same font and teal accents through
+   these variables until each one gets its own Stitch redesign. */
+.stitch {
+  --blue: #103d37;
+  --blue-soft: #dcf3ee;
+  --blue-ring: #a3cfc7;
+  --blue-ink: #103d37;
+  --ink: #0a1f1c;
+  --muted: #404846;
+  --line: #d0e7e2;
+  --page: #f3fbf9;
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  background: #ffffff;
+}
+.stitch .btn { background: #103d37; box-shadow: 0 4px 0 #002622; }
+.stitch .h1, .stitch .h2 { color: #002622; font-weight: 800; }
+.msym {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal;
+  text-transform: none; display: inline-block; white-space: nowrap; direction: ltr;
+  -webkit-font-smoothing: antialiased; font-feature-settings: "liga";
+}
+.snav { @apply flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-body-sm font-semibold transition-colors whitespace-nowrap; color: #a3cfc7; }
+.snav:hover { background: #103d37; color: #fff; }
+.snav[aria-current="page"] { background: #103d37; color: #fff; font-weight: 700; }
