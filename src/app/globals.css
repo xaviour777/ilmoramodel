@@ -201,8 +201,45 @@ body {
   font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
   background: #ffffff;
 }
-.stitch .btn { background: #103d37; box-shadow: 0 4px 0 #002622; }
-.stitch .h1, .stitch .h2 { color: #002622; font-weight: 800; }
+/* Older pages inside the principal shell: calm Stitch look instead of the chunky one. */
+.stitch .h1 { color: #002622; font-size: 26px; line-height: 34px; font-weight: 800; letter-spacing: -0.02em; }
+.stitch .h2 { color: #002622; font-size: 18px; line-height: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.stitch .muted { color: #404846; font-weight: 500; }
+.stitch .eyebrow { color: #006d3b; font-weight: 700; letter-spacing: 0.02em; }
+.stitch .card { border-width: 0; border-radius: 0.75rem; box-shadow: 0 1px 2px rgba(10,31,28,.06), 0 0 0 1px rgba(208,231,226,.7); padding: 1.25rem; }
+.stitch .btn, .stitch .btn-ghost {
+  min-height: 2.75rem; border-radius: 0.5rem; text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08); padding: 0 1rem;
+}
+.stitch .btn { background: #103d37; }
+.stitch .btn:hover { background: #002622; }
+.stitch .btn-ghost { border-width: 1px; border-color: #c0c8c5; color: #103d37; background: #fff; }
+.stitch .btn-ghost:hover { background: #e1f8f3; }
+.stitch .btn:active, .stitch .btn-ghost:active { transform: translateY(1px); }
+.stitch .input { min-height: 2.75rem; border-width: 1px; border-radius: 0.5rem; font-weight: 500; font-size: 14px; background: #fff; border-color: #c0c8c5; }
+.stitch .input:focus { border-color: #103d37; box-shadow: 0 0 0 3px rgba(16,61,55,.12); }
+.stitch .field { font-weight: 600; font-size: 12px; color: #404846; }
+.stitch .chip { border-width: 1px; border-radius: 0.5rem; font-size: 14px; }
+.stitch .pill { border-radius: 0.25rem; font-weight: 700; letter-spacing: 0.03em; }
+.stitch .tile { border-width: 0; border-radius: 0.75rem; background: #e1f8f3; }
+.stitch .row-box { border-width: 1px; border-radius: 0.5rem; }
+.stitch .tbl td { background: #f3fbf9; font-weight: 500; }
+.stitch .tbl td:first-child { border-radius: 0.5rem 0 0 0.5rem; }
+.stitch .tbl td:last-child { border-radius: 0 0.5rem 0.5rem 0; }
+.stitch .notice-ok, .stitch .notice-warn, .stitch .notice-bad { border-radius: 0.5rem; font-weight: 600; }
+.stitch .seg span { border-width: 1px; border-radius: 0.5rem; }
+
+/* page tabs: one row that scrolls sideways on a phone */
+.tabs { @apply -mx-1 flex gap-2 overflow-x-auto px-1 pb-1; scrollbar-width: none; }
+.tab {
+  @apply inline-flex min-h-11 shrink-0 items-center rounded-xl border-2 bg-white px-4 text-sm font-black uppercase tracking-wide whitespace-nowrap;
+  border-color: var(--line);
+}
+.tab[aria-selected="true"] { border-color: var(--blue-ring); background: var(--blue-soft); color: var(--blue-ink); }
+.stitch .tabs { gap: 0.25rem; border-radius: 0.625rem; background: #e1f8f3; padding: 0.25rem; margin: 0; width: fit-content; max-width: 100%; }
+.stitch .tab { min-height: 2.25rem; border: 0; border-radius: 0.5rem; background: transparent; text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: #404846; padding: 0 0.875rem; }
+.stitch .tab:hover { color: #002622; }
+.stitch .tab[aria-selected="true"] { background: #fff; color: #002622; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 .msym {
   font-family: "Material Symbols Outlined";
   font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal;

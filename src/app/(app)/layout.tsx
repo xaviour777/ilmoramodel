@@ -3,7 +3,7 @@ import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
 import { Avatar } from "@/components/avatar";
 import Link from "next/link";
-import { StitchNav, StitchNavRow, type StitchGroup, type StitchItem } from "@/components/stitch-nav";
+import { StitchNav, StitchBottomNav, type StitchGroup, type StitchItem } from "@/components/stitch-nav";
 import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
 
@@ -28,6 +28,13 @@ const STITCH_GROUPS: StitchGroup[] = [
     { href: "/teacher/paper-check", label: "Paper checking", icon: "fact_check" },
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "cast_for_education" },
   ] },
+];
+// the phone's bottom bar: the places a principal opens most
+const STITCH_MAIN: StitchItem[] = [
+  { href: "/principal", label: "Today", icon: "dashboard" },
+  { href: "/principal/students", label: "Students", icon: "school", also: ["/principal/classes"] },
+  { href: "/accounts", label: "Fees", icon: "payments", also: ["/accounts/setup", "/accounts/messages", "/accounts/online", "/accounts/calls", "/accounts/day-close", "/accounts/expenses"] },
+  { href: "/principal/staff", label: "Staff", icon: "badge" },
 ];
 const STITCH_FOOTER: StitchItem[] = [
   { href: "/settings", label: "Settings", icon: "settings", also: ["/profile"] },
@@ -139,10 +146,10 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
         <header className="sticky top-0 z-40 border-b border-surface-variant bg-surface-container-lowest/90 backdrop-blur-md">
           <div className="flex h-16 items-center justify-between gap-space-md px-4 lg:px-gutter-desktop">
             <div className="flex max-w-xl flex-1 items-center gap-space-md">
-              <div className="flex items-center gap-2 text-body-sm text-on-surface-variant">
-                <span className="font-semibold text-primary">Ilmora</span>
+              <div className="flex min-w-0 flex-col text-body-sm text-on-surface-variant sm:flex-row sm:items-center sm:gap-2">
+                <span className="font-bold text-primary">Ilmora</span>
                 <span className="hidden text-outline-variant sm:inline">/</span>
-                <span className="hidden truncate text-on-surface sm:inline">{me.campus_name}</span>
+                <span className="truncate text-[11px] text-on-surface sm:text-body-sm">{me.campus_name}</span>
               </div>
               <form action="/principal/students" className="relative hidden max-w-md flex-1 md:block" role="search">
                 <span className="msym absolute top-2.5 left-3 text-[18px] text-outline" aria-hidden="true">search</span>
@@ -154,15 +161,15 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
               {year?.name && <span className="hidden items-center gap-1.5 rounded border border-surface-variant bg-surface px-2.5 py-1 text-label-sm xl:flex">
                 <span className="msym text-[16px] text-outline" aria-hidden="true">calendar_month</span>{year.name}</span>}
               <span className="hidden rounded border border-surface-variant bg-surface px-2.5 py-1 text-label-sm text-on-surface-variant 2xl:inline">Today, {today}</span>
+              <Link href="/principal/students" aria-label="Find a student" className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface md:hidden"><span className="msym text-[22px]">search</span></Link>
               <Link href="/principal#actions" aria-label="What needs you today" className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface">
                 <span className="msym text-[20px]">notifications</span></Link>
               <Link href="/profile" aria-label="My profile" className="border-l border-surface-variant pl-2"><Avatar name={me.full_name} url={me.avatar_url} size={32} /></Link>
-              <form action={signOut} className="lg:hidden"><button type="submit" className="text-label-sm text-on-surface-variant underline">Sign out</button></form>
             </div>
           </div>
         </header>
-        <div className="lg:hidden"><StitchNavRow groups={STITCH_GROUPS} footer={STITCH_FOOTER} /></div>
-        <main className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col gap-5 px-4 py-space-lg lg:px-gutter-desktop">{children}</main>
+        <main className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col gap-5 px-4 pt-space-lg pb-28 lg:px-gutter-desktop lg:pb-space-lg">{children}</main>
+        <StitchBottomNav groups={STITCH_GROUPS} footer={STITCH_FOOTER} main={STITCH_MAIN} />
       </div>
     </div>
   );

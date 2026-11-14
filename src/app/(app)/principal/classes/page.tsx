@@ -9,6 +9,7 @@ import {
   createTimingProfile, deletePeriod, setClassTeacher, setSlot, autoFillSection, sendTimetableForReview, confirmTimetable,
 } from "../actions";
 import { WeekGrid } from "@/components/week-grid";
+import { AutoSubmitSelect } from "@/components/auto-submit";
 import { liveWeek, weekdayOf } from "@/lib/timetable";
 
 type Search = { tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
@@ -20,10 +21,10 @@ export default async function ClassesPage({ searchParams }: { searchParams: Prom
   const tab = sp.tab ?? "classes";
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-col gap-3">
         <div>
-          <h1 className="h1">Classes, timings and timetable</h1>
-          <p className="muted text-base">Set up the school once a year. Teachers and parents see the changes straight away.</p>
+          <h1 className="h1">Students & Classes</h1>
+          <p className="muted">Classes, sections, timings and the timetable. Teachers and parents see changes straight away.</p>
         </div>
         <ClassesTabs current={tab} />
       </div>
@@ -52,83 +53,146 @@ async function ClassesTab() {
   ]);
   const perSection = new Map<string, number>();
   for (const s of counts ?? []) perSection.set(s.section_id, (perSection.get(s.section_id) ?? 0) + 1);
+  const teacherName = new Map(teachers.map((t) => [t.id, t.full_name]));
+  const allSecs = (classes ?? []).flatMap((c) => c.sections);
+  const students = allSecs.reduce((t, s) => t + (perSection.get(s.id) ?? 0), 0);
+  const seats = allSecs.reduce((t, s) => t + (s.capacity ?? 0), 0);
+  const noTeacher = allSecs.filter((s) => !s.class_teacher_id).length;
+  const full = allSecs.filter((s) => s.capacity && (perSection.get(s.id) ?? 0) >= s.capacity).length;
 
   return (
-    <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-      <section className="card flex-[2]">
-        <h2 className="h2">Classes and sections</h2>
-        <div className="grid gap-3 md:grid-cols-2">
-          {(classes ?? []).map((c) => (
-            <div key={c.id} className="flex flex-col gap-2.5 rounded-2xl border-2 p-3.5" style={{ borderColor: "var(--line)" }}>
-              <div className="flex items-baseline justify-between"><b className="text-lg font-black">{c.name}</b><span className="muted">{c.board}</span></div>
-              {c.sections.sort((a, b) => a.name.localeCompare(b.name)).map((s) => (
-                <form key={s.id} action={setClassTeacher} className="flex items-center gap-2">
-                  <input type="hidden" name="section_id" value={s.id} />
-                  <span className="pill pill-blue">{s.name}</span>
-                  <span className="muted w-16 text-xs">{perSection.get(s.id) ?? 0}/{s.capacity}</span>
-                  <select className="input min-h-10 flex-1 py-1 text-sm" name="teacher_id" defaultValue={s.class_teacher_id ?? ""} aria-label={`Class teacher for ${c.name}-${s.name}`}>
-                    <option value="">No class teacher</option>
-                    {teachers.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}
-                  </select>
-                  <button className="eyebrow px-1" type="submit">Save</button>
-                </form>
-              ))}
-              <form action={addSection} className="flex items-center gap-2">
-                <input type="hidden" name="class_id" value={c.id} />
-                <input className="input min-h-10 w-20 py-1 text-sm" name="name" placeholder="C" required aria-label="New section name" />
-                <input className="input min-h-10 w-20 py-1 text-sm" name="capacity" type="number" placeholder="40" aria-label="Seats" />
-                <button className="eyebrow" type="submit">Add section</button>
-              </form>
-              <details>
-                <summary className="muted cursor-pointer text-xs font-extrabold underline">Rename or remove</summary>
-                <div className="mt-2 flex flex-col gap-2">
-                  <form action={editClass} className="flex flex-wrap items-center gap-2">
-                    <input type="hidden" name="class_id" value={c.id} />
-                    <input className="input min-h-10 flex-1 py-1 text-sm" name="name" defaultValue={c.name} required aria-label="Class name" />
-                    <input className="input min-h-10 w-28 py-1 text-sm" name="board" defaultValue={c.board ?? ""} placeholder="Board" aria-label="Board" />
-                    <input className="input min-h-10 w-16 py-1 text-sm" name="sort" type="number" defaultValue={c.sort} aria-label="Order on lists" />
-                    <button className="eyebrow" type="submit">Save</button>
-                    <button className="muted text-xs underline" type="submit" name="remove" value="1">Remove class</button>
-                  </form>
-                  {c.sections.map((s) => (
-                    <form key={s.id} action={editSection} className="flex flex-wrap items-center gap-2">
-                      <input type="hidden" name="section_id" value={s.id} />
-                      <input className="input min-h-10 w-20 py-1 text-sm" name="name" defaultValue={s.name} required aria-label="Section name" />
-                      <input className="input min-h-10 w-20 py-1 text-sm" name="capacity" type="number" defaultValue={s.capacity} aria-label="Seats" />
-                      <button className="eyebrow" type="submit">Save</button>
-                      <button className="muted text-xs underline" type="submit" name="remove" value="1">Remove {s.name}</button>
-                    </form>
-                  ))}
-                  <p className="muted text-xs">A class or section can be removed only when no student is in it.</p>
-                </div>
-              </details>
-            </div>
-          ))}
-        </div>
+    <>
+      {/* the whole school at a glance */}
+      <section className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <Stat label="Classes" value={String((classes ?? []).length)} sub={`${allSecs.length} sections`} />
+        <Stat label="Students" value={students.toLocaleString("en-IN")} sub={seats ? `${Math.round((students / seats) * 100)}% of ${seats.toLocaleString("en-IN")} seats` : "No seats set"} />
+        <Stat label="No class teacher" value={String(noTeacher)} sub={noTeacher ? "Pick one below" : "Every section has one"} warn={noTeacher > 0} />
+        <Stat label="Full sections" value={String(full)} sub={full ? "Add a section or seats" : "Room in every section"} warn={full > 0} />
       </section>
-      <div className="flex flex-1 flex-col gap-5">
-        <form action={addStandardClasses} className="card">
-          <h2 className="h2">Class 1 to Class 10</h2>
-          <p className="muted">Adds the classes from 1 to 10 that aren&apos;t here yet, each with section A. Classes you already have stay as they are.</p>
-          <button className="btn-ghost" type="submit">Add Class 1 to 10</button>
-        </form>
-        <form action={createClass} className="card">
-          <h2 className="h2">Add a class</h2>
-          <label className="field">Class name<input className="input" name="name" required placeholder="Class 11 (FSc Pre-Medical)" /></label>
-          <label className="field">Sections<input className="input" name="sections" placeholder="A, B" /></label>
-          <div className="grid grid-cols-3 gap-3">
-            <label className="field">Seats<input className="input" name="capacity" type="number" placeholder="40" /></label>
-            <label className="field col-span-2">Board<input className="input" name="board" placeholder="BISE Lahore" /></label>
+
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+        <section className="card flex-[2]">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="h2">Classes and sections</h2>
+            <span className="muted text-xs">Tap a section to see its students. Changing the class teacher saves straight away.</span>
           </div>
-          <label className="field">Order on lists<input className="input" name="sort" type="number" placeholder="11" /></label>
-          <button className="btn" type="submit">Create class</button>
-        </form>
-        <form action={createSubject} className="card">
-          <h2 className="h2">Subjects</h2>
-          <div className="flex flex-wrap gap-1.5">{(subjects ?? []).map((s) => <span key={s.id} className="pill pill-gray">{s.name}</span>)}</div>
-          <div className="flex gap-2"><input className="input" name="name" required placeholder="Computer Science" aria-label="New subject" /><button className="btn-ghost" type="submit">Add</button></div>
-        </form>
+          {(classes ?? []).length === 0 && <p className="muted">No classes yet. Use “Add Class 1 to 10” to start.</p>}
+          <div className="flex flex-col gap-3">
+            {(classes ?? []).map((c) => {
+              const secs = [...c.sections].sort((a, b) => a.name.localeCompare(b.name));
+              const n = secs.reduce((t, s) => t + (perSection.get(s.id) ?? 0), 0);
+              return (
+                <div key={c.id} className="rounded-xl bg-surface-container-low p-3 sm:p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <div className="flex items-baseline gap-2">
+                      <b className="text-title-md font-bold text-primary">{c.name}</b>
+                      <span className="text-body-sm text-on-surface-variant">{n} student{n === 1 ? "" : "s"}{c.board ? ` · ${c.board}` : ""}</span>
+                    </div>
+                    <Link href={`/principal/students?${new URLSearchParams({ class: c.id })}`} className="text-label-sm font-bold text-secondary hover:underline">All students</Link>
+                  </div>
+                  <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+                    {secs.map((s) => {
+                      const k = perSection.get(s.id) ?? 0;
+                      const r = s.capacity ? k / s.capacity : 0;
+                      return (
+                        <div key={s.id} className="flex flex-col gap-2 rounded-lg bg-surface-container-lowest p-2.5 shadow-sm">
+                          <Link href={`/principal/students?section=${s.id}`} className="flex items-center gap-2.5 rounded hover:bg-surface-container-low">
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-container text-label-md font-bold text-on-primary">{s.name}</span>
+                            <span className="min-w-0 flex-1">
+                              <span className="flex justify-between text-label-sm"><span className="text-on-surface">{k} / {s.capacity} seats</span>
+                                <span className={r >= 1 ? "text-error" : "text-on-surface-variant"}>{r >= 1 ? "Full" : `${s.capacity - k} free`}</span></span>
+                              <span className="mt-1 block h-1.5 rounded-full bg-surface-container-high"><span className={`block h-1.5 rounded-full ${r >= 1 ? "bg-error" : "bg-secondary"}`} style={{ width: `${Math.min(100, r * 100)}%` }} /></span>
+                            </span>
+                            <span className="msym text-[18px] text-outline">chevron_right</span>
+                          </Link>
+                          <form action={setClassTeacher} className="flex items-center gap-2">
+                            <input type="hidden" name="section_id" value={s.id} />
+                            <span className="msym text-[18px] text-outline" aria-hidden="true">person</span>
+                            <AutoSubmitSelect name="teacher_id" defaultValue={s.class_teacher_id ?? ""} aria-label={`Class teacher for ${c.name}-${s.name}`}
+                              className={`min-h-9 w-full min-w-0 rounded-md border bg-surface-container-lowest px-2 text-body-sm ${s.class_teacher_id ? "border-surface-variant text-on-surface" : "border-error/50 text-error"}`}>
+                              <option value="">No class teacher</option>
+                              {teachers.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+                            </AutoSubmitSelect>
+                            <noscript><button className="eyebrow" type="submit">Save</button></noscript>
+                          </form>
+                          {s.class_teacher_id && !teacherName.has(s.class_teacher_id) && <span className="text-[11px] text-error">Teacher no longer active</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <details className="mt-2.5 group">
+                    <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-label-sm font-bold text-on-surface-variant hover:text-primary">
+                      <span className="msym text-[16px]">edit_note</span>Add section, rename or remove
+                    </summary>
+                    <div className="mt-2 flex flex-col gap-2 rounded-lg bg-surface-container-lowest p-3">
+                      <form action={addSection} className="flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="class_id" value={c.id} />
+                        <input className="input w-24" name="name" placeholder="Section" required aria-label="New section name" />
+                        <input className="input w-24" name="capacity" type="number" placeholder="Seats" aria-label="Seats" />
+                        <button className="btn-ghost" type="submit">Add section</button>
+                      </form>
+                      <form action={editClass} className="flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="class_id" value={c.id} />
+                        <input className="input min-w-40 flex-1" name="name" defaultValue={c.name} required aria-label="Class name" />
+                        <input className="input w-32" name="board" defaultValue={c.board ?? ""} placeholder="Board" aria-label="Board" />
+                        <input className="input w-20" name="sort" type="number" defaultValue={c.sort} aria-label="Order on lists" />
+                        <button className="btn-ghost" type="submit">Save</button>
+                        <button className="text-label-sm text-error underline" type="submit" name="remove" value="1">Remove class</button>
+                      </form>
+                      {secs.map((s) => (
+                        <form key={s.id} action={editSection} className="flex flex-wrap items-center gap-2">
+                          <input type="hidden" name="section_id" value={s.id} />
+                          <input className="input w-24" name="name" defaultValue={s.name} required aria-label="Section name" />
+                          <input className="input w-24" name="capacity" type="number" defaultValue={s.capacity} aria-label="Seats" />
+                          <button className="btn-ghost" type="submit">Save</button>
+                          <button className="text-label-sm text-error underline" type="submit" name="remove" value="1">Remove {s.name}</button>
+                        </form>
+                      ))}
+                      <p className="muted text-xs">A class or section can be removed only when no student is in it.</p>
+                    </div>
+                  </details>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+        <div className="flex flex-1 flex-col gap-5">
+          <details className="card group" open={(classes ?? []).length === 0}>
+            <summary className="flex cursor-pointer list-none items-center justify-between">
+              <h2 className="h2">Add a class</h2><span className="msym text-[20px] text-outline transition-transform group-open:rotate-90">chevron_right</span>
+            </summary>
+            <form action={createClass} className="mt-3 flex flex-col gap-3">
+              <label className="field">Class name<input className="input" name="name" required placeholder="Class 11 (FSc Pre-Medical)" /></label>
+              <label className="field">Sections<input className="input" name="sections" placeholder="A, B" /></label>
+              <div className="grid grid-cols-3 gap-3">
+                <label className="field">Seats<input className="input" name="capacity" type="number" placeholder="40" /></label>
+                <label className="field col-span-2">Board<input className="input" name="board" placeholder="BISE Lahore" /></label>
+              </div>
+              <label className="field">Order on lists<input className="input" name="sort" type="number" placeholder="11" /></label>
+              <button className="btn" type="submit">Create class</button>
+            </form>
+            <form action={addStandardClasses} className="mt-4 flex flex-col gap-2 border-t border-surface-variant pt-4">
+              <p className="muted text-sm">Or add Class 1 to Class 10 in one go. Each gets section A; classes you already have stay as they are.</p>
+              <button className="btn-ghost" type="submit">Add Class 1 to 10</button>
+            </form>
+          </details>
+          <form action={createSubject} className="card">
+            <h2 className="h2">Subjects</h2>
+            <div className="flex flex-wrap gap-1.5">{(subjects ?? []).map((s) => <span key={s.id} className="pill pill-gray">{s.name}</span>)}</div>
+            <div className="flex gap-2"><input className="input" name="name" required placeholder="Computer Science" aria-label="New subject" /><button className="btn-ghost" type="submit">Add</button></div>
+          </form>
+        </div>
       </div>
+    </>
+  );
+}
+
+function Stat({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
+  return (
+    <div className="rounded-xl bg-surface-container-lowest p-3 shadow-sm ring-1 ring-surface-variant/70 sm:p-4">
+      <div className="text-label-sm uppercase tracking-wider text-on-surface-variant">{label}</div>
+      <div className={`text-headline-md font-bold tabular-nums ${warn ? "text-error" : "text-primary"}`}>{value}</div>
+      <div className="text-[12px] text-on-surface-variant">{sub}</div>
     </div>
   );
 }

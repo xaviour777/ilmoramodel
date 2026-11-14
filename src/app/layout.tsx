@@ -22,7 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0&icon_names=account_balance,arrow_right_alt,assignment,auto_awesome,badge,calendar_month,call,campaign,cast_for_education,chevron_right,co_present,currency_exchange,dashboard,edit_note,event,fact_check,forum,history,logout,notification_important,notifications,payments,person,person_add,point_of_sale,receipt_long,school,search,settings,task_alt,trending_down,trending_up&display=block"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0&icon_names=account_balance,arrow_right_alt,assignment,auto_awesome,badge,calendar_month,call,campaign,cast_for_education,chevron_right,close,co_present,currency_exchange,dashboard,edit_note,event,fact_check,forum,history,logout,menu,notification_important,notifications,payments,person,person_add,point_of_sale,receipt_long,school,search,settings,task_alt,trending_down,trending_up&display=block"
         />
       </head>
       <body className="antialiased">{children}</body>
