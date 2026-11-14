@@ -110,7 +110,10 @@ export default async function StudentProfile({ params, searchParams }: { params:
                 <span key={b.id}>{i ? ", " : ""}<Link href={`/principal/students/${b.id}`} className="underline">{b.full_name}</Link>{b.sections ? ` (${b.sections.classes.name}-${b.sections.name})` : ""}</span>
               ))}</p>
             )}
-            <button className="btn self-start" type="submit">Save family</button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button className="btn" type="submit">Save family</button>
+              <Link href={`/principal/families/${fam.id}`} className="font-bold underline">Whole family: fees and results</Link>
+            </div>
           </form>
           <section className="card">
             <h2 className="h2">Results</h2>

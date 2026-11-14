@@ -29,7 +29,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
     familyIds = (fams ?? []).map((f) => f.id);
   }
   let query = supabase.from("students")
-    .select("id, full_name, roll_no, admission_no, status, section_id, families(name, phone, reminder_phone), sections(name, classes(name))", { count: "exact" })
+    .select("id, full_name, roll_no, admission_no, status, section_id, families(id, name, phone, reminder_phone), sections(name, classes(name))", { count: "exact" })
     .eq("status", status).order("full_name").range(page * PAGE, page * PAGE + PAGE - 1);
   if (sp.section) query = query.eq("section_id", sp.section);
   else if (sp.class) query = query.in("section_id", secs.filter((x) => x.class_id === sp.class).map((x) => x.id).concat("00000000-0000-0000-0000-000000000000"));
@@ -39,7 +39,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
     query = query.or(ors.join(","));
   }
   const { data: rows, count } = await query;
-  type Row = { id: string; full_name: string; roll_no: string | null; admission_no: string | null; status: string; families: { name: string; phone: string | null; reminder_phone: string | null } | null; sections: { name: string; classes: { name: string } } | null };
+  type Row = { id: string; full_name: string; roll_no: string | null; admission_no: string | null; status: string; families: { id: string; name: string; phone: string | null; reminder_phone: string | null } | null; sections: { name: string; classes: { name: string } } | null };
   const link = (o: Partial<Search>) => {
     const p = new URLSearchParams();
     const v = { q: sp.q, section: sp.section, class: sp.class, status: status === "enrolled" ? undefined : status, ...o };
@@ -134,7 +134,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
                     <td><Link href={`/principal/students/${r.id}`} className="font-bold text-primary hover:underline">{r.full_name}</Link>{r.status !== "enrolled" && <span className={`pill ${STATUS[r.status][1]} ml-2`}>{STATUS[r.status][0]}</span>}</td>
                     <td>{r.sections ? `${r.sections.classes.name}-${r.sections.name}` : "No class"}</td>
                     <td>{r.roll_no}</td><td>{r.admission_no}</td>
-                    <td>{r.families?.name}</td>
+                    <td>{r.families ? <Link href={`/principal/families/${r.families.id}`} className="hover:underline">{r.families.name}</Link> : null}</td>
                     <td>{phoneOf(r) && <a href={`tel:${phoneOf(r)!.replace(/[^\d+]/g, "")}`} className="inline-flex items-center gap-1 hover:underline"><span className="msym text-[16px] text-secondary">call</span>{phoneOf(r)}</a>}</td>
                   </tr>
                 ))}

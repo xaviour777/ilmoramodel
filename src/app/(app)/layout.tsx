@@ -13,6 +13,7 @@ const STITCH_GROUPS: StitchGroup[] = [
   { title: "Overview", items: [{ href: "/principal", label: "Today", icon: "dashboard" }] },
   { title: "School", items: [
     { href: "/principal/classes", label: "Students & Classes", icon: "school", also: ["/principal/students"] },
+    { href: "/principal/families", label: "Families", icon: "family_restroom" },
     { href: "/principal/exams", label: "Exams", icon: "assignment" },
     { href: "/principal/admissions", label: "Admissions", icon: "person_add" },
     { href: "/principal/staff", label: "Staff & leave", icon: "badge" },
@@ -33,7 +34,7 @@ const STITCH_GROUPS: StitchGroup[] = [
 // the phone's bottom bar: the places a principal opens most
 const STITCH_MAIN: StitchItem[] = [
   { href: "/principal", label: "Today", icon: "dashboard" },
-  { href: "/principal/students", label: "Students", icon: "school", also: ["/principal/classes"] },
+  { href: "/principal/students", label: "Students", icon: "school", also: ["/principal/classes", "/principal/families"] },
   { href: "/accounts", label: "Fees", icon: "payments", also: ["/accounts/setup", "/accounts/messages", "/accounts/online", "/accounts/calls", "/accounts/day-close", "/accounts/expenses"] },
   { href: "/principal/staff", label: "Staff", icon: "badge" },
 ];
@@ -57,6 +58,7 @@ const NAV: Record<Role, NavItem[]> = {
   owner: [],
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
+    { href: "/principal/families", label: "Families", icon: "people" },
     { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],
