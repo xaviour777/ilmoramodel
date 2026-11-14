@@ -1,4 +1,5 @@
 import { signIn } from "./actions";
+import { InstallAppButton } from "@/components/pwa";
 
 const demo = [
   ["Principal", "principal@demo.ilmora.pk"],
@@ -30,6 +31,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </label>
         <button className="btn" type="submit">Sign in</button>
       </form>
+      <InstallAppButton className="btn-ghost inline-flex min-h-11 items-center justify-center gap-2" />
       <div className="card">
         <div className="eyebrow">Demo logins · password Ilmora@2026</div>
         <ul className="flex flex-col gap-1.5 text-sm font-bold">

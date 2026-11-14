@@ -1,6 +1,7 @@
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
+import { InstallAppButton } from "@/components/pwa";
 import { Avatar } from "@/components/avatar";
 import Link from "next/link";
 import { StitchNav, StitchBottomNav, type StitchGroup, type StitchItem } from "@/components/stitch-nav";
@@ -94,6 +95,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>ilmora</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
+            <InstallAppButton className="btn-ghost inline-flex min-h-10 items-center gap-1 px-2 text-sm" iconClass="msym text-[18px]" />
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
           </div>
         </div>

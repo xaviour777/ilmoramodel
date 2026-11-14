@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "@/app/login/actions";
+import { InstallAppButton } from "@/components/pwa";
 
 // Grouped sidebar for the principal and owner (Stitch design).
 // also: other pages that belong under this entry, so it stays lit there.
@@ -67,6 +68,7 @@ export function StitchBottomNav({ groups, footer, main }: { groups: StitchGroup[
                 </div>
               </div>
             ))}
+            <InstallAppButton className="snav mb-2 min-h-11 w-full bg-secondary-fixed/20" />
             <form action={signOut} className="border-t border-on-primary/10 pt-2">
               <button type="submit" className="snav min-h-11 w-full"><span className="msym text-[20px]" aria-hidden="true">logout</span>Sign out</button>
             </form>
