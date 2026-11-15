@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School —Mobile app</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.card{background:#fff;border:2px solid #e5e7eb;border-radius:18px;padding:14px;box-shadow:0 4px 0 #e5e7eb}
+.chunk{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:0;border-radius:14px;font:900 14px Nunito,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.chunk.g{background:#16a34a;color:#fff;box-shadow:0 4px 0 #15803d}
+.chunk.w{background:#fff;color:#0369a1;border:2px solid #e5e7eb;box-shadow:0 4px 0 #e5e7eb}
+.chunk.sm{min-height:36px;padding:0 12px;font-size:12px}
+.chip{min-height:38px;padding:0 14px;border-radius:99px;border:2px solid #e5e7eb;background:#fff;font:800 13px Nunito,sans-serif;color:#4b5563;cursor:pointer;white-space:nowrap}
+.chip.on{background:#e0f2fe;border-color:#7dd3fc;color:#0369a1}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:60px;border:0;background:none;font:800 11px Nunito,sans-serif;color:#6b7280;cursor:pointer;border-radius:14px}
+.tb.on{color:#0369a1}
+.tb .ic{width:44px;height:30px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid transparent}
+.tb.on .ic{background:#e0f2fe;border-color:#7dd3fc}
+.todo{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 12px;border:2px solid #e5e7eb;border-radius:14px;background:#fff;font:800 14px Nunito,sans-serif;color:#1f2937;cursor:pointer;text-align:left;box-shadow:0 3px 0 #e5e7eb}
+.todo.done{background:#f0fdf4;border-color:#86efac;box-shadow:0 3px 0 #86efac;color:#15803d}
+.box{width:26px;height:26px;border-radius:8px;border:2.5px solid #d1d5db;display:flex;align-items:center;justify-content:center;flex:none;background:#fff}
+.todo.done .box{background:#16a34a;border-color:#16a34a}
+.pa{width:44px;height:40px;border-radius:12px;border:2px solid #e5e7eb;background:#fff;font:900 14px Nunito,sans-serif;color:#6b7280;cursor:pointer}
+.pa.p{background:#dcfce7;border-color:#22c55e;color:#15803d}
+.pa.a{background:#fee2e2;border-color:#ef4444;color:#b91c1c}
+.pa.l{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.mi{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 4px;border:2px solid #e5e7eb;border-radius:16px;background:#fff;font:800 12px Nunito,sans-serif;color:#1f2937;cursor:pointer;box-shadow:0 3px 0 #e5e7eb;min-height:96px}
+.tile{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.lbl{font:900 12px Nunito,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#6b7280}
+.bar{height:12px;border-radius:99px;background:#e5e7eb;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:99px}
+.li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:2px solid #f1f5f9}
+.tag{font:900 11px Nunito,sans-serif;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.tg{width:52px;height:30px;border-radius:99px;border:0;background:#d1d5db;position:relative;cursor:pointer;flex:none}
+.tg span{position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:99px;background:#fff}
+.tg.on{background:#16a34a}.tg.on span{left:26px}
+.full{display:block;text-align:center;font:800 14px Nunito,sans-serif;color:#0369a1;padding:8px}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;font-family:Nunito,sans-serif;color:#1f2937;background:#f7f9fc;overflow:hidden">
+  <header style="display:flex;align-items:center;gap:10px;padding:16px 16px 10px;background:#fff;border-bottom:2px solid #e5e7eb">
+    <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}"><button type="button" aria-label="Back" onClick="{{back}}" style="width:44px;height:44px;border-radius:12px;border:2px solid #e5e7eb;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></button></sc-if>
+    <sc-if value="{{noBack}}" hint-placeholder-val="{{ true }}"><div style="width:40px;height:40px;border-radius:12px;background:#16a34a;box-shadow:0 3px 0 #15803d;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px">M</div></sc-if>
+    <div style="flex:1;min-width:0"><div style="font-weight:900;font-size:19px">{{title}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">Model School · Sun 15 Nov</div></div>
+    <button type="button" aria-label="Notifications, 3 new" style="position:relative;width:44px;height:44px;border-radius:12px;border:2px solid #e5e7eb;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.4" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:99px;background:#ef4444;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span></button>
+  </header>
+
+  <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px">
+
+    <sc-if value="{{s.home}}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><div style="font-weight:900;font-size:24px">Assalamu Alaikum, Dr Saim</div><div style="font-weight:700;color:#4b5563;font-size:14px">{{left}} jobs left today</div></div>
+        <div class="card" style="background:#fffbeb;border-color:#fcd34d;box-shadow:0 4px 0 #fcd34d">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:900">Today's goal</span><span style="font-weight:900;color:#c2410c">{{doneCount}} / 4</span></div>
+          <div class="bar" style="margin-top:8px"><span style="width:{{goalPct}};background:#f59e0b"></span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{todos}}" as="t" hint-placeholder-count="4">
+            <button type="button" class="{{t.cls}}" onClick="{{t.toggle}}" aria-pressed="{{t.done}}">
+              <span class="box"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+              <span style="flex:1"><span style="display:block">{{t.label}}</span><span style="display:block;font-size:12px;font-weight:700;color:#6b7280">{{t.sub}}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <div class="lbl">Quick actions</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+          <sc-for list="{{quick}}" as="i" hint-placeholder-count="4">
+            <button type="button" class="mi" style="min-height:84px;font-size:11px" onClick="{{i.open}}"><span class="tile" style="background:{{i.bg}}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{i.fg}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{i.d}}"></path></svg></span>{{i.label}}</button>
+          </sc-for>
+        </div>
+        <div class="card" style="background:#1f2937;border-color:#1f2937;box-shadow:0 4px 0 #111827;color:#fff">
+          <div class="lbl" style="color:#fcd34d">AI brief</div>
+          <p style="margin:6px 0 0;font-weight:700;font-size:14px;line-height:21px">117 families still have a balance. 9‑C attendance fell to 84% this week, mostly Mondays.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <div class="card"><div class="lbl">Students</div><div style="font-weight:900;font-size:26px">380</div></div>
+          <div class="card"><div class="lbl">Present</div><div style="font-weight:900;font-size:26px;color:#c2410c">—</div></div>
+          <div class="card"><div class="lbl">Fees in</div><div style="font-weight:900;font-size:26px">Rs 0</div></div>
+          <div class="card"><div class="lbl">Balance</div><div style="font-weight:900;font-size:26px;color:#dc2626">117</div></div>
+        </div>
+        <a class="full" href="HomeV2.dc.html">Open desktop Home</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{s.classes}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
+          <sc-for list="{{cf}}" as="f" hint-placeholder-count="4"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+        </div>
+        <sc-for list="{{classes}}" as="c" hint-placeholder-count="4">
+          <div class="card" style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:900;font-size:17px">{{c.name}}</span><span class="tag" style="background:{{c.tagBg}};color:{{c.tagFg}}">{{c.tag}}</span></div>
+            <div style="font-size:13px;font-weight:700;color:#6b7280">{{c.meta}}</div>
+            <div class="bar"><span style="width:{{c.fill}};background:#0284c7"></span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>Attend. {{c.att}}</span><span>Result {{c.res}}</span><span>Fees {{c.fee}}</span></div>
+          </div>
+        </sc-for>
+        <a class="full" href="Classes.dc.html">Open desktop Classes</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{s.exams}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="lbl">BISE Lahore board prep</div>
+        <div style="display:flex;gap:8px">
+          <sc-for list="{{gp}}" as="g" hint-placeholder-count="2"><button type="button" class="{{g.cls}}" onClick="{{g.pick}}">{{g.label}}</button></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <div class="card"><div class="lbl">Predicted</div><div style="font-weight:900;font-size:26px">{{b.pred}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">target {{b.target}}</div></div>
+          <div class="card"><div class="lbl">Fail risk</div><div style="font-weight:900;font-size:26px;color:#dc2626">{{b.risk}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">students</div></div>
+        </div>
+        <div class="card">
+          <div style="font-weight:900;margin-bottom:6px">Weak chapters</div>
+          <sc-for list="{{b.ch}}" as="c" hint-placeholder-count="3">
+            <div style="padding:8px 0;border-top:2px solid #f1f5f9"><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800"><span>{{c.n}}</span><span>{{c.s}}</span></div><div class="bar" style="margin-top:6px;height:10px"><span style="width:{{c.s}};background:{{c.col}}"></span></div></div>
+          </sc-for>
+        </div>
+        <button type="button" class="chunk g" style="width:100%">Apply AI plan</button>
+        <a class="full" href="Exams.dc.html">Open full reports</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{s.staff}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="background:#eff6ff;border-color:#93c5fd;box-shadow:0 4px 0 #93c5fd">
+          <div style="font-weight:900">Sadia Malik asked for leave</div>
+          <div style="font-size:13px;font-weight:700;color:#4b5563">{{leaveNote}}</div>
+          <sc-if value="{{leavePending}}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="chunk w" style="flex:1" onClick="{{decline}}">Decline</button><button type="button" class="chunk g" style="flex:1" onClick="{{approve}}">Approve</button></div></sc-if>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Staff attendance</span><span style="font-weight:900;font-size:13px">{{pCount}} P · {{aCount}} A · {{nCount}} left</span></div>
+        <sc-for list="{{staff}}" as="m" hint-placeholder-count="5">
+          <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+            <div style="flex:1;min-width:0"><div style="font-weight:900;font-size:15px">{{m.n}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">{{m.r}}</div></div>
+            <button type="button" class="{{m.pc}}" onClick="{{m.setP}}" aria-label="Present">P</button>
+            <button type="button" class="{{m.ac}}" onClick="{{m.setA}}" aria-label="Absent">A</button>
+          </div>
+        </sc-for>
+        <button type="button" class="chunk g" style="width:100%" onClick="{{allP}}">Mark all present</button>
+        <button type="button" class="chunk w" style="width:100%" onClick="{{openPay}}">Payroll</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{s.more}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{moreGroups}}" as="g" hint-placeholder-count="4">
+          <div>
+            <div class="lbl" style="margin:4px 0 8px">{{g.label}}</div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+              <sc-for list="{{g.items}}" as="i" hint-placeholder-count="3">
+                <button type="button" class="mi" onClick="{{i.open}}"><span class="tile" style="background:{{i.bg}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{i.fg}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{i.d}}"></path></svg></span>{{i.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.att}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <div class="card" style="padding:10px"><div class="lbl">P</div><div style="font-weight:900;font-size:22px;color:#15803d">{{kp}}</div></div>
+          <div class="card" style="padding:10px"><div class="lbl">A</div><div style="font-weight:900;font-size:22px;color:#b91c1c">{{ka}}</div></div>
+          <div class="card" style="padding:10px"><div class="lbl">L</div><div style="font-weight:900;font-size:22px;color:#92400e">{{kl}}</div></div>
+        </div>
+        <div class="lbl">Class 9‑C · today</div>
+        <sc-for list="{{kids}}" as="k" hint-placeholder-count="5">
+          <div class="card" style="display:flex;align-items:center;gap:8px;padding:10px 12px">
+            <div style="flex:1;min-width:0"><div style="font-weight:900;font-size:15px">{{k.n}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">{{k.note}}</div></div>
+            <button type="button" class="{{k.pc}}" onClick="{{k.setP}}" aria-label="Present">P</button><button type="button" class="{{k.ac}}" onClick="{{k.setA}}" aria-label="Absent">A</button><button type="button" class="{{k.lc}}" onClick="{{k.setL}}" aria-label="Leave">L</button>
+          </div>
+        </sc-for>
+        <button type="button" class="chunk g" style="width:100%">Save · SMS absent parents</button>
+        <a class="full" href="Attendance.dc.html">Open desktop Attendance</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.notices}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px">
+          <div class="lbl">Tell Ilmora in a few words</div>
+          <input aria-label="Notice idea" value="school closed Monday due to smog" style="min-height:44px;border:2px solid #e5e7eb;border-radius:12px;padding:0 12px;font:700 14px Nunito,sans-serif">
+          <div style="display:flex;gap:8px"><button type="button" class="chip on">English</button><button type="button" class="chip">Urdu</button><button type="button" class="chip">Both</button></div>
+          <button type="button" class="chunk g">Draft and send</button>
+        </div>
+        <div class="card"><div style="font-weight:900;margin-bottom:4px">Published</div>
+          <div class="li"><span style="flex:1;font-weight:800">Smog closure Monday</span><span class="tag" style="background:#dcfce7;color:#15803d">Today</span></div>
+          <div class="li"><span style="flex:1;font-weight:800">Mid-term exams 2 Nov</span><span class="tag" style="background:#f1f5f9;color:#334155">23 Oct</span></div>
+          <div class="li"><span style="flex:1;font-weight:800">Quaid Day holiday</span><span class="tag" style="background:#fef3c7;color:#92400e">25 Dec</span></div>
+        </div>
+        <a class="full" href="Notices.dc.html">Open desktop Notices &amp; holidays</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.ai}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <button type="button" class="chunk g" style="width:100%">Scan answer sheets</button>
+        <div class="card"><div style="font-weight:900;margin-bottom:4px">Waiting for teacher</div>
+          <div class="li"><div style="flex:1"><div style="font-weight:900">Physics 9‑C · 50</div><div style="font-size:12px;font-weight:700;color:#6b7280">Avg 58% · 4 flagged</div></div><span class="tag" style="background:#fef3c7;color:#92400e">Review</span></div>
+          <div class="li"><div style="flex:1"><div style="font-weight:900">Biology 9‑A · 50</div><div style="font-size:12px;font-weight:700;color:#6b7280">Avg 74%</div></div><span class="tag" style="background:#fef3c7;color:#92400e">Review</span></div>
+        </div>
+        <div class="card" style="background:#1f2937;border-color:#1f2937;box-shadow:0 4px 0 #111827;color:#fff"><div class="lbl" style="color:#fcd34d">Ask Ilmora</div><p style="margin:6px 0 10px;font-weight:700;font-size:14px">"Who might fail the board exam?"</p><button type="button" class="chunk g sm">Ask</button></div>
+        <a class="full" href="AITools.dc.html">Open desktop AI tools</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.students}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input aria-label="Search students" placeholder="Name, roll no or phone" style="min-height:46px;border:2px solid #e5e7eb;border-radius:14px;padding:0 14px;font:700 15px Nunito,sans-serif">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"><sc-for list="{{sf}}" as="f" hint-placeholder-count="4"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for></div>
+        <sc-for list="{{studs}}" as="x" hint-placeholder-count="4">
+          <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+            <span class="tile" style="border-radius:99px;background:{{x.bg}};color:{{x.fg}};font-weight:900">{{x.ini}}</span>
+            <div style="flex:1;min-width:0"><div style="font-weight:900">{{x.n}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">{{x.c}} · avg {{x.avg}} · att {{x.att}}</div></div>
+            <span class="tag" style="background:{{x.bg}};color:{{x.fg}}">{{x.tag}}</span>
+          </div>
+        </sc-for>
+        <a class="full" href="Students.dc.html">Open desktop Students</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.adm}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{pipe}}" as="c" hint-placeholder-count="4">
+          <div class="card" style="background:{{c.bg}};border-color:{{c.bd}};box-shadow:0 4px 0 {{c.bd}}">
+            <div style="display:flex;justify-content:space-between;font-weight:900"><span>{{c.title}}</span><span>{{c.count}}</span></div>
+            <sc-for list="{{c.items}}" as="i" hint-placeholder-count="1">
+              <div style="display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:8px 10px;margin-top:8px"><div style="flex:1"><div style="font-weight:900;font-size:14px">{{i.n}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">{{i.info}}</div></div><sc-if value="{{i.canMove}}" hint-placeholder-val="{{ true }}"><button type="button" class="chunk w sm" onClick="{{i.move}}">Next</button></sc-if></div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <a class="full" href="Admissions.dc.html">Open desktop Admissions</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.pay}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="lbl">Net to pay · November</div><div style="font-weight:900;font-size:30px">Rs 1,246,300</div><div style="font-size:13px;font-weight:700;color:#6b7280">14 staff · due 1 Dec</div></div>
+        <div class="card"><div style="font-weight:900;margin-bottom:4px">Needs a look</div>
+          <div class="li"><span style="flex:1;font-weight:800">Sadia Malik · unpaid leave</span><span style="font-weight:900;color:#b91c1c">−5,670</span></div>
+          <div class="li"><span style="flex:1;font-weight:800">Kamran Shah · no bank</span><span class="tag" style="background:#fee2e2;color:#b91c1c">Add</span></div>
+        </div>
+        <button type="button" class="chunk w" style="width:100%">Send payslips</button>
+        <button type="button" class="chunk g" style="width:100%" onClick="{{payNow}}">{{payLabel}}</button>
+        <a class="full" href="Staff.dc.html">Open desktop Staff &amp; pay</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.fees}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <div class="card"><div class="lbl">Collected</div><div style="font-weight:900;font-size:22px;color:#15803d">Rs 1.13M</div><div style="font-size:12px;font-weight:700;color:#6b7280">October · 91%</div></div>
+          <div class="card"><div class="lbl">Due</div><div style="font-weight:900;font-size:22px;color:#b91c1c">Rs 828k</div><div style="font-size:12px;font-weight:700;color:#6b7280">117 families</div></div>
+        </div>
+        <button type="button" class="chunk g" style="width:100%">Make November challans</button>
+        <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:900">Top defaulters</span><button type="button" class="chunk w sm">Remind all</button></div>
+          <div class="li"><span style="flex:1;font-weight:800">Nadeem Butt · 3 months</span><span style="font-weight:900">Rs 12,600</span></div>
+          <div class="li"><span style="flex:1;font-weight:800">Ali Akbar · 2 months</span><span style="font-weight:900">Rs 9,500</span></div>
+          <div class="li"><span style="flex:1;font-weight:800">Asad Shah · 1 month</span><span style="font-weight:900">Rs 7,140</span></div>
+        </div>
+        <a class="full" href="Fees.dc.html">Open desktop Fees</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.reports}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"><sc-for list="{{rp}}" as="r" hint-placeholder-count="4"><button type="button" class="{{r.cls}}" onClick="{{r.pick}}">{{r.label}}</button></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <sc-for list="{{rk}}" as="k" hint-placeholder-count="4"><div class="card"><div class="lbl">{{k.l}}</div><div style="font-weight:900;font-size:22px">{{k.v}}</div></div></sc-for>
+        </div>
+        <div style="display:flex;gap:8px"><button type="button" class="chunk w" style="flex:1">PDF</button><button type="button" class="chunk w" style="flex:1">Share</button></div>
+        <a class="full" href="Reports.dc.html">Open desktop Reports</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{v.settings}}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card">
+          <sc-for list="{{toggles}}" as="t" hint-placeholder-count="4">
+            <div class="li"><div style="flex:1"><div style="font-weight:900;font-size:14px">{{t.n}}</div><div style="font-size:12px;font-weight:700;color:#6b7280">{{t.d}}</div></div><button type="button" class="{{t.cls}}" onClick="{{t.flip}}" role="switch" aria-checked="{{t.on}}" aria-label="{{t.n}}"><span></span></button></div>
+          </sc-for>
+        </div>
+        <a class="full" href="Settings.dc.html">Open desktop Settings</a>
+      </div>
+    </sc-if>
+  </div>
+
+  <nav aria-label="Main" style="display:flex;gap:2px;padding:6px 8px 14px;background:#fff;border-top:2px solid #e5e7eb">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+      <button type="button" class="{{t.cls}}" onClick="{{t.pick}}" aria-current="{{t.cur}}">
+        <span class="ic"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{t.fg}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.d}}"></path></svg></span>{{t.label}}
+      </button>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { tab:'home', sub:null, done:{ notice:true }, cf:'all', g:'9', st:{ ayesha:'P', farhan:'P', sadia:'A' }, leave:'pending', km:{ 1:'P', 2:'A', 3:'P', 4:'L' }, sf:'all', adm:{ a:0, b:0, c:1, d:1, e:2, f:3 }, paid:false, rp:'day', tg:{ abs:true, fee:true, res:true, sum:true } }; }
+  renderVals() {
+    const S0 = this.state;
+    const { tab, sub, done, cf, g, st } = S0;
+    const set = (o) => this.setState(o);
+    const I = {
+      home:'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      classes:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5',
+      exams:'M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4',
+      staff:'M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18',
+      more:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'
+    };
+    const T = [['home','Home'],['classes','Classes'],['exams','Exams'],['staff','Staff'],['more','More']];
+    const activeTab = sub ? 'more' : tab;
+    const tabs = T.map(([k,l]) => ({ label:l, d:I[k], cls: activeTab===k ? 'tb on':'tb', fg: activeTab===k ? '#0369a1':'#6b7280', cur: activeTab===k ? 'page':'false', pick: () => set({ tab:k, sub:null }) }));
+
+    const TD = [['att','Mark staff attendance','14 staff · 0 marked'],['chal','Make November challans','117 families waiting'],['leave','Reply to 1 leave request','Sadia Malik · Mon'],['notice','Post smog notice','Sent to 380 families']];
+    const todos = TD.map(([k,l,s]) => ({ label:l, sub:s, done: !!done[k], cls: done[k] ? 'todo done':'todo', toggle: () => set({ done:{ ...done, [k]: !done[k] } }) }));
+    const doneCount = todos.filter(t => t.done).length;
+
+    const C = [
+      { name:'Class 9', g:'mat', meta:'4 sections · 200 / 200 seats', fill:'100%', att:'86%', res:'68%', fee:'74%', tag:'Full', tagBg:'#fee2e2', tagFg:'#b91c1c' },
+      { name:'Class 10', g:'mat', meta:'2 sections · 15 / 80 seats', fill:'19%', att:'91%', res:'74%', fee:'93%', tag:'Board reg.', tagBg:'#dbeafe', tagFg:'#1d4ed8' },
+      { name:'Class 8', g:'mid', meta:'2 sections · 15 / 80 seats', fill:'19%', att:'88%', res:'64%', fee:'70%', tag:'Low marks', tagBg:'#fef3c7', tagFg:'#92400e' },
+      { name:'Class 5', g:'pri', meta:'2 sections · 50 / 80 seats', fill:'62%', att:'93%', res:'76%', fee:'88%', tag:'Good', tagBg:'#dcfce7', tagFg:'#15803d' },
+      { name:'Class 1', g:'pri', meta:'1 section · 0 / 40 seats', fill:'0%', att:'—', res:'—', fee:'—', tag:'No teacher', tagBg:'#fef3c7', tagFg:'#92400e' }
+    ];
+    const cfs = [['all','All'],['pri','Primary'],['mid','Middle'],['mat','Matric']].map(([k,l]) => ({ label:l, cls: cf===k ? 'chip on':'chip', pick: () => set({ cf:k }) }));
+
+    const B = {
+      '9': { pred:'66%', target:'75%', risk:'21', ch:[{n:'Turning effect · Phy',s:'41%',col:'#ef4444'},{n:'Logarithms · Maths',s:'48%',col:'#ef4444'},{n:'Essay writing · Eng',s:'55%',col:'#f59e0b'}] },
+      '10': { pred:'72%', target:'80%', risk:'2', ch:[{n:'Equilibrium · Chem',s:'52%',col:'#f59e0b'},{n:'Matrices · Maths',s:'61%',col:'#f59e0b'},{n:'Electromagnetism · Phy',s:'64%',col:'#0284c7'}] }
+    };
+    const gp = ['9','10'].map(k => ({ label:'Class '+k, cls: g===k ? 'chip on':'chip', pick: () => set({ g:k }) }));
+
+    const SS = [['ayesha','Ayesha Siddiqui','Biology · 9‑A'],['farhan','Farhan Akhtar','Physics'],['sadia','Sadia Malik','Maths'],['rabia','Rabia Noor','English · 8‑A'],['usman','Usman Ghani','Chemistry · 10‑A']];
+    const staff = SS.map(([k,n,r]) => ({ n, r, pc: st[k]==='P' ? 'pa p':'pa', ac: st[k]==='A' ? 'pa a':'pa', setP: () => set({ st:{ ...st, [k]:'P' } }), setA: () => set({ st:{ ...st, [k]:'A' } }) }));
+    const sv = SS.map(([k]) => st[k]);
+    const leaveNote = S0.leave==='pending' ? 'Mon 16 Nov · medical · 4 periods' : S0.leave==='ok' ? 'Approved · Farhan and Rabia cover 4 periods' : 'Declined · Sadia has been told';
+
+    const K = [[1,'Ahmed Raza','—'],[2,'Hamza Ali','4th absence'],[3,'Fatima Zahid','—'],[4,'Iqra Shah','Leave approved'],[5,'Usama Iqbal','Late 6 times']];
+    const km = S0.km;
+    const kids = K.map(([r,n,note]) => ({ n, note, pc: km[r]==='P' ? 'pa p':'pa', ac: km[r]==='A' ? 'pa a':'pa', lc: km[r]==='L' ? 'pa l':'pa',
+      setP:()=>set({ km:{...km,[r]:'P'} }), setA:()=>set({ km:{...km,[r]:'A'} }), setL:()=>set({ km:{...km,[r]:'L'} }) }));
+    const kv = K.map(([r]) => km[r]);
+
+    const ST = [
+      { n:'Zainab Tariq', c:'9‑A', avg:'91%', att:'98%', tag:'Top', g:'top', bg:'#dcfce7', fg:'#15803d' },
+      { n:'Hamza Ali', c:'9‑C', avg:'38%', att:'81%', tag:'At risk', g:'risk', bg:'#fee2e2', fg:'#b91c1c' },
+      { n:'Maryam Khan', c:'9‑D', avg:'79%', att:'95%', tag:'Rising', g:'top', bg:'#e0f2fe', fg:'#075985' },
+      { n:'Ali Raza', c:'9‑B', avg:'52%', att:'90%', tag:'Slipping', g:'risk', bg:'#fef3c7', fg:'#92400e' },
+      { n:'Iqra Shah', c:'7‑B', avg:'74%', att:'93%', tag:'Fee due', g:'fee', bg:'#fce7f3', fg:'#9d174d' }
+    ];
+    const sf = S0.sf;
+    const sfs = [['all','All'],['risk','At risk'],['top','Top'],['fee','Fee due']].map(([k,l]) => ({ label:l, cls: sf===k ? 'chip on':'chip', pick:()=>set({ sf:k }) }));
+    const studs = ST.filter(x => sf==='all' || x.g===sf).map(x => ({ ...x, ini: x.n.split(' ').map(w=>w[0]).join('') }));
+
+    const P = { a:['Rayan Ahmed','Class 6 · called'], b:['Sara Nadeem','Class 3 · walk-in'], c:['Hassan Raza','Class 9 · test Tue'], d:['Anaya Butt','Class 1 · test Sat'], e:['Daniyal Shah','Class 7 · 78%'], f:['Mehak Ali','Class 5 · paid'] };
+    const adm = S0.adm;
+    const pipe = [['Inquiry','#fdf2f8','#fbcfe8'],['Entry test','#eff6ff','#bfdbfe'],['Offer sent','#fffbeb','#fde68a'],['Joined','#f0fdf4','#bbf7d0']].map(([title,bg,bd], i) => {
+      const items = Object.keys(P).filter(k => adm[k]===i).map(k => ({ n:P[k][0], info:P[k][1], canMove: i<3, move:()=>set({ adm:{ ...adm, [k]: i+1 } }) }));
+      return { title, bg, bd, items, count: items.length };
+    });
+
+    const RK = { day:[['Received','Rs 0'],['Cash','Rs 0'],['Online','Rs 0'],['Expenses','Rs 4,200']], fee:[['Billed','Rs 1.24M'],['Collected','Rs 1.13M'],['Rate','91%'],['Due','Rs 828k']], att:[['Students','89.6%'],['Staff','94%'],['Late','81'],['Calls','12']], pl:[['Income','Rs 1.27M'],['Salaries','Rs 1.25M'],['Other','Rs 96k'],['Net','− Rs 76k']] };
+    const rps = [['day','Day close'],['fee','Fees'],['att','Attendance'],['pl','Profit & loss']].map(([k,l]) => ({ label:l, cls: S0.rp===k ? 'chip on':'chip', pick:()=>set({ rp:k }) }));
+
+    const TG = [['abs','SMS when absent','9:30 am after attendance'],['fee','Fee reminders','WhatsApp, before and after due date'],['res','Send results to parents','When results publish'],['sum','Daily summary to owner','Every evening at 6 pm']];
+    const toggles = TG.map(([k,n,d]) => ({ n, d, on: S0.tg[k] ? 'true':'false', cls: S0.tg[k] ? 'tg on':'tg', flip:()=>set({ tg:{ ...S0.tg, [k]: !S0.tg[k] } }) }));
+
+    const M = [
+      { label:'Daily', items:[
+        { id:'att', label:'Attendance', bg:'#ffedd5', fg:'#ea580c', d:'M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9' },
+        { id:'notices', label:'Notices', bg:'#fce7f3', fg:'#db2777', d:'M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8' } ] },
+      { label:'Academics', items:[
+        { id:'ai', label:'AI tools', bg:'#fef9c3', fg:'#ca8a04', d:'M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z' } ] },
+      { label:'People', items:[
+        { id:'students', label:'Students', bg:'#dcfce7', fg:'#16a34a', d:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8' },
+        { id:'adm', label:'Admissions', bg:'#fce7f3', fg:'#db2777', d:'M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6' },
+        { id:'pay', label:'Payroll', bg:'#e0f2fe', fg:'#0284c7', d:'M2 7h20v12H2zM12 13a2 2 0 1 0 0-.01M6 10v6M18 10v6' } ] },
+      { label:'Money', items:[
+        { id:'fees', label:'Fees', bg:'#ffedd5', fg:'#ea580c', d:'M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01' },
+        { id:'reports', label:'Reports', bg:'#ede9fe', fg:'#7c3aed', d:'M4 20V10M10 20V4M16 20v-7M22 20H2' },
+        { id:'settings', label:'Settings', bg:'#f3f4f6', fg:'#4b5563', d:'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4' } ] }
+    ];
+    let subObj = null;
+    const all = [];
+    const moreGroups = M.map(gr => ({ label:gr.label, items: gr.items.map(i => { if (i.id===sub) subObj = i; const o = { ...i, open: () => set({ sub:i.id }) }; all.push(o); return o; }) }));
+    const quick = ['att','fees','notices','students'].map(id => all.find(x => x.id===id));
+    const titles = { home:'Today', classes:'Classes', exams:'Exams', staff:'Staff', more:'More' };
+    const scr = sub ? 'sub' : tab;
+    const v = {}; M.forEach(gr => gr.items.forEach(i => { v[i.id] = sub===i.id; }));
+    return {
+      title: subObj ? subObj.label : titles[tab],
+      hasBack: !!sub, noBack: !sub, back: () => set({ sub:null }),
+      s: { home:scr==='home', classes:scr==='classes', exams:scr==='exams', staff:scr==='staff', more:scr==='more' }, v,
+      tabs, todos, doneCount, left: 4 - doneCount, goalPct: (doneCount*25)+'%', quick,
+      cf: cfs, classes: C.filter(c => cf==='all' || c.g===cf),
+      gp, b: B[g],
+      staff, pCount: sv.filter(x => x==='P').length, aCount: sv.filter(x => x==='A').length, nCount: sv.filter(x => !x).length,
+      allP: () => set({ st: Object.fromEntries(SS.map(([k]) => [k,'P'])) }),
+      leaveNote, leavePending: S0.leave==='pending', approve: () => set({ leave:'ok' }), decline: () => set({ leave:'no' }),
+      openPay: () => set({ sub:'pay' }),
+      kids, kp: kv.filter(x=>x==='P').length, ka: kv.filter(x=>x==='A').length, kl: kv.filter(x=>x==='L').length,
+      sf: sfs, studs, pipe,
+      payNow: () => set({ paid:true }), payLabel: S0.paid ? 'Sent for owner approval' : 'Transfer to bank accounts',
+      rp: rps, rk: RK[S0.rp].map(([l,val]) => ({ l, v:val })),
+      toggles, moreGroups
+    };
+  }
+}
+</script>
+</body>
+</html>

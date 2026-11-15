@@ -1,0 +1,57 @@
+/* Ilmora shared look: bright, chunky, rounded */
+body{margin:0;background:#f7f9fc}
+body *{font-family:Nunito,system-ui,sans-serif !important}
+a{color:#0369a1}a:hover{color:#075985}
+.shell{display:flex;flex-wrap:wrap;min-height:100vh;color:#1f2937;background:#f7f9fc}
+.side{flex:1 1 248px;max-width:264px;box-sizing:border-box;background:#fff;border-right:2px solid #e5e7eb;padding:18px 12px;display:flex;flex-direction:column;gap:3px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 6px 12px}
+.logo{width:42px;height:42px;border-radius:14px;background:#16a34a;box-shadow:0 4px 0 #15803d;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:22px}
+.it{display:flex;align-items:center;gap:12px;min-height:46px;padding:5px 10px;border:2px solid transparent;border-radius:14px;font-weight:800;font-size:15px;color:#4b5563;text-decoration:none;box-sizing:border-box}
+.it:hover{background:#f1f5f9;color:#1f2937}
+.it.on{background:#e0f2fe;border-color:#7dd3fc;color:#0369a1;box-shadow:0 3px 0 #7dd3fc}
+.tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+.tile.lg{width:48px;height:48px;border-radius:14px}
+.t-g{background:#dcfce7;color:#16a34a}.t-o{background:#ffedd5;color:#ea580c}.t-p{background:#fce7f3;color:#db2777}
+.t-b{background:#e0f2fe;color:#0284c7}.t-v{background:#ede9fe;color:#7c3aed}.t-y{background:#fef9c3;color:#ca8a04}.t-n{background:#f3f4f6;color:#4b5563}
+.badge{margin-left:auto;min-width:22px;height:22px;padding:0 7px;box-sizing:border-box;border-radius:99px;background:#ef4444;color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center}
+.grp{font-weight:900;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;padding:14px 12px 6px}
+.me{margin-top:auto;padding-top:16px;display:flex;align-items:center;gap:10px}
+.av{width:40px;height:40px;border-radius:99px;background:#ede9fe;color:#6d28d9;display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.content{flex:999 1 560px;min-width:0;padding:28px 28px 48px;box-sizing:border-box}
+.wrap{max-width:1220px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.title{margin:4px 0 0;font-weight:900;font-size:34px;letter-spacing:-.5px;line-height:40px}
+.sub{margin:6px 0 0;font-weight:700;color:#4b5563;font-size:15px}
+.h2{margin:0;font-weight:900;font-size:19px;color:#1f2937}
+.lbl,.kick{font-weight:900 !important;font-size:12px !important;letter-spacing:.1em !important;text-transform:uppercase;color:#6b7280}
+.big{font-weight:900;font-size:30px;margin-top:6px}
+.muted{font-weight:700;font-size:13px;color:#4b5563}
+.card{background:#fff;border:2px solid #e5e7eb;border-radius:18px !important;padding:18px;box-shadow:0 4px 0 #e5e7eb !important;box-sizing:border-box}
+.chunk,.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border:0 !important;border-radius:14px !important;font-weight:900 !important;font-size:14px !important;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;text-decoration:none;background:#16a34a;color:#fff;box-shadow:0 4px 0 #15803d !important;transform:none !important}
+.btn{background:#16a34a !important;color:#fff !important}
+.chunk.w,.btn.ghost{background:#fff !important;color:#0369a1 !important;border:2px solid #e5e7eb !important;box-shadow:0 4px 0 #e5e7eb !important}
+.chunk.sm,.btn.sm{min-height:36px;padding:0 12px;font-size:12px !important}
+.chunk:active,.btn:active{transform:translateY(3px) !important;box-shadow:none !important}
+.chip,.pill,.tab{min-height:40px;padding:0 16px;border-radius:12px !important;border:2px solid #e5e7eb !important;background:#fff !important;font-weight:800 !important;font-size:14px !important;color:#4b5563 !important;cursor:pointer;box-shadow:0 3px 0 #e5e7eb;white-space:nowrap}
+.chip.on,.pill.on,.tab.on{background:#e0f2fe !important;border-color:#7dd3fc !important;color:#0369a1 !important;box-shadow:0 3px 0 #7dd3fc}
+.tabbtn{min-height:44px !important;padding:0 16px !important;border:0 !important;border-bottom:4px solid transparent !important;background:none !important;font-weight:900 !important;font-size:15px !important;color:#6b7280 !important;cursor:pointer}
+.tabbtn.on{color:#0369a1 !important;border-bottom-color:#38bdf8 !important}
+.tag{display:inline-block;font-weight:900 !important;font-size:11px !important;padding:4px 10px !important;border-radius:99px !important;background:#f1f5f9;color:#334155;letter-spacing:.02em;white-space:nowrap;text-transform:none !important}
+.tag.g{background:#dcfce7;color:#15803d}.tag.r{background:#fee2e2;color:#b91c1c}.tag.b{background:#e0f2fe;color:#075985}.tag.y{background:#fef3c7;color:#92400e}.tag.p{background:#fce7f3;color:#9d174d}.tag.v{background:#ede9fe;color:#5b21b6}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:800;color:#374151}
+.field input,.field select,.field textarea,.inp{min-height:44px;box-sizing:border-box;border:2px solid #e5e7eb !important;border-radius:12px !important;padding:0 12px;font-weight:700;font-size:14px;background:#fff;color:#1f2937}
+.field textarea{padding:10px 12px;min-height:96px}
+.bar{height:12px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:99px;background:#16a34a}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 0;border-top:2px solid #f1f5f9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.cols{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.c3{flex:3 1 540px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.c2{flex:2 1 320px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.tbl{overflow-x:auto}
+.tbl table,table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:10px 8px;font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b7280}
+td{padding:11px 8px;border-top:2px solid #f1f5f9;vertical-align:middle;font-weight:700}
+.dark{background:#1f2937 !important;color:#fff;border-color:#111827 !important;box-shadow:0 4px 0 #111827 !important}
+.hero{background:#16a34a !important;color:#fff;border-color:#15803d !important;box-shadow:0 5px 0 #15803d !important}
+.warm{background:#fffbeb !important;border-color:#fcd34d !important;box-shadow:0 4px 0 #fcd34d !important}
+.ok{color:#15803d}.bad{color:#b91c1c}.warn{color:#c2410c}

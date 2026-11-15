@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School —Exams, results and board prep</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fdfdfd}
+a{color:#047857}a:hover{color:#065f46}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:14px;min-height:24px}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a.on{background:#123326;color:#34d399;font-weight:600}
+.kick{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#475569}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-sizing:border-box}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid #0f172a;background:#0f172a;color:#fff;font:600 14px Inter,sans-serif;cursor:pointer;box-shadow:2px 2px 0 #000,4px 4px 0 #000;text-decoration:none}
+.btn:hover{box-shadow:2px 2px 0 #000;transform:translate(2px,2px)}
+.btn.ghost{background:#fff;color:#0f172a}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;box-shadow:2px 2px 0 #000}
+.tag{display:inline-block;font:600 11px 'IBM Plex Mono',monospace;padding:3px 8px;border-radius:4px;background:#f1f5f9;color:#334155;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.tag.g{background:#d1fae5;color:#065f46}.tag.r{background:#fee2e2;color:#991b1b}.tag.b{background:#dbeafe;color:#1e40af}.tag.y{background:#fef3c7;color:#92400e}
+.tabbtn{min-height:44px;padding:0 18px;border:0;border-bottom:3px solid transparent;background:none;font:600 15px Inter,sans-serif;color:#475569;cursor:pointer}
+.tabbtn.on{color:#0f172a;border-bottom-color:#0f172a}
+.pill{min-height:36px;padding:0 14px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;font:600 13px Inter,sans-serif;color:#0f172a;cursor:pointer}
+.pill.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.field{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#334155}
+.field select,.field input{min-height:40px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:0 10px;font:400 14px Inter,sans-serif;background:#fff;color:#0f172a}
+.bar{height:8px;border-radius:99px;background:#e2e8f0;overflow:hidden}
+.bar span{display:block;height:100%;background:#0f172a}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #e2e8f0}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+th{text-align:left;padding:10px 8px}
+td{padding:11px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
+.up{color:#047857}.dn{color:#b91c1c}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:Inter,sans-serif;color:#0f172a;background:#fdfdfd">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
+    <div class="grp">Daily</div>
+    <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
+    <div class="grp">Academics</div>
+    <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it on" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
+    <a class="it" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
+    <div class="grp">People</div>
+    <a class="it" href="Students.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students</a>
+    <a class="it" href="Staff.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"></path></svg></span>Staff &amp; pay<span class="badge">1</span></a>
+    <a class="it" href="Admissions.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg></span>Admissions<span class="badge">6</span></a>
+    <div class="grp">Money</div>
+    <a class="it" href="Fees.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"></path></svg></span>Fees<span class="badge">117</span></a>
+    <a class="it" href="Reports.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span>Reports</a>
+    <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
+    <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:32px 32px 48px;box-sizing:border-box">
+    <div style="max-width:1180px;display:flex;flex-direction:column;gap:20px">
+      <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+        <div><div class="kick">School · Exams</div><h1 style="margin:6px 0 0;font-size:40px;line-height:44px;letter-spacing:-1px">Exams, results and board prep</h1><p style="margin:8px 0 0;color:#475569">Plan every test, see who is slipping, and lift Class 9–12 BISE Lahore marks with a clear plan.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn ghost">Export</button><button type="button" class="btn">Create test or exam</button></div>
+      </header>
+
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #e2e8f0">
+        <button type="button" role="tab" class="{{tPlan}}" onClick="{{goPlan}}">Plan &amp; marks entry</button>
+        <button type="button" role="tab" class="{{tRep}}" onClick="{{goRep}}">Results &amp; reports</button>
+        <button type="button" role="tab" class="{{tBoard}}" onClick="{{goBoard}}">BISE board prep · 9–12</button>
+      </div>
+
+      <sc-if value="{{showPlan}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <ol aria-label="Terms" style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            <li class="card" style="padding:14px 16px"><span class="tag g">Done · avg 72%</span><div style="font-weight:600;margin-top:8px">First term</div><div style="font-size:13px;color:#475569">1 Apr – 30 Sep · 5 tests</div></li>
+            <li class="card" style="padding:14px 16px;border:1.5px solid #0f172a;box-shadow:2px 2px 0 #000,4px 4px 0 #000"><span class="tag b">Now</span><div style="font-weight:600;margin-top:8px">Mid-term</div><div style="font-size:13px;color:#475569">1 Oct – 20 Nov · 2 tests</div></li>
+            <li class="card" style="padding:14px 16px"><span class="tag">Later</span><div style="font-weight:600;margin-top:8px">Second term</div><div style="font-size:13px;color:#475569">21 Nov – 12 Feb</div></li>
+            <li class="card" style="padding:14px 16px"><span class="tag">Later</span><div style="font-weight:600;margin-top:8px">Send-up and final</div><div style="font-size:13px;color:#475569">16 Feb – 31 Mar</div></li>
+          </ol>
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+            <div class="card" style="flex:3 1 520px;min-width:0">
+              <h2 style="margin:0 0 6px;font-size:18px">Marks entry · Mid-term exam</h2>
+              <p style="margin:0 0 6px;font-size:13px;color:#475569">42 papers · locks when you publish results</p>
+              <div class="row"><span style="flex:1 1 200px;font-weight:600">Farhan Akhtar · Physics 9‑A, 9‑C</span><div class="bar" style="flex:1 1 140px"><span style="width:100%;background:#059669"></span></div><span class="tag g">Done</span></div>
+              <div class="row"><span style="flex:1 1 200px;font-weight:600">Ayesha Siddiqui · Biology 9, 10</span><div class="bar" style="flex:1 1 140px"><span style="width:60%"></span></div><span class="tag b">60%</span></div>
+              <div class="row"><span style="flex:1 1 200px;font-weight:600">Sadia Malik · Maths 9‑B, 8</span><div class="bar" style="flex:1 1 140px"><span style="width:10%"></span></div><span class="tag r">2 days late</span><button type="button" class="btn sm ghost">Remind</button></div>
+              <div class="row"><span style="flex:1 1 200px;font-weight:600">Usman Ghani · Chemistry 9, 10</span><div class="bar" style="flex:1 1 140px"><span style="width:0%"></span></div><span class="tag y">Not started</span><button type="button" class="btn sm ghost">Remind</button></div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:14px"><button type="button" class="btn ghost">Check with AI paper checking</button><button type="button" class="btn">Publish results</button></div>
+            </div>
+            <div class="card" style="flex:2 1 300px;min-width:0">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Date sheet</h2><button type="button" class="btn sm ghost">Auto-make</button></div>
+              <div class="row" style="margin-top:8px"><span class="num" style="width:80px">Mon 2</span><span style="flex:1">Physics · 9, 10</span></div>
+              <div class="row"><span class="num" style="width:80px">Tue 3</span><span style="flex:1">Maths · all</span></div>
+              <div class="row"><span class="num" style="width:80px">Wed 4</span><span style="flex:1">Chemistry · 9, 10</span></div>
+              <div class="row"><span class="num" style="width:80px">Thu 5</span><span style="flex:1">English · all</span></div>
+              <p style="margin:10px 0 0;font-size:13px;color:#475569">No class has two papers on one day. Invigilators avoid their own subject.</p>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showRep}}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <section class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+            <label class="field" style="flex:1 1 140px">Session<select><option>2026–27</option><option>2025–26</option></select></label>
+            <label class="field" style="flex:1 1 160px">Term / test<select><option>All tests this session</option><option>Monthly test · October</option><option>First term exam</option></select></label>
+            <label class="field" style="flex:1 1 120px">Class<select><option>Class 9</option><option>All classes</option><option>Class 10</option></select></label>
+            <label class="field" style="flex:1 1 110px">Section<select><option>All</option><option>A</option><option>C</option></select></label>
+            <label class="field" style="flex:1 1 130px">Subject<select><option>All subjects</option><option>Physics</option><option>Maths</option></select></label>
+            <label class="field" style="flex:1 1 130px">Teacher<select><option>All teachers</option><option>Farhan Akhtar</option></select></label>
+            <label class="field" style="flex:1 1 130px">Show<select><option>Everyone</option><option>Below 50%</option><option>Top 10</option><option>Dropped 10+ pts</option></select></label>
+          </section>
+
+          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Report view">
+              <button type="button" class="{{vClass}}" onClick="{{setClass}}">By class</button>
+              <button type="button" class="{{vStu}}" onClick="{{setStu}}">By student</button>
+              <button type="button" class="{{vTch}}" onClick="{{setTch}}">By teacher</button>
+              <button type="button" class="{{vSub}}" onClick="{{setSub}}">By subject &amp; chapter</button>
+            </div>
+            <div style="display:flex;gap:8px"><button type="button" class="btn sm ghost">PDF</button><button type="button" class="btn sm ghost">Excel</button><button type="button" class="btn sm ghost">Send to parents</button></div>
+          </div>
+
+          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+            <div class="card"><div class="kick">Average</div><div style="font-size:28px;font-weight:700;margin-top:6px">68%</div><div style="font-size:13px" class="up">▲ 4 pts since first term</div></div>
+            <div class="card"><div class="kick">Pass rate</div><div style="font-size:28px;font-weight:700;margin-top:6px">87%</div><div style="font-size:13px;color:#475569">174 of 200 students</div></div>
+            <div class="card"><div class="kick">A+ and A</div><div style="font-size:28px;font-weight:700;margin-top:6px">41</div><div style="font-size:13px;color:#475569">80% and above</div></div>
+            <div class="card" style="border-color:#dc2626"><div class="kick">At risk</div><div style="font-size:28px;font-weight:700;margin-top:6px;color:#b91c1c">26</div><div style="font-size:13px;color:#475569">below 40% in 1+ subject</div></div>
+          </section>
+
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+            <div class="card" style="flex:3 1 520px;min-width:0">
+              <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between"><h2 style="margin:0;font-size:18px">Class 9 average · test by test</h2><span style="font-size:12px;color:#475569">Each bar is one test this session</span></div>
+              <div role="img" aria-label="Class 9 average rose from 61% in April to 68% in October" style="display:flex;align-items:flex-end;gap:10px;height:180px;margin-top:16px;border-bottom:1px solid #cbd5e1">
+                <sc-for list="{{trend}}" as="t" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px"><span class="num" style="font-size:12px">{{t.v}}</span><div style="width:100%;height:{{t.h}};background:{{t.c}};border-radius:4px 4px 0 0"></div></div></sc-for>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:6px"><sc-for list="{{trend}}" as="t" hint-placeholder-count="6"><span class="kick" style="flex:1;text-align:center;font-size:10px">{{t.l}}</span></sc-for></div>
+            </div>
+            <div class="card" style="flex:2 1 300px;min-width:0">
+              <h2 style="margin:0 0 6px;font-size:18px">Grade spread</h2>
+              <div class="row"><span class="num" style="width:36px">A+</span><div class="bar" style="flex:1"><span style="width:8%;background:#059669"></span></div><span class="num">16</span></div>
+              <div class="row"><span class="num" style="width:36px">A</span><div class="bar" style="flex:1"><span style="width:12%;background:#059669"></span></div><span class="num">25</span></div>
+              <div class="row"><span class="num" style="width:36px">B</span><div class="bar" style="flex:1"><span style="width:28%"></span></div><span class="num">56</span></div>
+              <div class="row"><span class="num" style="width:36px">C</span><div class="bar" style="flex:1"><span style="width:26%"></span></div><span class="num">52</span></div>
+              <div class="row"><span class="num" style="width:36px">D</span><div class="bar" style="flex:1"><span style="width:13%;background:#f59e0b"></span></div><span class="num">25</span></div>
+              <div class="row"><span class="num" style="width:36px">F</span><div class="bar" style="flex:1"><span style="width:13%;background:#dc2626"></span></div><span class="num">26</span></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2 style="margin:0;font-size:18px">{{view.title}}</h2>
+            <p style="margin:4px 0 0;font-size:13px;color:#475569">{{view.sub}}</p>
+            <div style="overflow-x:auto;margin-top:8px">
+              <table>
+                <thead><tr class="kick"><sc-for list="{{view.head}}" as="h" hint-placeholder-count="6"><th>{{h}}</th></sc-for></tr></thead>
+                <tbody>
+                  <sc-for list="{{view.rows}}" as="r" hint-placeholder-count="5">
+                    <tr><td style="font-weight:600">{{r.a}}</td><td class="num">{{r.b}}</td><td class="num">{{r.c}}</td><td class="num">{{r.d}}</td><td><span class="{{r.ec}}">{{r.e}}</span></td><td style="font-size:13px;color:#334155">{{r.f}}</td></tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showBoard}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Board class">
+              <sc-for list="{{grades}}" as="g" hint-placeholder-count="4"><button type="button" class="{{g.cls}}" onClick="{{g.pick}}">{{g.label}}</button></sc-for>
+            </div>
+            <span class="kick">BISE Lahore · annual exam March 2027 · {{b.days}} days left</span>
+          </div>
+
+          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+            <div class="card"><div class="kick">Predicted board avg</div><div style="font-size:28px;font-weight:700;margin-top:6px">{{b.pred}}</div><div style="font-size:13px;color:#475569">from {{b.tests}} school tests</div></div>
+            <div class="card"><div class="kick">Target</div><div style="font-size:28px;font-weight:700;margin-top:6px">{{b.target}}</div><div style="font-size:13px;color:#475569">last year: {{b.last}}</div></div>
+            <div class="card"><div class="kick">On track for A+</div><div style="font-size:28px;font-weight:700;margin-top:6px" class="up">{{b.aplus}}</div><div style="font-size:13px;color:#475569">80%+ predicted</div></div>
+            <div class="card" style="border-color:#dc2626"><div class="kick">Might fail a paper</div><div style="font-size:28px;font-weight:700;margin-top:6px;color:#b91c1c">{{b.risk}}</div><div style="font-size:13px;color:#475569">below 33% in a subject</div></div>
+            <div class="card"><div class="kick">Past papers done</div><div style="font-size:28px;font-weight:700;margin-top:6px">{{b.pp}}</div><div style="font-size:13px;color:#475569">of 10 years · per student</div></div>
+          </section>
+
+          <section class="card" style="background:#0f172a;color:#fff;border-color:#0f172a;box-shadow:2px 2px 0 #3b82f6,4px 4px 0 #3b82f6,6px 6px 0 #3b82f6">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start">
+              <div style="flex:1 1 480px"><div class="kick" style="color:#94a3b8">AI plan to raise marks · {{b.name}}</div>
+                <ol style="margin:10px 0 0;padding-left:20px;line-height:26px;font-size:15px">
+                  <sc-for list="{{b.plan}}" as="p" hint-placeholder-count="4"><li>{{p}}</li></sc-for>
+                </ol>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px"><button type="button" class="btn" style="background:#34d399;color:#0b1220;border-color:#34d399;box-shadow:none">Apply plan to timetable</button><button type="button" class="btn ghost" style="box-shadow:none">Share with teachers</button></div>
+            </div>
+          </section>
+
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+            <div class="card" style="flex:3 1 520px;min-width:0">
+              <h2 style="margin:0 0 4px;font-size:18px">Weak chapters · where marks are lost</h2>
+              <p style="margin:0 0 6px;font-size:13px;color:#475569">From every test answer, matched to the BISE Lahore syllabus and how much each chapter usually carries in the paper</p>
+              <sc-for list="{{b.chapters}}" as="c" hint-placeholder-count="5">
+                <div class="row"><div style="flex:1 1 220px"><div style="font-weight:600">{{c.ch}}</div><div style="font-size:12px;color:#475569">{{c.sub}} · ~{{c.w}} marks in board paper</div></div><div class="bar" style="flex:1 1 120px"><span style="width:{{c.score}};background:{{c.col}}"></span></div><span class="num" style="width:44px">{{c.score}}</span><button type="button" class="btn sm ghost">Assign practice</button></div>
+              </sc-for>
+            </div>
+            <div class="card" style="flex:2 1 320px;min-width:0">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Students to push</h2><span class="tag r">{{b.risk}} at risk</span></div>
+              <sc-for list="{{b.students}}" as="s" hint-placeholder-count="4">
+                <div class="row"><div style="flex:1 1 150px"><div style="font-weight:600">{{s.n}}</div><div style="font-size:12px;color:#475569">{{s.why}}</div></div><span class="{{s.tc}}">{{s.t}}</span></div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px"><button type="button" class="btn sm ghost">Extra class list</button><button type="button" class="btn sm ghost">Call parents</button></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2 style="margin:0 0 4px;font-size:18px">Board prep calendar</h2>
+            <p style="margin:0 0 10px;font-size:13px;color:#475569">Built from the days left and each subject's weight. Teachers see their part in their app.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+              <div style="border-top:4px solid #059669;padding-top:10px"><div class="kick">Now – 20 Dec</div><div style="font-weight:600;margin-top:4px">Finish syllabus</div><div style="font-size:13px;color:#475569">Weekly chapter tests, 25 marks</div></div>
+              <div style="border-top:4px solid #0f172a;padding-top:10px"><div class="kick">Jan</div><div style="font-weight:600;margin-top:4px">Past papers 2016–2025</div><div style="font-size:13px;color:#475569">2 papers a week, AI-checked</div></div>
+              <div style="border-top:4px solid #3b82f6;padding-top:10px"><div class="kick">Feb</div><div style="font-weight:600;margin-top:4px">Send-up · full board pattern</div><div style="font-size:13px;color:#475569">Objective + subjective, timed</div></div>
+              <div style="border-top:4px solid #f59e0b;padding-top:10px"><div class="kick">Late Feb – Mar</div><div style="font-weight:600;margin-top:4px">Revision and guess papers</div><div style="font-size:13px;color:#475569">Only weak chapters per student</div></div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { tab:'rep', view:'class', g:'9' }; }
+  renderVals() {
+    const { tab, view, g } = this.state;
+    const T = [['Apr test',61],['May test',63],['1st term',64],['Aug test',66],['Sep test',65],['Oct test',68]];
+    const trend = T.map(([l,v]) => ({ l, v: v+'%', h: (v*1.3)+'px', c: v>=66 ? '#059669' : '#0f172a' }));
+    const V = {
+      class: { title:'Class-wise report', sub:'Average of all tests this session, by section', head:['Section','Avg','Pass','Change','Status','Weakest subject'],
+        rows:[{a:'9‑A',b:'74%',c:'96%',d:'+6',e:'Strong',ec:'tag g',f:'Chemistry 61%'},{a:'9‑B',b:'69%',c:'90%',d:'+3',e:'OK',ec:'tag b',f:'Maths 58%'},{a:'9‑C',b:'58%',c:'76%',d:'−2',e:'Falling',ec:'tag r',f:'Physics 47%'},{a:'9‑D',b:'71%',c:'88%',d:'+5',e:'OK',ec:'tag b',f:'English 62%'}] },
+      stu: { title:'Student-wise report', sub:'Each student across all tests. Click a name for the full profile.', head:['Student','Avg','Rank','Change','Grade','Needs help in'],
+        rows:[{a:'Hamza Ali · 9‑C',b:'38%',c:'188',d:'−11',e:'F',ec:'tag r',f:'Physics, Maths · 4 absences'},{a:'Zainab Tariq · 9‑A',b:'91%',c:'1',d:'+3',e:'A+',ec:'tag g',f:'—'},{a:'Ali Raza · 9‑B',b:'52%',c:'131',d:'−8',e:'D',ec:'tag y',f:'Maths: algebraic fractions'},{a:'Maryam Khan · 9‑D',b:'79%',c:'22',d:'+12',e:'A',ec:'tag g',f:'Close to A+ in Chemistry'},{a:'Usama Iqbal · 9‑C',b:'44%',c:'170',d:'−6',e:'D',ec:'tag y',f:'English writing'}] },
+      tch: { title:'Teacher-wise report', sub:'Average marks of each teacher’s students, and change since first term', head:['Teacher','Students avg','Pass','Change','Status','Note'],
+        rows:[{a:'Ayesha Siddiqui · Biology',b:'76%',c:'95%',d:'+7',e:'Best gain',ec:'tag g',f:'Weekly quizzes working'},{a:'Usman Ghani · Chemistry',b:'64%',c:'85%',d:'+2',e:'OK',ec:'tag b',f:'Marks entry late twice'},{a:'Sadia Malik · Maths',b:'58%',c:'79%',d:'−3',e:'Watch',ec:'tag y',f:'9 leave days this term'},{a:'Farhan Akhtar · Physics',b:'61%',c:'81%',d:'+1',e:'OK',ec:'tag b',f:'9‑C much lower than 9‑A'}] },
+      sub: { title:'Subject and chapter report', sub:'Which chapters cost the most marks, across Class 9', head:['Subject · chapter','Avg','Board weight','Change','Status','Suggestion'],
+        rows:[{a:'Physics · Ch 4 Turning effect',b:'41%',c:'~12',d:'−5',e:'Weak',ec:'tag r',f:'Numericals practice, 2 periods'},{a:'Maths · Ch 3 Logarithms',b:'48%',c:'~10',d:'+2',e:'Weak',ec:'tag r',f:'Past paper MCQs daily'},{a:'Chemistry · Ch 2 Atomic structure',b:'63%',c:'~9',d:'+4',e:'OK',ec:'tag b',f:'—'},{a:'English · Essay writing',b:'55%',c:'~15',d:'0',e:'Watch',ec:'tag y',f:'One essay a week, AI-checked'}] }
+    };
+    const B = {
+      '9':  { name:'Class 9', days:118, pred:'66%', target:'75%', last:'63%', aplus:'34', risk:'21', pp:'2.1', tests:6,
+        plan:['Two extra Physics periods a week for 9‑C, taken from Games, until 20 Dec.','Daily 15-minute MCQ drill from 10 years of BISE past papers, auto-checked.','After-school help for 21 at-risk students, Tue and Thu, with a parent call this week.','Push 18 students sitting at 75–79% toward A+ with chapter-wise practice.'],
+        chapters:[{ch:'Turning effect of forces',sub:'Physics',w:12,score:'41%',col:'#dc2626'},{ch:'Logarithms',sub:'Maths',w:10,score:'48%',col:'#dc2626'},{ch:'Essay and letter writing',sub:'English',w:15,score:'55%',col:'#f59e0b'},{ch:'Periodic table',sub:'Chemistry',w:8,score:'58%',col:'#f59e0b'},{ch:'Cell cycle',sub:'Biology',w:9,score:'72%',col:'#0f172a'}],
+        students:[{n:'Hamza Ali · 9‑C',why:'Physics 28%, Maths 35%',t:'Fail risk',tc:'tag r'},{n:'Usama Iqbal · 9‑C',why:'English 31%',t:'Fail risk',tc:'tag r'},{n:'Maryam Khan · 9‑D',why:'79% avg, rising fast',t:'Near A+',tc:'tag g'},{n:'Ali Raza · 9‑B',why:'Dropped 8 points',t:'Slipping',tc:'tag y'}] },
+      '10': { name:'Class 10', days:110, pred:'72%', target:'80%', last:'70%', aplus:'4', risk:'2', pp:'3.4', tests:6,
+        plan:['Board registration first: 3 students still missing B‑form copies.','Two full past papers a week from January, timed like the board.','Chemistry numericals clinic every Saturday.','Pair each weak student with an A+ student for revision.'],
+        chapters:[{ch:'Chemical equilibrium',sub:'Chemistry',w:10,score:'52%',col:'#f59e0b'},{ch:'Matrices',sub:'Maths',w:12,score:'61%',col:'#f59e0b'},{ch:'Electromagnetism',sub:'Physics',w:11,score:'64%',col:'#0f172a'}],
+        students:[{n:'Bilal Hassan · 10‑B',why:'Chemistry 30%',t:'Fail risk',tc:'tag r'},{n:'Sana Javed · 10‑A',why:'84%, top of class',t:'A+ track',tc:'tag g'}] },
+      '11': { name:'Class 11 (FSc)', days:132, pred:'61%', target:'70%', last:'—', aplus:'—', risk:'—', pp:'—', tests:0,
+        plan:['Class 11 isn’t set up yet. Add it under Classes to start tracking.','Then set FSc Pre-Medical / Pre-Engineering subject groups.'],
+        chapters:[], students:[] },
+      '12': { name:'Class 12 (FSc)', days:150, pred:'—', target:'—', last:'—', aplus:'—', risk:'—', pp:'—', tests:0,
+        plan:['Class 12 isn’t set up yet. Add it under Classes to start tracking.'], chapters:[], students:[] }
+    };
+    const t = (k) => tab===k ? 'tabbtn on' : 'tabbtn';
+    const v = (k) => view===k ? 'pill on' : 'pill';
+    const grades = ['9','10','11','12'].map(k => ({ label:'Class '+k, cls: g===k ? 'pill on':'pill', pick: () => this.setState({ g:k }) }));
+    return {
+      tPlan:t('plan'), tRep:t('rep'), tBoard:t('board'),
+      goPlan:()=>this.setState({tab:'plan'}), goRep:()=>this.setState({tab:'rep'}), goBoard:()=>this.setState({tab:'board'}),
+      showPlan:tab==='plan', showRep:tab==='rep', showBoard:tab==='board',
+      vClass:v('class'), vStu:v('stu'), vTch:v('tch'), vSub:v('sub'),
+      setClass:()=>this.setState({view:'class'}), setStu:()=>this.setState({view:'stu'}), setTch:()=>this.setState({view:'tch'}), setSub:()=>this.setState({view:'sub'}),
+      view: V[view], trend, grades, b: B[g]
+    };
+  }
+}
+</script>
+</body>
+</html>

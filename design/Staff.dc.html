@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School —Staff, leave and salaries</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fdfdfd}
+a{color:#047857}a:hover{color:#065f46}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:14px;min-height:24px}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a.on{background:#123326;color:#34d399;font-weight:600}
+.kick{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#475569}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-sizing:border-box}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid #0f172a;background:#0f172a;color:#fff;font:600 14px Inter,sans-serif;cursor:pointer;box-shadow:2px 2px 0 #000,4px 4px 0 #000;text-decoration:none}
+.btn:hover{box-shadow:2px 2px 0 #000;transform:translate(2px,2px)}
+.btn.ghost{background:#fff;color:#0f172a}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;box-shadow:2px 2px 0 #000}
+.tag{display:inline-block;font:600 11px 'IBM Plex Mono',monospace;padding:3px 8px;border-radius:4px;background:#f1f5f9;color:#334155;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.tag.g{background:#d1fae5;color:#065f46}.tag.r{background:#fee2e2;color:#991b1b}.tag.b{background:#dbeafe;color:#1e40af}.tag.y{background:#fef3c7;color:#92400e}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#0f172a}
+.field input,.field select{min-height:44px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff;color:#0f172a}
+.tabbtn{min-height:44px;padding:0 18px;border:0;border-bottom:3px solid transparent;background:none;font:600 15px Inter,sans-serif;color:#475569;cursor:pointer}
+.tabbtn.on{color:#0f172a;border-bottom-color:#0f172a}
+.pill{min-height:36px;padding:0 14px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;font:600 13px Inter,sans-serif;color:#0f172a;cursor:pointer}
+.pill.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.seg{display:inline-flex;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}
+.seg label{min-width:40px;min-height:36px;display:flex;align-items:center;justify-content:center;font:600 13px 'IBM Plex Mono',monospace;border-left:1px solid #cbd5e1;cursor:pointer}
+.seg label:first-child{border-left:0}
+.seg input{position:absolute;opacity:0}
+.seg .p{background:#d1fae5;color:#065f46}.seg .a{background:#fee2e2;color:#991b1b}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #e2e8f0}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}
+th{text-align:left;padding:10px 8px}
+td{padding:11px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
+td input{width:90px;min-height:36px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:6px;padding:0 8px;font:14px Inter,sans-serif}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:Inter,sans-serif;color:#0f172a;background:#fdfdfd">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
+    <div class="grp">Daily</div>
+    <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
+    <div class="grp">Academics</div>
+    <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
+    <a class="it" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
+    <div class="grp">People</div>
+    <a class="it" href="Students.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students</a>
+    <a class="it on" href="Staff.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"></path></svg></span>Staff &amp; pay<span class="badge">1</span></a>
+    <a class="it" href="Admissions.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg></span>Admissions<span class="badge">6</span></a>
+    <div class="grp">Money</div>
+    <a class="it" href="Fees.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"></path></svg></span>Fees<span class="badge">117</span></a>
+    <a class="it" href="Reports.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span>Reports</a>
+    <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
+    <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:32px 32px 48px;box-sizing:border-box">
+    <div style="max-width:1180px;display:flex;flex-direction:column;gap:20px">
+      <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+        <div><div class="kick">School · Staff</div><h1 style="margin:6px 0 0;font-size:40px;line-height:44px;letter-spacing:-1px">Staff, leave and salaries</h1><p style="margin:8px 0 0;color:#475569">Track attendance and leave over any period, set pay by subject or hour, and pay staff straight to their bank.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn ghost">Export report</button><button type="button" class="btn">Add staff member</button></div>
+      </header>
+
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #e2e8f0">
+        <button type="button" role="tab" class="{{tabToday}}" onClick="{{goToday}}">Today</button>
+        <button type="button" role="tab" class="{{tabReports}}" onClick="{{goReports}}">Reports</button>
+        <button type="button" role="tab" class="{{tabPay}}" onClick="{{goPay}}">Salaries &amp; payroll</button>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Period">
+          <button type="button" class="{{pWeek}}" onClick="{{setWeek}}">This week</button>
+          <button type="button" class="{{pMonth}}" onClick="{{setMonth}}">This month</button>
+          <button type="button" class="{{pTerm}}" onClick="{{setTerm}}">This term</button>
+          <button type="button" class="{{pCustom}}" onClick="{{setCustom}}">Custom</button>
+        </div>
+        <sc-if value="{{isCustom}}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <label class="field">From<input type="date" value="2026-10-01"></label>
+            <label class="field">To<input type="date" value="2026-11-15"></label>
+            <select aria-label="Staff filter" style="min-height:44px;border:1px solid #cbd5e1;border-radius:8px;padding:0 10px;font:14px Inter,sans-serif"><option>All staff</option><option>Teachers</option><option>Admin &amp; support</option><option>Science department</option></select>
+          </div>
+        </sc-if>
+        <sc-if value="{{notCustom}}" hint-placeholder-val="{{ true }}"><span class="kick">{{rangeLabel}}</span></sc-if>
+      </div>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+        <div class="card"><div class="kick">Attendance</div><div style="font-size:30px;font-weight:700;margin-top:6px">{{k.att}}</div><div style="font-size:13px;color:#475569">{{k.attNote}}</div></div>
+        <div class="card"><div class="kick">Leave days</div><div style="font-size:30px;font-weight:700;margin-top:6px">{{k.leave}}</div><div style="font-size:13px;color:#475569">{{k.leaveNote}}</div></div>
+        <div class="card"><div class="kick">Late arrivals</div><div style="font-size:30px;font-weight:700;margin-top:6px">{{k.late}}</div><div style="font-size:13px;color:#475569">after 7:45 am</div></div>
+        <div class="card"><div class="kick">Periods covered</div><div style="font-size:30px;font-weight:700;margin-top:6px">{{k.cover}}</div><div style="font-size:13px;color:#475569">by substitutes</div></div>
+        <div class="card"><div class="kick">Payroll</div><div style="font-size:30px;font-weight:700;margin-top:6px">{{k.pay}}</div><div style="font-size:13px;color:#475569">{{k.payNote}}</div></div>
+      </section>
+
+      <sc-if value="{{showToday}}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+            <div class="card" style="flex:1 1 340px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Leave requests</h2><span class="tag y">1 waiting</span></div>
+              <div class="row" style="margin-top:8px"><div style="flex:1 1 180px"><div style="font-weight:600">Sadia Malik · Maths</div><div style="font-size:13px;color:#475569">Mon 16 Nov · medical · 4 periods · 3 of 12 leave days used</div></div><div style="display:flex;gap:8px"><button type="button" class="btn sm ghost">Decline</button><button type="button" class="btn sm">Approve</button></div></div>
+            </div>
+            <div class="card" style="flex:1 1 340px;background:#0f172a;color:#fff;border-color:#0f172a;box-shadow:2px 2px 0 #3b82f6,4px 4px 0 #3b82f6,6px 6px 0 #3b82f6">
+              <div class="kick" style="color:#94a3b8">Cover periods · AI suggestion</div>
+              <p style="margin:8px 0 12px;line-height:24px">If Sadia's leave is approved, 4 periods open up. Farhan Akhtar (P2, P5) and Rabia Noor (P3, P6) are free and teach Maths. Paid as extra periods at Rs 400 each.</p>
+              <button type="button" class="btn" style="background:#34d399;color:#0b1220;border-color:#34d399;box-shadow:none">Assign substitutes</button>
+            </div>
+          </section>
+          <section class="card">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+              <div><h2 style="margin:0;font-size:18px">Mark attendance · Sun 15 Nov</h2><p style="margin:4px 0 0;font-size:13px;color:#475569">P present · A absent · L leave · H half day. Approved leave fills in by itself.</p></div>
+              <button type="button" class="btn sm ghost">Mark all present</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));column-gap:32px;margin-top:10px">
+              <div class="row"><div style="flex:1"><div style="font-weight:600">Ayesha Siddiqui</div><div style="font-size:13px;color:#475569">Teacher · Class 9‑A</div></div><div class="seg" role="radiogroup" aria-label="Ayesha Siddiqui"><label class="p"><input type="radio" name="s2" checked>P</label><label><input type="radio" name="s2">A</label><label><input type="radio" name="s2">L</label><label><input type="radio" name="s2">H</label></div></div>
+              <div class="row"><div style="flex:1"><div style="font-weight:600">Sadia Malik</div><div style="font-size:13px;color:#475569">Teacher · Maths</div></div><div class="seg" role="radiogroup" aria-label="Sadia Malik"><label><input type="radio" name="s3">P</label><label class="a"><input type="radio" name="s3" checked>A</label><label><input type="radio" name="s3">L</label><label><input type="radio" name="s3">H</label></div></div>
+              <div class="row"><div style="flex:1"><div style="font-weight:600">Farhan Akhtar</div><div style="font-size:13px;color:#475569">Teacher · Physics</div></div><div class="seg" role="radiogroup" aria-label="Farhan Akhtar"><label class="p"><input type="radio" name="s4" checked>P</label><label><input type="radio" name="s4">A</label><label><input type="radio" name="s4">L</label><label><input type="radio" name="s4">H</label></div></div>
+              <div class="row"><div style="flex:1"><div style="font-weight:600">Rabia Noor</div><div style="font-size:13px;color:#475569">Teacher · Class 8‑A</div></div><div class="seg" role="radiogroup" aria-label="Rabia Noor"><label class="p"><input type="radio" name="s5" checked>P</label><label><input type="radio" name="s5">A</label><label><input type="radio" name="s5">L</label><label><input type="radio" name="s5">H</label></div></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-top:16px"><span style="font-size:13px;color:#475569">3 present · 1 absent · 10 not marked</span><button type="button" class="btn">Save attendance</button></div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showReports}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+            <div class="card" style="flex:3 1 520px;min-width:0">
+              <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Staff attendance · {{rangeLabel}}</h2><span style="display:flex;gap:14px;font-size:12px;color:#475569"><span><span style="display:inline-block;width:10px;height:10px;background:#0f172a;border-radius:2px"></span> Present</span><span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px"></span> Leave</span><span><span style="display:inline-block;width:10px;height:10px;background:#dc2626;border-radius:2px"></span> Absent</span></span></div>
+              <div role="img" aria-label="{{chartAria}}" style="display:flex;align-items:flex-end;gap:8px;height:200px;margin-top:18px;border-bottom:1px solid #cbd5e1">
+                <sc-for list="{{bars}}" as="b" hint-placeholder-count="6">
+                  <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%">
+                    <div style="height:{{b.ab}};background:#dc2626"></div>
+                    <div style="height:{{b.lv}};background:#f59e0b"></div>
+                    <div style="height:{{b.pr}};background:#0f172a;border-radius:3px 3px 0 0"></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <sc-for list="{{bars}}" as="b" hint-placeholder-count="6"><span class="kick" style="flex:1;text-align:center">{{b.label}}</span></sc-for>
+              </div>
+            </div>
+            <div class="card" style="flex:2 1 300px;min-width:0">
+              <h2 style="margin:0 0 6px;font-size:18px">Leave by type</h2>
+              <div class="row"><span style="flex:1">Sick</span><div style="flex:2;height:10px;background:#e2e8f0;border-radius:99px"><div style="width:55%;height:100%;background:#0f172a;border-radius:99px"></div></div><span class="num">11</span></div>
+              <div class="row"><span style="flex:1">Casual</span><div style="flex:2;height:10px;background:#e2e8f0;border-radius:99px"><div style="width:30%;height:100%;background:#0f172a;border-radius:99px"></div></div><span class="num">6</span></div>
+              <div class="row"><span style="flex:1">Unpaid</span><div style="flex:2;height:10px;background:#e2e8f0;border-radius:99px"><div style="width:10%;height:100%;background:#dc2626;border-radius:99px"></div></div><span class="num">2</span></div>
+              <div class="row"><span style="flex:1">Half day</span><div style="flex:2;height:10px;background:#e2e8f0;border-radius:99px"><div style="width:15%;height:100%;background:#f59e0b;border-radius:99px"></div></div><span class="num">3</span></div>
+              <p style="margin:10px 0 0;font-size:13px;color:#475569;line-height:20px"><strong style="color:#0f172a">AI note:</strong> Mondays have 2× the absences of other days. Sadia Malik has used 9 of 12 sick days this year.</p>
+            </div>
+          </section>
+          <section class="card">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Per teacher · {{rangeLabel}}</h2><div style="display:flex;gap:8px"><button type="button" class="btn sm ghost">Download PDF</button><button type="button" class="btn sm ghost">Excel</button></div></div>
+            <div style="overflow-x:auto;margin-top:8px">
+              <table>
+                <thead><tr class="kick"><th>Staff</th><th>Present</th><th>Leave</th><th>Absent</th><th>Late</th><th>Periods taught</th><th>Extra periods</th><th>Attendance</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:600">Ayesha Siddiqui</td><td class="num">22</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">132</td><td class="num">6</td><td><span class="tag g">100%</span></td></tr>
+                  <tr><td style="font-weight:600">Farhan Akhtar</td><td class="num">21</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">126</td><td class="num">10</td><td><span class="tag g">95%</span></td></tr>
+                  <tr><td style="font-weight:600">Rabia Noor</td><td class="num">20</td><td class="num">1</td><td class="num">1</td><td class="num">3</td><td class="num">118</td><td class="num">4</td><td><span class="tag y">91%</span></td></tr>
+                  <tr><td style="font-weight:600">Sadia Malik</td><td class="num">17</td><td class="num">3</td><td class="num">2</td><td class="num">4</td><td class="num">98</td><td class="num">0</td><td><span class="tag r">77%</span></td></tr>
+                  <tr><td style="font-weight:600">Usman Ghani</td><td class="num">22</td><td class="num">0</td><td class="num">0</td><td class="num">2</td><td class="num">130</td><td class="num">2</td><td><span class="tag g">100%</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showPay}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+            <div class="card" style="flex:3 1 520px;min-width:0">
+              <h2 style="margin:0;font-size:18px">Payroll · November 2026</h2>
+              <ol style="list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+                <li style="border-top:4px solid #059669;padding-top:8px"><div class="kick">1 · Hours</div><div style="font-size:13px">Synced from timetable</div></li>
+                <li style="border-top:4px solid #059669;padding-top:8px"><div class="kick">2 · Review</div><div style="font-size:13px">Deductions checked</div></li>
+                <li style="border-top:4px solid #0f172a;padding-top:8px"><div class="kick" style="color:#0f172a">3 · Payslips</div><div style="font-size:13px">Ready to send</div></li>
+                <li style="border-top:4px solid #e2e8f0;padding-top:8px"><div class="kick">4 · Transfer</div><div style="font-size:13px">To bank accounts</div></li>
+              </ol>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-top:18px">
+                <div><div class="kick">Gross</div><div class="num" style="font-size:22px">Rs 1,284,500</div></div>
+                <div><div class="kick">Deductions</div><div class="num" style="font-size:22px;color:#b91c1c">− Rs 38,200</div></div>
+                <div><div class="kick">Net to pay</div><div class="num" style="font-size:22px">Rs 1,246,300</div></div>
+                <div><div class="kick">Staff</div><div class="num" style="font-size:22px">14</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:18px">
+                <button type="button" class="btn ghost">Send payslips (WhatsApp + email)</button>
+                <button type="button" class="btn">Transfer Rs 1,246,300</button>
+              </div>
+              <p style="margin:10px 0 0;font-size:12px;color:#475569;text-align:right">Paid from Meezan Bank ••4412 via IBFT / Raast. Needs principal PIN + owner approval.</p>
+            </div>
+            <form class="card" style="flex:2 1 300px;min-width:0;display:flex;flex-direction:column;gap:12px">
+              <h2 style="margin:0;font-size:18px">Pay rates by subject</h2>
+              <p style="margin:0;font-size:13px;color:#475569">Used for hourly staff and for extra or substitute periods.</p>
+              <div class="row"><span style="flex:1;font-weight:600">Physics, Chemistry, Biology</span><span class="num">Rs 600 / hr</span></div>
+              <div class="row"><span style="flex:1;font-weight:600">Mathematics</span><span class="num">Rs 550 / hr</span></div>
+              <div class="row"><span style="flex:1;font-weight:600">English, Urdu</span><span class="num">Rs 450 / hr</span></div>
+              <div class="row"><span style="flex:1;font-weight:600">Substitute period (any)</span><span class="num">Rs 400</span></div>
+              <div style="display:flex;gap:8px;align-items:flex-end"><label class="field" style="flex:2">Subject<select><option>Computer science</option><option>Islamiat</option></select></label><label class="field" style="flex:1">Rs / hr<input value="500"></label><button type="button" class="btn sm" style="min-height:44px">Add</button></div>
+            </form>
+          </section>
+          <section class="card">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Salary sheet</h2><span style="font-size:13px;color:#475569">Edit a rate and the net updates. Unpaid leave is deducted by day.</span></div>
+            <div style="overflow-x:auto;margin-top:8px">
+              <table style="min-width:960px">
+                <thead><tr class="kick"><th><span style="position:absolute;left:-9999px">Select</span></th><th>Staff</th><th>Pay type</th><th>Base / rate</th><th>Hours / extra</th><th>Allowance</th><th>Deduction</th><th>Net</th><th>Bank</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><input type="checkbox" checked aria-label="Select Ayesha" style="width:20px;height:20px"></td><td style="font-weight:600">Ayesha Siddiqui<div style="font-size:12px;color:#475569;font-weight:400">Biology</div></td><td>Monthly</td><td><input value="95,000" aria-label="Base Ayesha"></td><td class="num">6 × 400</td><td class="num">5,000</td><td class="num">0</td><td class="num">102,400</td><td>HBL ••0921</td><td><span class="tag b">Ready</span></td></tr>
+                  <tr><td><input type="checkbox" checked aria-label="Select Farhan" style="width:20px;height:20px"></td><td style="font-weight:600">Farhan Akhtar<div style="font-size:12px;color:#475569;font-weight:400">Physics</div></td><td>Hourly</td><td><input value="600" aria-label="Rate Farhan"></td><td class="num">96 hr</td><td class="num">0</td><td class="num">0</td><td class="num">57,600</td><td>Meezan ••3310</td><td><span class="tag b">Ready</span></td></tr>
+                  <tr><td><input type="checkbox" checked aria-label="Select Sadia" style="width:20px;height:20px"></td><td style="font-weight:600">Sadia Malik<div style="font-size:12px;color:#475569;font-weight:400">Mathematics</div></td><td>Monthly</td><td><input value="85,000" aria-label="Base Sadia"></td><td class="num">—</td><td class="num">3,000</td><td class="num" style="color:#b91c1c">−5,670</td><td class="num">82,330</td><td>JazzCash ••7781</td><td><span class="tag y">Check leave</span></td></tr>
+                  <tr><td><input type="checkbox" aria-label="Select Usman" style="width:20px;height:20px"></td><td style="font-weight:600">Usman Ghani<div style="font-size:12px;color:#475569;font-weight:400">Chemistry</div></td><td>Monthly</td><td><input value="90,000" aria-label="Base Usman"></td><td class="num">2 × 400</td><td class="num">5,000</td><td class="num">0</td><td class="num">95,800</td><td>UBL ••4402</td><td><span class="tag g">Paid 1 Nov</span></td></tr>
+                  <tr><td><input type="checkbox" aria-label="Select Kamran" style="width:20px;height:20px"></td><td style="font-weight:600">Kamran Shah<div style="font-size:12px;color:#475569;font-weight:400">Guard</div></td><td>Monthly</td><td><input value="38,000" aria-label="Base Kamran"></td><td class="num">—</td><td class="num">0</td><td class="num">0</td><td class="num">38,000</td><td><a href="#">Add account</a></td><td><span class="tag r">No bank</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { tab: 'reports', range: 'month' }; }
+  renderVals() {
+    const { tab, range } = this.state;
+    const D = {
+      week:   { label: 'Mon 9 – Sat 14 Nov', k: { att:'92%', attNote:'14 staff · 6 days', leave:'4', leaveNote:'3 paid · 1 unpaid', late:'5', cover:'12', pay:'Rs 296k', payNote:'accrued this week' },
+                b: [['Mon',70,20,10],['Tue',95,5,0],['Wed',90,10,0],['Thu',95,0,5],['Fri',88,12,0],['Sat',100,0,0]] },
+      month:  { label: 'November 2026', k: { att:'89%', attNote:'14 staff · 12 days so far', leave:'22', leaveNote:'19 paid · 3 unpaid', late:'18', cover:'46', pay:'Rs 1.28M', payNote:'net Rs 1.25M · due 1 Dec' },
+                b: [['Wk 1',92,6,2],['Wk 2',86,10,4],['Wk 3',90,8,2],['Wk 4',0,0,0]] },
+      term:   { label: 'Mid-term · 1 Oct – 20 Nov', k: { att:'91%', attNote:'14 staff · 41 days', leave:'48', leaveNote:'42 paid · 6 unpaid', late:'39', cover:'110', pay:'Rs 2.55M', payNote:'Oct + Nov' },
+                b: [['Wk 1',94,5,1],['Wk 2',93,6,1],['Wk 3',90,8,2],['Wk 4',95,4,1],['Wk 5',88,9,3],['Wk 6',92,6,2],['Wk 7',86,10,4]] },
+      custom: { label: '1 Oct – 15 Nov', k: { att:'90%', attNote:'filtered: all staff', leave:'44', leaveNote:'38 paid · 6 unpaid', late:'35', cover:'98', pay:'Rs 2.4M', payNote:'for selected dates' },
+                b: [['Oct',93,6,1],['1–15 Nov',87,9,4]] }
+    };
+    const d = D[range];
+    const pc = (v) => v + '%';
+    const bars = d.b.map(([label, p, l, a]) => ({ label, pr: pc(p * 0.95), lv: pc(l * 0.95), ab: pc(a * 0.95) }));
+    const t = (k) => tab === k ? 'tabbtn on' : 'tabbtn';
+    const p = (k) => range === k ? 'pill on' : 'pill';
+    return {
+      tabToday: t('today'), tabReports: t('reports'), tabPay: t('pay'),
+      goToday: () => this.setState({ tab: 'today' }), goReports: () => this.setState({ tab: 'reports' }), goPay: () => this.setState({ tab: 'pay' }),
+      showToday: tab === 'today', showReports: tab === 'reports', showPay: tab === 'pay',
+      pWeek: p('week'), pMonth: p('month'), pTerm: p('term'), pCustom: p('custom'),
+      setWeek: () => this.setState({ range: 'week' }), setMonth: () => this.setState({ range: 'month' }),
+      setTerm: () => this.setState({ range: 'term' }), setCustom: () => this.setState({ range: 'custom' }),
+      isCustom: range === 'custom', notCustom: range !== 'custom',
+      rangeLabel: d.label, k: d.k, bars,
+      chartAria: 'Stacked bars of present, leave and absent share for ' + d.label
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School —Notices and holidays</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.cal div{border:2px solid #e5e7eb !important;border-radius:12px !important;font-weight:900 !important}
+.cal .h{background:#fef3c7 !important;border-color:#fcd34d !important;color:#92400e}
+.cal .su{background:#f1f5f9 !important}
+a{color:#047857}a:hover{color:#065f46}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:14px;min-height:24px}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a.on{background:#123326;color:#34d399;font-weight:600}
+.kick{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#475569}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid #0f172a;background:#0f172a;color:#fff;font:600 14px Inter,sans-serif;cursor:pointer;box-shadow:2px 2px 0 #000,4px 4px 0 #000;text-decoration:none}
+.btn:hover{box-shadow:2px 2px 0 #000;transform:translate(2px,2px)}
+.btn.ghost{background:#fff;color:#0f172a}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;box-shadow:2px 2px 0 #000}
+.tag{display:inline-block;font:600 11px 'IBM Plex Mono',monospace;padding:3px 8px;border-radius:4px;background:#f1f5f9;color:#334155;text-transform:uppercase;letter-spacing:.04em}
+.tag.g{background:#d1fae5;color:#065f46}.tag.r{background:#fee2e2;color:#991b1b}.tag.b{background:#dbeafe;color:#1e40af}.tag.y{background:#fef3c7;color:#92400e}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#0f172a}
+.field input,.field select,.field textarea{min-height:44px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff;color:#0f172a}
+.field textarea{padding:10px 12px;min-height:96px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #e2e8f0}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal div{min-height:52px;border:1px solid #e2e8f0;border-radius:6px;padding:6px;font-size:12px;font-weight:600;box-sizing:border-box}
+.cal .su{background:#f1f5f9;color:#475569}.cal .h{background:#fef3c7;border-color:#f59e0b}
+</style>
+</helmet>
+<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:Inter,sans-serif;color:#0f172a;background:#fdfdfd">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
+    <div class="grp">Daily</div>
+    <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it on" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
+    <div class="grp">Academics</div>
+    <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
+    <a class="it" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
+    <div class="grp">People</div>
+    <a class="it" href="Students.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students</a>
+    <a class="it" href="Staff.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"></path></svg></span>Staff &amp; pay<span class="badge">1</span></a>
+    <a class="it" href="Admissions.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg></span>Admissions<span class="badge">6</span></a>
+    <div class="grp">Money</div>
+    <a class="it" href="Fees.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"></path></svg></span>Fees<span class="badge">117</span></a>
+    <a class="it" href="Reports.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span>Reports</a>
+    <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
+    <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:32px 32px 48px;box-sizing:border-box">
+    <div style="max-width:1180px;display:flex;flex-direction:column;gap:20px">
+      <header>
+        <div class="kick">School · Notices</div>
+        <h1 style="margin:6px 0 0;font-size:40px;line-height:44px;letter-spacing:-1px">Notices and holidays</h1>
+        <p style="margin:8px 0 0;color:#475569;line-height:24px">One message to the whole school, staff or a single class. It shows in everyone's app and can go to parents on WhatsApp or SMS.</p>
+      </header>
+
+      <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+        <form class="card" style="flex:3 1 480px;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:2px 2px 0 #000,4px 4px 0 #000;border-color:#0f172a">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:20px">Write a notice</h2><span class="tag b">AI assisted</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#f8fafc;border:1px dashed #94a3b8;border-radius:8px;padding:12px">
+            <label class="field" style="flex:1 1 260px">Tell Ilmora in a few words<input value="school closed Monday due to smog, online classes"></label>
+            <label class="field" style="flex:0 1 120px">Language<select><option>English</option><option>Urdu</option><option>Both</option></select></label>
+            <button type="button" class="btn sm">Draft it</button>
+          </div>
+          <label class="field">Title<input value="School closed on Monday 16 Nov due to smog"></label>
+          <label class="field">Message<textarea>Dear parents, on the Punjab government's instruction the campus will stay closed on Monday 16 November. Classes will run online on the usual timetable. School reopens on Tuesday.</textarea></label>
+          <div style="display:flex;flex-wrap:wrap;gap:12px">
+            <label class="field" style="flex:1 1 200px">Who sees it<select><option>Everyone</option><option>Parents and students</option><option>Staff only</option><option>One class</option></select></label>
+            <label class="field" style="flex:1 1 200px">Class or section<select><option>All classes</option><option>Class 9‑A</option></select></label>
+          </div>
+          <label style="display:flex;gap:10px;align-items:center;font-size:14px;min-height:44px"><input type="checkbox" checked style="width:20px;height:20px"> Also send on WhatsApp / SMS to parents who don't open the app (≈ 140)</label>
+          <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn ghost">Save draft</button><button type="button" class="btn">Publish notice</button></div>
+        </form>
+
+        <div class="card" style="flex:2 1 340px;min-width:0">
+          <h2 style="margin:0 0 6px;font-size:18px">Published</h2>
+          <div class="row" style="align-items:flex-start"><div style="flex:1"><div style="font-weight:600">Mid-term exams start 2 November</div><div style="font-size:13px;color:#475569">Date sheet is in the app · 23 Oct</div></div><span class="tag g">Parents</span></div>
+          <div class="row" style="align-items:flex-start"><div style="flex:1"><div style="font-weight:600">Winter timing from 1 November</div><div style="font-size:13px;color:#475569">8:00 am start, assembly 7:45 · 23 Oct</div></div><span class="tag">Everyone</span></div>
+          <div class="row" style="align-items:flex-start"><div style="flex:1"><div style="font-weight:600">Staff meeting Saturday 10 am</div><div style="font-size:13px;color:#475569">Mid-term papers and report cards · 23 Oct</div></div><span class="tag b">Staff</span></div>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+        <div class="card" style="flex:3 1 480px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <h2 style="margin:0;font-size:18px">November 2026</h2>
+            <div style="display:flex;gap:8px"><button type="button" class="btn sm ghost" aria-label="Previous month">‹</button><button type="button" class="btn sm ghost">Today</button><button type="button" class="btn sm ghost" aria-label="Next month">›</button></div>
+          </div>
+          <div class="cal kick" style="margin-bottom:6px"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div class="cal">
+            <span></span><span></span><span></span><span></span><span></span><span></span><div class="su">1</div>
+            <div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div class="su">8</div>
+            <div class="h">9<br><span style="font-weight:500">Iqbal Day</span></div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div class="su">15</div>
+            <div class="h">16<br><span style="font-weight:500">Smog</span></div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div class="su">22</div>
+            <div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div><div class="su">29</div>
+            <div>30</div>
+          </div>
+          <p style="margin:12px 0 0;font-size:13px;color:#475569">2 school days off this month, besides Sundays.</p>
+        </div>
+        <div style="flex:2 1 340px;min-width:0;display:flex;flex-direction:column;gap:20px">
+          <form class="card" style="display:flex;flex-direction:column;gap:12px">
+            <h2 style="margin:0;font-size:18px">Add a holiday</h2>
+            <label class="field">Name<input placeholder="Eid-ul-Fitr, Sports day"></label>
+            <div style="display:flex;gap:10px"><label class="field" style="flex:1">First day<input type="date"></label><label class="field" style="flex:1">Last day<input type="date"></label></div>
+            <label style="display:flex;gap:10px;align-items:center;font-size:14px"><input type="checkbox" checked style="width:20px;height:20px"> Post it as a notice</label>
+            <button type="button" class="btn">Add to calendar</button>
+            <button type="button" class="btn ghost">Add Pakistan's public holidays</button>
+          </form>
+          <div class="card">
+            <h2 style="margin:0 0 6px;font-size:18px">Coming up</h2>
+            <div class="row"><span style="flex:1;font-weight:600">Quaid-e-Azam Day</span><span class="kick">Fri 25 Dec</span></div>
+            <div class="row"><span style="flex:1;font-weight:600">Kashmir Solidarity Day</span><span class="kick">Fri 5 Feb</span></div>
+            <div class="row"><span style="flex:1;font-weight:600">Pakistan Day</span><span class="kick">Tue 23 Mar</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
