@@ -59,7 +59,7 @@ export default async function Expenses({ searchParams }: { searchParams: Promise
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Expenses</h1>
+          <div className="kick">Money</div><h1 className="h1">Expenses</h1>
           <p className="muted text-base">{monthName(month)}: every expense with its voucher, category totals, and what is left after salaries.</p>
         </div>
         <FeesTabs current="expenses" salaries={me.role === "accountant"} />

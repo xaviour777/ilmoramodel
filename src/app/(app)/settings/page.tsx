@@ -24,7 +24,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Settings</h1>
+          <div className="kick">Money</div><h1 className="h1">Settings</h1>
           <p className="muted text-base">{me.campus_name}: connect WhatsApp and SMS so fee reminders and notices reach parents by themselves.</p>
         </div>
         <SettingsTabs current="connect" />

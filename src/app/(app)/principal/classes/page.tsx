@@ -22,7 +22,7 @@ export default async function ClassesPage({ searchParams }: { searchParams: Prom
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Classes, timings and timetable</h1>
+          <div className="kick">Academics</div><h1 className="h1">Classes, timings and timetable</h1>
           <p className="muted text-base">Set up the school once a year. Teachers and parents see the changes straight away.</p>
         </div>
         <ClassesTabs current={tab} />

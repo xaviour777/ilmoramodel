@@ -41,7 +41,7 @@ export default async function SchoolYearPage({ searchParams }: { searchParams: P
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">School year</h1>
+          <div className="kick">Money</div><h1 className="h1">School year</h1>
           <p className="muted text-base">The session and its terms, the grades on report cards, and moving every class up at the end of the year.</p>
         </div>
         <SettingsTabs current="year" />

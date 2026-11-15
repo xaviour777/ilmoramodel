@@ -50,7 +50,7 @@ export default async function AiSettingsPage({ searchParams }: { searchParams: P
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">AI</h1>
+          <div className="kick">Money</div><h1 className="h1">AI</h1>
           <p className="muted text-base">{me.campus_name}: choose the AI company, paste its key, and set how much it may spend each day. When the limit is reached, AI stops until tomorrow and the app goes back to Demo AI.</p>
         </div>
         <SettingsTabs current="ai" />

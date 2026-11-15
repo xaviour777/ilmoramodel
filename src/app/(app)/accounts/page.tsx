@@ -67,7 +67,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
+        <div><div className="kick">Money</div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
         <div className="flex items-center gap-3">
           <FeesTabs current="desk" salaries={me.role === "accountant"} />
           <LiveRefresh tables={["payments"]} />

@@ -36,7 +36,7 @@ export default async function BoardReadinessPage({ searchParams }: { searchParam
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Board registration</h1>
+          <div className="kick">Academics</div><h1 className="h1">Board registration</h1>
           <p className="muted text-base">Every student of the class on one page: who is ready for the board, what is missing, and the files to put on the board&apos;s portal.</p>
         </div>
         <ClassesTabs current="board" />

@@ -51,7 +51,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Students</h1>
+          <div className="kick">People</div><h1 className="h1">Students</h1>
           <p className="muted text-base">Find any student by name, roll number, admission number, B-form or the parent&apos;s phone.</p>
         </div>
         <ClassesTabs current="students" />
