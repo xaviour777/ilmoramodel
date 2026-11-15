@@ -22,11 +22,13 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
       ? supabase.from("timetable_slots").select("id, teacher_id, period_id, periods!inner(name, starts_at, sort, timing_profiles!inner(is_active)), subjects(name), sections(name, classes(name))").eq("weekday", weekday).eq("periods.timing_profiles.is_active", true)
       : Promise.resolve({ data: [] }),
     supabase.from("substitutions").select("timetable_slot_id, substitute_id").eq("date", today),
-    supabase.from("staff_attendance").select("profile_id, date, status").gte("date", monthStart).lte("date", day),
+    supabase.from("staff_attendance").select("profile_id, date, status, check_in_at, check_out_at, method").gte("date", monthStart).lte("date", day),
     supabase.from("leave_requests").select("profile_id").eq("status", "approved").lte("from_on", day).gte("to_on", day),
   ]);
   // what is already marked for the chosen day, and this month's absences per person
   const onDay = new Map((marked ?? []).filter((m) => m.date === day).map((m) => [m.profile_id, m.status as string]));
+  const gateTimes = new Map((marked ?? []).filter((m) => m.date === day && m.check_in_at).map((m) => [m.profile_id, { in: m.check_in_at as string, out: m.check_out_at as string | null }]));
+  const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Karachi" });
   const leaveOnDay = new Set((dayAway ?? []).map((a) => a.profile_id));
   const absentDays = new Map<string, number>();
   for (const m of marked ?? []) if (m.status === "absent") absentDays.set(m.profile_id, (absentDays.get(m.profile_id) ?? 0) + 1);
@@ -45,10 +47,37 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="h1">Staff, leave and substitutes</h1>
-          <p className="muted text-base">Approve leave, then cover the periods of anyone away today.</p>
+          <p className="muted text-base">Approve leave, cover the periods of anyone away, and see who came in.</p>
         </div>
         <StaffTabs current="staff" />
       </div>
+      <div className="flex flex-wrap gap-2">
+        <Link href="/principal/staff/gate" className="btn inline-flex items-center gap-1"><span className="msym text-[20px]" aria-hidden="true">qr_code_scanner</span>Gate scanner</Link>
+        <Link href="/print/staff-cards" target="_blank" className="btn-ghost inline-flex items-center gap-1"><span className="msym text-[20px]" aria-hidden="true">badge</span>Print staff cards</Link>
+        <Link href="/principal/attendance" className="btn-ghost inline-flex items-center gap-1"><span className="msym text-[20px]" aria-hidden="true">how_to_reg</span>Monthly report</Link>
+      </div>
+      {(() => {
+        const todayMarks = (marked ?? []).filter((m) => m.date === today);
+        const inSchool = todayMarks.filter((m) => m.status === "present" || m.status === "late").length;
+        const late = todayMarks.filter((m) => m.status === "late").length;
+        const needCover = uncovered.filter((u) => !subFor.get(u.id)).length;
+        return (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              ["In school today", `${inSchool} of ${(staff ?? []).length}`, late ? `${late} late` : "Nobody late", false],
+              ["On leave today", String(awayIds.size), "Approved leave", false],
+              ["Periods needing cover", String(needCover), needCover ? "Pick a free teacher below" : "All covered", needCover > 0],
+              ["Leave requests waiting", String((pending ?? []).length), "Approve or reject below", (pending ?? []).length > 0],
+            ].map(([label, value, note, warn]) => (
+              <div key={String(label)} className="card !p-4">
+                <div className="text-label-md text-on-surface-variant">{label}</div>
+                <div className={`mt-1 text-headline-sm font-extrabold ${warn ? "text-error" : "text-primary"}`}>{value}</div>
+                <div className="text-body-sm text-on-surface-variant">{note}</div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
       <div className="grid gap-5 xl:grid-cols-2">
@@ -116,6 +145,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
                   <div className="min-w-32 flex-1">
                     <div className="font-extrabold">{s.full_name}</div>
                     <div className="muted text-xs">{s.role}{absentDays.get(s.id) ? ` · absent ${absentDays.get(s.id)} day${absentDays.get(s.id) === 1 ? "" : "s"} this month` : ""}</div>
+                    {gateTimes.get(s.id) && <div className="text-xs font-bold text-secondary">Gate: in {hhmm(gateTimes.get(s.id)!.in)}{gateTimes.get(s.id)!.out ? ` · out ${hhmm(gateTimes.get(s.id)!.out!)}` : ""}</div>}
                   </div>
                   {[["present", "P"], ["late", "L"], ["absent", "A"], ["leave", "Lv"]].map(([v, l]) => (
                     <label key={v} className="flex items-center gap-1 text-sm font-extrabold" title={v}>
@@ -139,6 +169,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
               <span className={`pill ${s.role === "teacher" ? "pill-blue" : s.role === "principal" ? "pill-purple" : "pill-orange"}`}>{s.role}</span>
               <Link href={`/principal/staff/${s.id}`} className="flex-1 font-extrabold hover:underline">{s.full_name}</Link>
               <span className="muted text-xs">{s.user_id ? "can log in" : "no login yet"}</span>
+              <Link href={`/print/staff-cards?id=${s.id}`} target="_blank" className="text-xs font-bold underline">Card</Link>
             </div>
           ))}
         </section>

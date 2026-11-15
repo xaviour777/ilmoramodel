@@ -8,14 +8,14 @@ import { InstallAppButton } from "@/components/pwa";
 
 // Grouped sidebar for the principal and owner (Stitch design).
 // also: other pages that belong under this entry, so it stays lit there.
-export type StitchItem = { href: string; label: string; icon: string; also?: string[] };
+export type StitchItem = { href: string; label: string; icon: string; also?: string[]; exact?: boolean };
 export type StitchGroup = { title: string; items: StitchItem[] };
 
 function currentOwner(path: string, items: StitchItem[]) {
   // the longest matching link is the current page
   return items
-    .flatMap((i) => [i.href, ...(i.also ?? [])].map((p) => ({ owner: i.href, p })))
-    .filter(({ p }) => path === p || path.startsWith(p + "/"))
+    .flatMap((i) => [i.href, ...(i.also ?? [])].map((p) => ({ owner: i.href, p, exact: i.exact && p === i.href })))
+    .filter(({ p, exact }) => path === p || (!exact && path.startsWith(p + "/")))
     .sort((a, b) => b.p.length - a.p.length)[0]?.owner;
 }
 

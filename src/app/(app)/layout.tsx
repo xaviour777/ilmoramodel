@@ -14,17 +14,15 @@ const STITCH_GROUPS: StitchGroup[] = [
   { title: "School", items: [
     { href: "/principal/classes", label: "Students & Classes", icon: "school", also: ["/principal/students"] },
     { href: "/principal/families", label: "Families", icon: "family_restroom" },
+    { href: "/principal/attendance", label: "Attendance", icon: "how_to_reg" },
     { href: "/principal/exams", label: "Exams", icon: "assignment" },
     { href: "/principal/admissions", label: "Admissions", icon: "person_add" },
     { href: "/principal/staff", label: "Staff & leave", icon: "badge" },
     { href: "/principal/notices", label: "Notices", icon: "campaign" },
   ] },
+  // one entry for money: fee desk, challans, online payments, defaulters, day close and expenses are tabs inside
   { title: "Finance", items: [
-    { href: "/accounts", label: "Fee desk", icon: "point_of_sale", also: ["/accounts/setup", "/accounts/messages"] },
-    { href: "/accounts/online", label: "Online payments", icon: "task_alt" },
-    { href: "/accounts/calls", label: "Defaulters", icon: "currency_exchange" },
-    { href: "/accounts/day-close", label: "Day close", icon: "account_balance" },
-    { href: "/accounts/expenses", label: "Expenses", icon: "receipt_long" },
+    { href: "/accounts", label: "Fees & money", icon: "payments" },
   ] },
   { title: "Learning", items: [
     { href: "/teacher/paper-check", label: "Paper checking", icon: "fact_check" },
@@ -33,10 +31,10 @@ const STITCH_GROUPS: StitchGroup[] = [
 ];
 // the phone's bottom bar: the places a principal opens most
 const STITCH_MAIN: StitchItem[] = [
-  { href: "/principal", label: "Today", icon: "dashboard" },
+  { href: "/principal", label: "Today", icon: "dashboard", exact: true },
+  { href: "/principal/attendance", label: "Attendance", icon: "how_to_reg" },
+  { href: "/accounts", label: "Fees", icon: "payments" },
   { href: "/principal/students", label: "Students", icon: "school", also: ["/principal/classes", "/principal/families"] },
-  { href: "/accounts", label: "Fees", icon: "payments", also: ["/accounts/setup", "/accounts/messages", "/accounts/online", "/accounts/calls", "/accounts/day-close", "/accounts/expenses"] },
-  { href: "/principal/staff", label: "Staff", icon: "badge" },
 ];
 const STITCH_FOOTER: StitchItem[] = [
   { href: "/settings", label: "Settings", icon: "settings", also: ["/profile"] },
@@ -59,6 +57,7 @@ const NAV: Record<Role, NavItem[]> = {
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
     { href: "/principal/families", label: "Families", icon: "people" },
+    { href: "/principal/staff/gate", label: "Staff gate", icon: "check" },
     { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],
