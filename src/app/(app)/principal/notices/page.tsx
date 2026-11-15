@@ -49,7 +49,7 @@ export default async function NoticesPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <div>
-        <h1 className="h1">Notices and holidays</h1>
+        <div className="kick">Daily</div><h1 className="h1">Notices and holidays</h1>
         <p className="muted text-base">One message to the whole school, staff, or a single class. It shows in everyone&apos;s app, and can go to parents on WhatsApp or SMS.</p>
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}

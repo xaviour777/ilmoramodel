@@ -59,7 +59,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <div>
-        <h1 className="h1">Terms and exams</h1>
+        <div className="kick">Academics</div><h1 className="h1">Terms and exams</h1>
         <p className="muted text-base">Make tests and exams, publish the date sheet, open marks entry for teachers, then publish results.</p>
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}

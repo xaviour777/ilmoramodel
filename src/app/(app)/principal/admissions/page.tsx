@@ -26,7 +26,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
   return (
     <>
       <div>
-        <h1 className="h1">Admissions</h1>
+        <div className="kick">People</div><h1 className="h1">Admissions</h1>
         <p className="muted text-base">From first call to first day. Admitting a child creates the family and student records.</p>
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}

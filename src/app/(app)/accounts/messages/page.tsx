@@ -37,7 +37,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">WhatsApp and SMS</h1>
+          <div className="kick">Money</div><h1 className="h1">WhatsApp and SMS</h1>
           <p className="muted text-base">Fee reminders and notices that go to parents&apos; phones, so they get them even if they never open the app.</p>
         </div>
         {admin ? <SettingsTabs current="messages" /> : <FeesTabs current="messages" salaries />}

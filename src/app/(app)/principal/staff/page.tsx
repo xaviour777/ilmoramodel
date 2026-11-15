@@ -44,7 +44,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Staff, leave and substitutes</h1>
+          <div className="kick">People</div><h1 className="h1">Staff, leave and substitutes</h1>
           <p className="muted text-base">Approve leave, then cover the periods of anyone away today.</p>
         </div>
         <StaffTabs current="staff" />

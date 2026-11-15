@@ -61,7 +61,7 @@ export default async function Defaulters({ searchParams }: { searchParams: Promi
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Defaulters</h1>
+          <div className="kick">Money</div><h1 className="h1">Defaulters</h1>
           <p className="muted text-base">Who to call today about fees, what they said, and the date they promised to pay.</p>
         </div>
         <FeesTabs current="calls" salaries={me.role === "accountant"} />
