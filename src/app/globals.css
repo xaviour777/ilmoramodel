@@ -212,3 +212,116 @@ body {
 .snav { @apply flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-body-sm font-semibold transition-colors whitespace-nowrap; color: #a3cfc7; }
 .snav:hover { background: #103d37; color: #fff; }
 .snav[aria-current="page"] { background: #103d37; color: #fff; font-weight: 700; }
+
+/* ---------------------------------------------------------------------------
+   Ilmora principal look (design/ilmora.css): bright, chunky, rounded.
+   Everything under .ilm: the principal and owner screens. The shared classes
+   (card, btn, pill, tbl ...) and the colour variables are re-set here, so
+   older pages pick up the look without changing their markup.
+--------------------------------------------------------------------------- */
+.ilm {
+  --green: #16a34a;
+  --green-lip: #15803d;
+  --green-deep: #16a34a;
+  --green-soft: #dcfce7;
+  --green-ink: #15803d;
+  --blue: #0284c7;
+  --blue-soft: #e0f2fe;
+  --blue-ring: #7dd3fc;
+  --blue-ink: #0369a1;
+  --orange: #ea580c;
+  --orange-soft: #ffedd5;
+  --orange-ink: #9a3412;
+  --red: #ef4444;
+  --red-soft: #fee2e2;
+  --red-ink: #b91c1c;
+  --purple: #7c3aed;
+  --purple-soft: #ede9fe;
+  --purple-ink: #5b21b6;
+  --yellow: #ca8a04;
+  --ink: #1f2937;
+  --muted: #4b5563;
+  --line: #e5e7eb;
+  --page: #f7f9fc;
+  --panel: #ffffff;
+  /* Stitch tokens some pages still use, mapped onto the new palette */
+  --color-primary: #1f2937;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #16a34a;
+  --color-on-primary-container: #dcfce7;
+  --color-primary-fixed: #dcfce7;
+  --color-primary-fixed-dim: #bbf7d0;
+  --color-secondary: #16a34a;
+  --color-secondary-container: #dcfce7;
+  --color-secondary-fixed: #dcfce7;
+  --color-secondary-fixed-dim: #86efac;
+  --color-on-secondary-fixed-variant: #15803d;
+  --color-tertiary-fixed: #ede9fe;
+  --color-tertiary-fixed-dim: #fcd34d;
+  --color-on-tertiary-fixed: #5b21b6;
+  --color-error: #dc2626;
+  --color-error-container: #fee2e2;
+  --color-on-error-container: #b91c1c;
+  --color-surface: #f7f9fc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #eef2f7;
+  --color-surface-container-highest: #e5e7eb;
+  --color-surface-variant: #e5e7eb;
+  --color-on-surface: #1f2937;
+  --color-on-surface-variant: #4b5563;
+  --color-outline: #6b7280;
+  --color-outline-variant: #d1d5db;
+  background: #f7f9fc;
+  color: #1f2937;
+  font-family: var(--font-nunito), "Nunito", ui-sans-serif, system-ui, sans-serif;
+}
+.ilm a:not([class]) { color: #0369a1; }
+.ilm .card { border-radius: 18px; border: 2px solid #e5e7eb; background: #fff; box-shadow: 0 4px 0 #e5e7eb; padding: 18px; }
+.ilm .h1 { font-weight: 900; font-size: 34px; line-height: 40px; letter-spacing: -0.5px; color: #1f2937; }
+.ilm .h2 { font-weight: 900; font-size: 19px; color: #1f2937; }
+.ilm .muted { color: #4b5563; font-weight: 700; }
+.ilm .eyebrow, .ilm .kick { color: #6b7280; font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+.ilm .btn { min-height: 44px; border-radius: 14px; background: #16a34a; color: #fff; box-shadow: 0 4px 0 #15803d; font-weight: 900; font-size: 14px; letter-spacing: .04em; }
+.ilm .btn:active, .ilm .btn-ghost:active { box-shadow: none; }
+.ilm .btn-ghost { min-height: 44px; border-radius: 14px; color: #0369a1; border-color: #e5e7eb; box-shadow: 0 4px 0 #e5e7eb; font-weight: 900; font-size: 14px; letter-spacing: .04em; }
+.ilm .input { min-height: 44px; border-radius: 12px; background: #fff; border-color: #e5e7eb; font-size: 14px; }
+.ilm .input:focus { border-color: #7dd3fc; }
+.ilm .chip { border-radius: 12px; font-size: 14px; box-shadow: 0 3px 0 #e5e7eb; }
+.ilm .pill { border-radius: 99px; font-size: 11px; font-weight: 900; padding: 4px 10px; text-transform: none; letter-spacing: .02em; }
+.ilm .pill-yellow { background: #fef3c7; color: #92400e; }
+.ilm .tile { border-radius: 18px; border-color: #e5e7eb; box-shadow: 0 4px 0 #e5e7eb; }
+.ilm .row-box { border-radius: 14px; border-color: #eef2f7; background: #fff; }
+.ilm .notice-ok, .ilm .notice-warn, .ilm .notice-bad { border-radius: 14px; border: 2px solid; }
+.ilm .notice-ok { border-color: #bbf7d0; }
+.ilm .notice-warn { border-color: #fed7aa; }
+.ilm .notice-bad { border-color: #fecaca; }
+.ilm .track { height: 12px; background: #eef2f7; }
+.ilm .tbl { border-spacing: 0; }
+.ilm .tbl th { padding: 10px 8px; font-size: 12px; letter-spacing: .08em; color: #6b7280; }
+.ilm .tbl td { background: transparent; border-top: 2px solid #f1f5f9; padding: 11px 8px; }
+.ilm .tbl td:first-child, .ilm .tbl td:last-child { border-radius: 0; }
+.ilm [role="tablist"] > a { box-shadow: 0 3px 0 #e5e7eb; border-radius: 12px; text-transform: none; letter-spacing: 0; font-weight: 800; }
+.ilm [role="tablist"] > a[aria-selected="true"] { box-shadow: 0 3px 0 #7dd3fc; }
+
+/* sidebar */
+.ilm-side { position: fixed; inset: 0 auto 0 0; z-index: 40; width: 264px; box-sizing: border-box; background: #fff; border-right: 2px solid #e5e7eb; padding: 18px 12px; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; }
+.ilm-it { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 5px 10px; border: 2px solid transparent; border-radius: 14px; font-weight: 800; font-size: 15px; color: #4b5563; }
+.ilm-it:hover { background: #f1f5f9; color: #1f2937; }
+.ilm-it[aria-current="page"] { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; box-shadow: 0 3px 0 #7dd3fc; }
+.ilm-tile { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
+.ilm-badge { margin-left: auto; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 99px; background: #ef4444; color: #fff; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.ilm-grp { font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #6b7280; padding: 14px 12px 6px; }
+.t-g { background: #dcfce7; color: #16a34a; } .t-o { background: #ffedd5; color: #ea580c; } .t-p { background: #fce7f3; color: #db2777; }
+.t-b { background: #e0f2fe; color: #0284c7; } .t-v { background: #ede9fe; color: #7c3aed; } .t-y { background: #fef9c3; color: #ca8a04; } .t-n { background: #f3f4f6; color: #4b5563; }
+
+/* phone bottom bar */
+.ilm-tabs { position: fixed; inset: auto 0 0 0; z-index: 40; display: flex; gap: 2px; padding: 6px 8px calc(10px + env(safe-area-inset-bottom)); background: #fff; border-top: 2px solid #e5e7eb; }
+.ilm-tb { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 60px; font-weight: 800; font-size: 11px; color: #6b7280; border-radius: 14px; background: none; border: 0; cursor: pointer; }
+.ilm-tb .ic { width: 44px; height: 30px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; position: relative; }
+.ilm-tb[aria-current="page"] { color: #0369a1; }
+.ilm-tb[aria-current="page"] .ic { background: #e0f2fe; border-color: #7dd3fc; }
+.ilm-tb .ilm-badge { position: absolute; top: -6px; right: -8px; margin: 0; min-width: 18px; height: 18px; font-size: 10px; padding: 0 5px; }
+.ilm-mi { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px; border: 2px solid #e5e7eb; border-radius: 16px; background: #fff; font-weight: 800; font-size: 12px; color: #1f2937; box-shadow: 0 3px 0 #e5e7eb; min-height: 96px; text-align: center; position: relative; }
+.ilm-mi .ilm-badge { position: absolute; top: 6px; right: 6px; }
