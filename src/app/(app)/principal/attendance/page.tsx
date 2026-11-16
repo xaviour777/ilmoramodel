@@ -226,7 +226,7 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
         <Link href="/principal/reports?r=att" className="btn-ghost">Reports</Link>
       </PageHead>
 
-      <form className="card flex flex-wrap items-end gap-3">
+      <form className="card flex flex-row flex-wrap items-end gap-3">
         <div className="flex-[1_1_100%]">
           <Chips label="Period" current={period} items={[["week", "This week"], ["month", "This month"], ["term", "This term"], ["custom", "Custom"]].map(([id, l]) => ({ id, label: l, href: q({ period: id, from: undefined, to: undefined }) }))} />
         </div>
@@ -262,7 +262,7 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
       </section>
 
       {notMarked.length > 0 && (
-        <section className="card warm flex flex-wrap items-start gap-4" style={{ background: "#fffbeb", borderColor: "#fcd34d", boxShadow: "0 4px 0 #fcd34d" }}>
+        <section className="card warm flex flex-row flex-wrap items-start gap-4" style={{ background: "#fffbeb", borderColor: "#fcd34d", boxShadow: "0 4px 0 #fcd34d" }}>
           <span className="ilm-tile t-o" style={{ width: 48, height: 48, borderRadius: 14 }}><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 8v5M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg></span>
           <div className="min-w-0 flex-[1_1_300px]">
             <div className="text-[17px] font-black">Today: {notMarked.length} section{notMarked.length === 1 ? "" : "s"} not marked yet</div>
