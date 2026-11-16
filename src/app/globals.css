@@ -213,6 +213,7 @@ body {
 .snav:hover { background: #103d37; color: #fff; }
 .snav[aria-current="page"] { background: #103d37; color: #fff; font-weight: 700; }
 
+@layer components {
 /* ---------------------------------------------------------------------------
    Ilmora principal look (design/ilmora.css): bright, chunky, rounded.
    Everything under .ilm: the principal and owner screens. The shared classes
@@ -329,3 +330,4 @@ body {
 .tagx.g { background: #dcfce7; color: #15803d; } .tagx.r { background: #fee2e2; color: #b91c1c; } .tagx.b { background: #e0f2fe; color: #075985; }
 .tagx.y { background: #fef3c7; color: #92400e; } .tagx.p { background: #fce7f3; color: #9d174d; } .tagx.v { background: #ede9fe; color: #5b21b6; }
 .kick { display: block; color: #6b7280; font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+}
