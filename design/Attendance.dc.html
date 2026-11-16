@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model School —Attendance</title>
+<title>Model School — Attendance</title>
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ilmora.css">
 </head>
@@ -12,9 +12,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0;background:#f7f9fc}
-.cell{height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
-.pa{width:44px;height:40px;border-radius:12px;border:2px solid #e5e7eb;background:#fff;font-weight:900;font-size:14px;color:#6b7280;cursor:pointer}
-.pa.p{background:#dcfce7;border-color:#22c55e;color:#15803d}.pa.a{background:#fee2e2;border-color:#ef4444;color:#b91c1c}.pa.l{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.cell{height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+.cmp{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:2px solid #f1f5f9;font-weight:800;font-size:14px}
+.trk{flex:1;position:relative;height:14px;border-radius:99px;background:#eef2f7}
+.trk .a{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.trk .b{position:absolute;top:-4px;width:4px;height:22px;border-radius:2px;background:#1f2937}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px}
 </style>
 </helmet>
 <div class="shell">
@@ -22,7 +25,7 @@ body{margin:0;background:#f7f9fc}
     <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
     <div class="grp">Daily</div>
     <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
-    <a class="it on" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it on" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">3</span></a>
     <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
     <div class="grp">Academics</div>
     <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
@@ -41,61 +44,105 @@ body{margin:0;background:#f7f9fc}
   <main class="content">
     <div class="wrap">
       <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
-        <div><div class="lbl">Daily</div><h1 class="title">Attendance</h1><p class="sub">Students by section, and who needs a call. Class teachers mark it in their app.</p></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk w">Remind teachers</button><button type="button" class="chunk">Mark a section</button></div>
+        <div><div class="lbl">Daily</div><h1 class="title">Attendance</h1><p class="sub">Teachers mark it in their app. Here you see who is coming, who is slipping and what to do about it.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk w">Download PDF</button><button type="button" class="chunk w">Excel</button><button type="button" class="chunk">Send monthly report to parents</button></div>
       </header>
 
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <section class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px">
         <sc-for list="{{periods}}" as="p" hint-placeholder-count="4"><button type="button" class="{{p.cls}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for>
+        <span style="width:2px;height:28px;background:#e5e7eb"></span>
+        <label class="field" style="flex-direction:row;align-items:center;gap:6px">Class<select class="inp" style="min-height:40px"><option>All classes</option><option>Class 9</option><option>Class 10</option></select></label>
+        <label class="field" style="flex-direction:row;align-items:center;gap:6px">Gender<select class="inp" style="min-height:40px"><option>All</option><option>Boys</option><option>Girls</option></select></label>
+        <label class="field" style="flex-direction:row;align-items:center;gap:6px">Compare with<select class="inp" style="min-height:40px"><option>Previous period</option><option>Same time last year</option><option>School goal (90%)</option></select></label>
         <span class="lbl" style="margin-left:auto">{{d.label}}</span>
-      </div>
+      </section>
 
       <section class="grid">
-        <div class="card"><div class="lbl">Present</div><div class="big ok">{{d.pres}}</div><div class="muted">{{d.presN}}</div></div>
-        <div class="card"><div class="lbl">Absent</div><div class="big bad">{{d.abs}}</div><div class="muted">{{d.absN}}</div></div>
-        <div class="card"><div class="lbl">On leave</div><div class="big warn">{{d.lv}}</div><div class="muted">approved</div></div>
-        <div class="card"><div class="lbl">Late</div><div class="big">{{d.late}}</div><div class="muted">after 7:45 am</div></div>
-        <div class="card warm"><div class="lbl">Not marked</div><div class="big">{{d.nm}}</div><div class="muted">sections</div></div>
+        <div class="card"><div class="lbl">Attendance</div><div class="big">{{d.att}}</div><div class="muted"><span class="{{d.attC}}">{{d.attD}}</span> vs {{d.prev}}</div></div>
+        <div class="card"><div class="lbl">Absent student-days</div><div class="big bad">{{d.abs}}</div><div class="muted"><span class="{{d.absC}}">{{d.absD}}</span> vs {{d.prev}}</div></div>
+        <div class="card"><div class="lbl">Late arrivals</div><div class="big warn">{{d.late}}</div><div class="muted">after 7:45 am</div></div>
+        <div class="card"><div class="lbl">Chronic absentees</div><div class="big bad">{{d.chronic}}</div><div class="muted">below 80% this period</div></div>
+        <div class="card"><div class="lbl">Perfect attendance</div><div class="big ok">{{d.perfect}}</div><div class="muted">students, 100%</div></div>
+      </section>
+
+      <section class="card warm" style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+        <span class="tile lg t-o"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 16h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span>
+        <div style="flex:1 1 320px"><div style="font-weight:900;font-size:16px">Today: 3 sections not marked yet</div><div class="muted">Class 4‑A (Saba Kausar), Class 9‑C (Farhan Akhtar), Class 10‑B (Bilal Ahmed). Marking closes at 9:00 am.</div></div>
+        <button type="button" class="chunk sm">Remind the 3 teachers</button>
       </section>
 
       <section class="cols">
         <div class="c3">
           <div class="card">
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Section heatmap</h2><span class="tag r">12 of 19 not marked today</span></div>
-            <div class="tbl"><div style="display:grid;grid-template-columns:110px repeat(5,minmax(64px,1fr));gap:6px;margin-top:12px;min-width:520px;align-items:center">
-              <span></span><span class="lbl" style="text-align:center">Mon</span><span class="lbl" style="text-align:center">Tue</span><span class="lbl" style="text-align:center">Wed</span><span class="lbl" style="text-align:center">Thu</span><span class="lbl" style="text-align:center">Fri</span>
-              <span style="font-weight:900">Class 5‑A</span><span class="cell" style="background:#16a34a;color:#fff">96</span><span class="cell" style="background:#16a34a;color:#fff">97</span><span class="cell" style="background:#86efac;color:#14532d">93</span><span class="cell" style="background:#16a34a;color:#fff">96</span><span class="cell" style="background:#86efac;color:#14532d">92</span>
-              <span style="font-weight:900">Class 7‑B</span><span class="cell" style="background:#fde68a;color:#78350f">86</span><span class="cell" style="background:#86efac;color:#14532d">91</span><span class="cell" style="background:#86efac;color:#14532d">90</span><span class="cell" style="background:#fde68a;color:#78350f">88</span><span class="cell" style="background:#86efac;color:#14532d">91</span>
-              <span style="font-weight:900">Class 9‑A</span><span class="cell" style="background:#86efac;color:#14532d">92</span><span class="cell" style="background:#16a34a;color:#fff">95</span><span class="cell" style="background:#86efac;color:#14532d">90</span><span class="cell" style="background:#86efac;color:#14532d">93</span><span class="cell" style="background:#86efac;color:#14532d">91</span>
-              <span style="font-weight:900">Class 9‑C</span><span class="cell" style="background:#fca5a5;color:#7f1d1d">74</span><span class="cell" style="background:#fde68a;color:#78350f">86</span><span class="cell" style="background:#fde68a;color:#78350f">85</span><span class="cell" style="background:#fde68a;color:#78350f">87</span><span class="cell" style="background:#fca5a5;color:#7f1d1d">78</span>
-              <span style="font-weight:900">Class 10‑A</span><span class="cell" style="background:#16a34a;color:#fff">100</span><span class="cell" style="background:#86efac;color:#14532d">93</span><span class="cell" style="background:#16a34a;color:#fff">96</span><span class="cell" style="background:#f1f5f9;color:#6b7280">—</span><span class="cell" style="background:#86efac;color:#14532d">93</span>
-            </div></div>
-            <div class="muted" style="margin-top:10px"><strong style="color:#1f2937">AI note:</strong> 9‑C drops every Monday. Most absences are 6 students from the same van route.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Trend · this period vs last</h2>
+              <div style="display:flex;gap:14px;font-weight:800;font-size:12px;color:#4b5563"><span><span class="dot" style="background:#16a34a"></span> This period</span><span><span class="dot" style="background:#cbd5e1"></span> Last period</span><span style="color:#b91c1c">- - 90% goal</span></div></div>
+            <div role="img" aria-label="{{trendAria}}" style="display:flex;align-items:flex-end;gap:10px;height:190px;margin-top:16px;position:relative;border-bottom:2px solid #e5e7eb">
+              <div style="position:absolute;left:0;right:0;bottom:{{goal}};border-top:2px dashed #ef4444"></div>
+              <sc-for list="{{trend}}" as="t" hint-placeholder-count="6">
+                <div style="flex:1;display:flex;align-items:flex-end;justify-content:center;gap:4px;height:100%">
+                  <div style="width:40%;max-width:22px;height:{{t.hp}};background:#cbd5e1;border-radius:6px 6px 2px 2px"></div>
+                  <div style="width:40%;max-width:22px;height:{{t.h}};background:{{t.c}};border-radius:6px 6px 2px 2px"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:6px"><sc-for list="{{trend}}" as="t" hint-placeholder-count="6"><span style="flex:1;text-align:center;font-weight:800;font-size:12px;color:#6b7280">{{t.l}}<br><span style="color:#1f2937">{{t.v}}</span></span></sc-for></div>
           </div>
 
           <div class="card">
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Mark Class 9‑C · today</h2><span class="muted">{{pc}} P · {{ac}} A · {{lc}} L</span></div>
-            <sc-for list="{{kids}}" as="k" hint-placeholder-count="5">
-              <div class="row"><span class="num" style="width:28px;font-weight:900;color:#6b7280">{{k.roll}}</span><div style="flex:1 1 160px"><div style="font-weight:900">{{k.n}}</div><div class="muted" style="font-size:12px">{{k.note}}</div></div>
-                <button type="button" class="{{k.pc}}" onClick="{{k.setP}}" aria-label="Present">P</button><button type="button" class="{{k.ac}}" onClick="{{k.setA}}" aria-label="Absent">A</button><button type="button" class="{{k.lc}}" onClick="{{k.setL}}" aria-label="Leave">L</button></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Compare classes</h2>
+              <div style="display:flex;gap:6px"><sc-for list="{{sorts}}" as="s" hint-placeholder-count="3"><button type="button" class="{{s.cls}}" onClick="{{s.pick}}" style="min-height:34px">{{s.label}}</button></sc-for></div></div>
+            <p class="muted" style="margin:6px 0 4px">Bar is this period, black mark is last period.</p>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+              <div class="cmp"><span style="width:96px">{{r.n}}</span><div class="trk"><div class="a" style="width:{{r.w}};background:{{r.c}}"></div><div class="b" style="left:{{r.pw}}"></div></div><span style="width:50px;text-align:right">{{r.v}}</span><span style="width:46px;text-align:right" class="{{r.dc}}">{{r.d}}</span><span class="muted" style="width:120px;font-size:12px">{{r.t}}</span></div>
             </sc-for>
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap"><button type="button" class="chunk w" onClick="{{allP}}">All present</button><button type="button" class="chunk">Save · SMS absent parents</button></div>
+          </div>
+
+          <div class="card">
+            <h2 class="h2">Day-of-week pattern</h2>
+            <p class="muted" style="margin:6px 0 0">Average attendance by weekday, last 8 weeks</p>
+            <div class="tbl"><div style="display:grid;grid-template-columns:110px repeat(6,minmax(54px,1fr));gap:6px;margin-top:12px;min-width:520px;align-items:center">
+              <span></span><span class="lbl" style="text-align:center">Mon</span><span class="lbl" style="text-align:center">Tue</span><span class="lbl" style="text-align:center">Wed</span><span class="lbl" style="text-align:center">Thu</span><span class="lbl" style="text-align:center">Fri</span><span class="lbl" style="text-align:center">Sat</span>
+              <span style="font-weight:900">Primary</span><span class="cell" style="background:#fde68a;color:#78350f">87</span><span class="cell" style="background:#16a34a;color:#fff">95</span><span class="cell" style="background:#86efac;color:#14532d">93</span><span class="cell" style="background:#16a34a;color:#fff">95</span><span class="cell" style="background:#86efac;color:#14532d">92</span><span class="cell" style="background:#86efac;color:#14532d">91</span>
+              <span style="font-weight:900">Middle</span><span class="cell" style="background:#fde68a;color:#78350f">86</span><span class="cell" style="background:#86efac;color:#14532d">92</span><span class="cell" style="background:#86efac;color:#14532d">91</span><span class="cell" style="background:#86efac;color:#14532d">93</span><span class="cell" style="background:#fde68a;color:#78350f">88</span><span class="cell" style="background:#86efac;color:#14532d">90</span>
+              <span style="font-weight:900">Matric</span><span class="cell" style="background:#fca5a5;color:#7f1d1d">79</span><span class="cell" style="background:#86efac;color:#14532d">90</span><span class="cell" style="background:#fde68a;color:#78350f">88</span><span class="cell" style="background:#86efac;color:#14532d">91</span><span class="cell" style="background:#fde68a;color:#78350f">85</span><span class="cell" style="background:#86efac;color:#14532d">90</span>
+            </div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-weight:800;font-size:12px;color:#4b5563"><span><span class="dot" style="background:#16a34a"></span> 95+</span><span><span class="dot" style="background:#86efac"></span> 90–95</span><span><span class="dot" style="background:#fde68a"></span> 80–90</span><span><span class="dot" style="background:#fca5a5"></span> below 80</span></div>
           </div>
         </div>
+
         <div class="c2">
-          <div class="card" style="border-color:#fca5a5;box-shadow:0 4px 0 #fca5a5 !important">
-            <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Students to call</h2><span class="tag r">5</span></div>
-            <div class="row" style="margin-top:6px"><div style="flex:1"><div style="font-weight:900">Hamza Ali · 9‑C</div><div class="muted">4 absences in 3 weeks</div></div><button type="button" class="chunk w sm">Call</button></div>
-            <div class="row"><div style="flex:1"><div style="font-weight:900">Areeba Noor · 7‑B</div><div class="muted">3 absences · all Mondays</div></div><button type="button" class="chunk w sm">Call</button></div>
-            <div class="row"><div style="flex:1"><div style="font-weight:900">Usama Iqbal · 9‑C</div><div class="muted">Late 6 times this month</div></div><button type="button" class="chunk w sm">Call</button></div>
+          <div class="card dark">
+            <div class="lbl" style="color:#fcd34d">AI insights</div>
+            <ul style="margin:10px 0 0;padding-left:18px;line-height:24px;font-weight:700">
+              <li>Monday is the weakest day in every level; Matric drops to 79%.</li>
+              <li>9‑C fell 6 points. 5 of its 7 frequent absentees use the same van route.</li>
+              <li>Girls' attendance (93%) is 4 points above boys' (89%) in Middle.</li>
+              <li>Students below 80% scored 18 points less in the October test.</li>
+            </ul>
+            <button type="button" class="chunk" style="margin-top:14px;width:100%">Make an action plan</button>
           </div>
+
           <div class="card">
-            <h2 class="h2">Rules</h2>
-            <div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">SMS parent when absent</span><span class="tag g">On</span></div>
-            <div class="row"><span style="flex:1;font-weight:800">Late after</span><span style="font-weight:900">7:45 am</span></div>
-            <div class="row"><span style="flex:1;font-weight:800">Flag after absences</span><span style="font-weight:900">3 in 3 weeks</span></div>
-            <div class="row"><span style="flex:1;font-weight:800">Goal</span><span style="font-weight:900">90%</span></div>
-            <a href="Settings.dc.html" style="font-weight:800;font-size:14px">Change in Settings</a>
+            <h2 class="h2">Boys vs girls</h2>
+            <div class="cmp" style="margin-top:8px"><span style="width:54px">Boys</span><div class="trk"><div class="a" style="width:89%;background:#0ea5e9"></div></div><span style="width:44px;text-align:right">89%</span></div>
+            <div class="cmp"><span style="width:54px">Girls</span><div class="trk"><div class="a" style="width:93%;background:#db2777"></div></div><span style="width:44px;text-align:right">93%</span></div>
+          </div>
+
+          <div class="card" style="border-color:#fca5a5;box-shadow:0 4px 0 #fca5a5 !important">
+            <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Chronic absentees</h2><span class="tag r">below 80%</span></div>
+            <div class="row" style="margin-top:6px"><div style="flex:1"><div style="font-weight:900">Hamza Ali · 9‑C</div><div class="muted">71% · 6 Mondays missed · marks down 11</div></div><button type="button" class="chunk w sm">Call</button></div>
+            <div class="row"><div style="flex:1"><div style="font-weight:900">Usama Iqbal · 9‑C</div><div class="muted">76% · late 6 times</div></div><button type="button" class="chunk w sm">Call</button></div>
+            <div class="row"><div style="flex:1"><div style="font-weight:900">Areeba Noor · 7‑B</div><div class="muted">78% · 3 absences in 3 weeks</div></div><button type="button" class="chunk w sm">Call</button></div>
+            <a href="Students.dc.html" style="font-weight:800;font-size:14px">See all 14</a>
+          </div>
+
+          <div class="card">
+            <h2 class="h2">Teachers marking on time</h2>
+            <p class="muted" style="margin:4px 0 6px">Marked before 9:00 am, this period</p>
+            <div class="row"><span style="flex:1;font-weight:800">Bushra Anwar · 1‑A</span><span class="tag g">100%</span></div>
+            <div class="row"><span style="flex:1;font-weight:800">Ayesha Siddiqui · 9‑A</span><span class="tag g">98%</span></div>
+            <div class="row"><span style="flex:1;font-weight:800">Bilal Ahmed · 10‑B</span><span class="tag y">81%</span></div>
+            <div class="row"><span style="flex:1;font-weight:800">Farhan Akhtar · 9‑C</span><span class="tag r">64%</span></div>
           </div>
         </div>
       </section>
@@ -103,28 +150,34 @@ body{margin:0;background:#f7f9fc}
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
 class Component extends DCLogic {
-  constructor(p){ super(p); this.state = { period:'today', m:{ 1:'P', 2:'A', 3:'P', 4:'L' } }; }
+  constructor(p){ super(p); this.state = { period:'month', sort:'low' }; }
   renderVals() {
-    const { period, m } = this.state;
+    const { period, sort } = this.state;
     const D = {
-      today:{ label:'Sun 15 Nov', pres:'—', presN:'7 sections marked', abs:'14', absN:'in marked sections', lv:'3', late:'5', nm:'12' },
-      week:{ label:'9 – 14 Nov', pres:'89%', presN:'goal 90%', abs:'204', absN:'student-days', lv:'21', late:'38', nm:'0' },
-      month:{ label:'November', pres:'89.6%', presN:'goal 90%', abs:'412', absN:'student-days', lv:'44', late:'81', nm:'0' },
-      term:{ label:'Mid-term', pres:'90.4%', presN:'goal 90%', abs:'1,380', absN:'student-days', lv:'131', late:'240', nm:'0' }
-    };
-    const P = [['today','Today'],['week','This week'],['month','This month'],['term','This term']];
-    const K = [[1,'Ahmed Raza','—'],[2,'Hamza Ali','4th absence · call parent'],[3,'Fatima Zahid','—'],[4,'Iqra Shah','Leave approved'],[5,'Usama Iqbal','Late 6 times']];
-    const kids = K.map(([r,n,note]) => ({ roll:r, n, note,
-      pc: m[r]==='P' ? 'pa p':'pa', ac: m[r]==='A' ? 'pa a':'pa', lc: m[r]==='L' ? 'pa l':'pa',
-      setP:()=>this.setState({ m:{...m,[r]:'P'} }), setA:()=>this.setState({ m:{...m,[r]:'A'} }), setL:()=>this.setState({ m:{...m,[r]:'L'} }) }));
-    const v = K.map(([r]) => m[r]);
+      week:{ label:'9 – 14 Nov', prev:'last week', att:'89.1%', attD:'▼ 1.4', attC:'bad', abs:'375', absD:'▲ 48', absC:'bad', late:'38', chronic:'19', perfect:'211',
+        t:[['Mon',84,88],['Tue',91,92],['Wed',90,91],['Thu',92,90],['Fri',88,90],['Sat',93,91]] },
+      month:{ label:'November so far', prev:'October', att:'89.6%', attD:'▼ 0.8', attC:'bad', abs:'720', absD:'▲ 64', absC:'bad', late:'81', chronic:'14', perfect:'164',
+        t:[['Wk 1',91,92],['Wk 2',88,90],['Wk 3',90,91]] },
+      term:{ label:'Mid-term · 1 Oct – 20 Nov', prev:'first term', att:'90.4%', attD:'▲ 1.1', attC:'ok', abs:'2,410', absD:'▼ 120', absC:'ok', late:'240', chronic:'11', perfect:'96',
+        t:[['Wk 1',92,90],['Wk 2',91,89],['Wk 3',89,90],['Wk 4',93,91],['Wk 5',90,88],['Wk 6',88,89],['Wk 7',90,90]] },
+      custom:{ label:'1 Oct – 15 Nov', prev:'same dates last year', att:'90.1%', attD:'▲ 2.3', attC:'ok', abs:'2,180', absD:'▼ 260', absC:'ok', late:'212', chronic:'12', perfect:'102',
+        t:[['Oct',91,89],['1–15 Nov',89,87]] }
+    }[period];
+    const H = (v) => Math.max(4, Math.round((v - 70) * 6.5)) + 'px';
+    const trend = D.t.map(([l,v,pv]) => ({ l, v: v+'%', h: H(v), hp: H(pv), c: v >= 90 ? '#16a34a' : '#f59e0b' }));
+    const C = [['Play group',94,93,'Sumaira Javed'],['Class 1',96,95,'Bushra Anwar'],['Class 2',95,94,'Asma Rafiq'],['Class 3',93,94,'Nadia Hameed'],['Class 4',92,91,'Saba Kausar'],['Class 5',94,92,'Nazia Parveen'],['Class 6',91,92,'Nazia Parveen'],['Class 7',89,90,'Shazia Kanwal'],['Class 8',88,87,'Rabia Noor'],['9‑A',91,90,'Ayesha Siddiqui'],['9‑C',84,90,'Farhan Akhtar'],['Class 10',90,91,'Usman Ghani']];
+    const sorted = C.slice().sort((a,b) => sort==='low' ? a[1]-b[1] : sort==='drop' ? (a[1]-a[2])-(b[1]-b[2]) : 0);
+    const pos = (v) => Math.max(0, Math.min(100, (v - 70) / 30 * 100)) + '%';
+    const rows = sorted.map(([n,v,pv,t]) => { const d = v - pv; return { n, t, v: v+'%', w: pos(v), pw: pos(pv), c: v>=95 ? '#16a34a' : v>=90 ? '#86efac' : v>=85 ? '#f59e0b' : '#ef4444', d: (d>0?'+':'') + d, dc: d<0 ? 'bad' : d>0 ? 'ok' : 'muted' }; });
+    const P = [['week','This week'],['month','This month'],['term','This term'],['custom','Custom']];
+    const S = [['low','Lowest first'],['drop','Biggest drop'],['class','By class']];
     return {
       periods: P.map(([k,l]) => ({ label:l, cls: period===k ? 'chip on':'chip', pick:()=>this.setState({ period:k }) })),
-      d: D[period], kids,
-      pc: v.filter(x=>x==='P').length, ac: v.filter(x=>x==='A').length, lc: v.filter(x=>x==='L').length,
-      allP: () => this.setState({ m: Object.fromEntries(K.map(([r])=>[r,'P'])) })
+      sorts: S.map(([k,l]) => ({ label:l, cls: sort===k ? 'chip on':'chip', pick:()=>this.setState({ sort:k }) })),
+      d: D, trend, rows, goal: H(90),
+      trendAria: 'Attendance for ' + D.label + ' compared with ' + D.prev + ', against a 90% goal'
     };
   }
 }
