@@ -223,7 +223,7 @@ export default async function PrincipalToday() {
           <Qa href="/principal/classes" bg="#ede9fe" fg="#6d28d9" d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5">Classes</Qa>
           <Qa href="/principal/exams" bg="#e0f2fe" fg="#0369a1" d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4">Add exam</Qa>
           <Qa href="/principal/notices" bg="#ffedd5" fg="#c2410c" d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8">Send notice</Qa>
-          <Qa href="/accounts" bg="#dcfce7" fg="#15803d" d="M2 7h20v12H2zM2 11h20">Collect fee</Qa>
+          <Qa href="/accounts?view=desk" bg="#dcfce7" fg="#15803d" d="M2 7h20v12H2zM2 11h20">Collect fee</Qa>
           <Qa href="/principal/reports" bg="#fff" fg="#374151" border d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z">Reports</Qa>
         </div>
       </section>
