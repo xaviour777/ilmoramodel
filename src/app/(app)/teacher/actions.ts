@@ -24,13 +24,11 @@ export async function saveAttendance(formData: FormData) {
   }));
   const { error } = await supabase.from("attendance").upsert(rows, { onConflict: "student_id,date" });
   const q = `?section=${sectionId}&date=${date}`;
-  // the principal's Attendance page marks a section too and wants to land back there
-  const base = str(formData, "back") === "principal" ? "/principal/attendance" : "/teacher";
-  if (error) redirect(`${base}${q}&error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/teacher${q}&error=${encodeURIComponent(error.message)}`);
   // parents of absent children get a message; a failure here must not lose the attendance
   const { data: queued } = await supabase.rpc("queue_absent_messages", { p_section: sectionId, p_date: date });
-  revalidatePath(base);
-  redirect(`${base}${q}&saved=1&alerts=${Number(queued) || 0}`);
+  revalidatePath("/teacher");
+  redirect(`/teacher${q}&saved=1&alerts=${Number(queued) || 0}`);
 }
 
 export async function createHomework(formData: FormData) {
