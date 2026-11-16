@@ -67,16 +67,19 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
 
 const fmt = (n: number) => (n > 999 ? "999+" : String(n));
 
-export function PrincipalSidebar({ badges, school, campus, year, name, role, initials }: {
-  badges: Record<string, number>; school: string; campus: string; year?: string | null; name: string; role: string; initials: string;
+export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials }: {
+  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string;
 }) {
   const cur = currentId(usePathname());
   return (
     <nav aria-label="Main" className="ilm-side">
       <div className="flex items-center gap-2.5 px-1.5 pt-1 pb-3">
-        <div className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[14px] bg-[#16a34a] text-[22px] font-black text-white shadow-[0_4px_0_#15803d]">{(school || "I")[0].toUpperCase()}</div>
+        {logo
+          // eslint-disable-next-line @next/next/no-img-element
+          ? <img src={logo} alt="" className="h-[42px] w-[42px] flex-none rounded-[14px] object-contain" />
+          : <div className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[14px] text-[22px] font-black text-white" style={{ background: "var(--brand, #16a34a)", boxShadow: "0 4px 0 var(--brand-lip, #15803d)" }}>{(school || "I")[0].toUpperCase()}</div>}
         <div className="min-w-0">
-          <div className="truncate text-[18px] font-black text-[#15803d]">{school}</div>
+          <div className="truncate text-[18px] font-black" style={{ color: "var(--brand-lip, #15803d)" }}>{school}</div>
           <div className="truncate text-[12px] font-bold text-[#6b7280]">{[campus, year].filter(Boolean).join(" · ")}</div>
         </div>
       </div>

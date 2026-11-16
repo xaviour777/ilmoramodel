@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { getBranding, shade } from "@/lib/branding";
 
 const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
 
-export const metadata: Metadata = {
-  title: "Ilmora",
-  description: "School management for Pakistani schools",
-};
+// The tab title and icon follow the school whose domain was opened.
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBranding();
+  return {
+    title: brand?.name ?? "Ilmora",
+    description: brand ? `${brand.name} · school app` : "School management for Pakistani schools",
+    ...(brand?.logo_url ? { icons: { icon: brand.logo_url } } : {}),
+  };
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const brand = await getBranding();
+  const c = brand?.primary_color;
+  // the school's colour replaces Ilmora green on buttons, logo tiles and links
+  const theme = c ? { ["--brand" as string]: c, ["--brand-lip" as string]: shade(c) } : undefined;
   return (
-    <html lang="en" className={nunito.variable}>
+    <html lang="en" className={nunito.variable} style={theme}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

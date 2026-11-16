@@ -2,9 +2,9 @@
 
 /* Ilmora look: bright, chunky and friendly, in the spirit of Duolingo. */
 :root {
-  --green: #58cc02;
-  --green-lip: #46a302;
-  --green-deep: #3b8a00;
+  --green: var(--brand, #58cc02);
+  --green-lip: var(--brand-lip, #46a302);
+  --green-deep: var(--brand, #3b8a00);
   --green-soft: #d7ffb8;
   --green-ink: #2b6600;
   --blue: #1cb0f6;
@@ -201,7 +201,7 @@ body {
   font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
   background: #ffffff;
 }
-.stitch .btn { background: #103d37; box-shadow: 0 4px 0 #002622; }
+.stitch .btn { background: var(--brand, #103d37); box-shadow: 0 4px 0 var(--brand-lip, #002622); }
 .stitch .h1, .stitch .h2 { color: #002622; font-weight: 800; }
 .msym {
   font-family: "Material Symbols Outlined";
@@ -221,9 +221,9 @@ body {
    older pages pick up the look without changing their markup.
 --------------------------------------------------------------------------- */
 .ilm {
-  --green: #16a34a;
-  --green-lip: #15803d;
-  --green-deep: #16a34a;
+  --green: var(--brand, #16a34a);
+  --green-lip: var(--brand-lip, #15803d);
+  --green-deep: var(--brand, #16a34a);
   --green-soft: #dcfce7;
   --green-ink: #15803d;
   --blue: #0284c7;
@@ -248,7 +248,7 @@ body {
   /* Stitch tokens some pages still use, mapped onto the new palette */
   --color-primary: #1f2937;
   --color-on-primary: #ffffff;
-  --color-primary-container: #16a34a;
+  --color-primary-container: var(--brand, #16a34a);
   --color-on-primary-container: #dcfce7;
   --color-primary-fixed: #dcfce7;
   --color-primary-fixed-dim: #bbf7d0;
@@ -284,7 +284,7 @@ body {
 .ilm .h2 { font-weight: 900; font-size: 19px; color: #1f2937; }
 .ilm .muted { color: #4b5563; font-weight: 700; }
 .ilm .eyebrow { color: #6b7280; font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
-.ilm .btn { min-height: 44px; border-radius: 14px; background: #16a34a; color: #fff; box-shadow: 0 4px 0 #15803d; font-weight: 900; font-size: 14px; letter-spacing: .04em; }
+.ilm .btn { min-height: 44px; border-radius: 14px; background: var(--brand, #16a34a); color: #fff; box-shadow: 0 4px 0 var(--brand-lip, #15803d); font-weight: 900; font-size: 14px; letter-spacing: .04em; }
 .ilm .btn:active, .ilm .btn-ghost:active { box-shadow: none; }
 .ilm .btn-ghost { min-height: 44px; border-radius: 14px; color: #0369a1; border-color: #e5e7eb; box-shadow: 0 4px 0 #e5e7eb; font-weight: 900; font-size: 14px; letter-spacing: .04em; }
 .ilm .input { min-height: 44px; border-radius: 12px; background: #fff; border-color: #e5e7eb; font-size: 14px; }

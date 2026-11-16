@@ -2,8 +2,12 @@ import { SUPABASE_URL, SUPABASE_KEY } from "@/lib/supabase/env";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Keeps the login session fresh and sends signed-out visitors to /login.
+// Keeps the login session fresh, sends signed-out visitors to /login, and passes
+// the domain the visitor opened (x-school-domain) to pages so each school's
+// own domain shows its own name, logo and colour.
 export async function middleware(request: NextRequest) {
+  const host = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(",")[0].trim().toLowerCase();
+  request.headers.set("x-school-domain", host.split(":")[0]);
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     SUPABASE_URL,

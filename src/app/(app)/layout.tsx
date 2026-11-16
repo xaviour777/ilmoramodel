@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PrincipalSidebar, PrincipalBottomBar } from "@/components/principal-nav";
 import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
+import { getBranding } from "@/lib/branding";
 
 const NAV: Record<Role, NavItem[]> = {
   principal: [
@@ -58,7 +59,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="mx-auto flex max-w-[1440px] flex-col gap-6 p-4 lg:flex-row lg:items-start lg:p-6">
       <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
         <div className="flex items-center justify-between lg:block">
-          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>ilmora</div>
+          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "ilmora"}</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
@@ -94,16 +95,17 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   // only count unmarked sections once the school day has started (someone has marked)
   const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
   const badges = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
-  const schoolName = (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
+  const brand = await getBranding();
+  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
     <div className="ilm min-h-screen">
       <div className="hidden lg:block">
-        <PrincipalSidebar badges={badges} school={schoolName} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
+        <PrincipalSidebar badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
       </div>
       {/* phone header */}
       <header className="sticky top-0 z-30 flex items-center gap-2.5 border-b-2 border-[#e5e7eb] bg-white px-4 pt-4 pb-2.5 lg:hidden">
-        <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-[#16a34a] text-xl font-black text-white shadow-[0_3px_0_#15803d]">{schoolName[0].toUpperCase()}</div>
+        <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl text-xl font-black text-white" style={{ background: "var(--brand, #16a34a)", boxShadow: "0 3px 0 var(--brand-lip, #15803d)" }}>{schoolName[0].toUpperCase()}</div>
         <div className="min-w-0 flex-1"><div className="truncate text-[17px] font-black">{schoolName}</div>
           <div className="truncate text-[12px] font-bold text-[#6b7280]">{me.campus_name}{year.data?.name ? ` · ${year.data.name}` : ""}</div></div>
         <Link href="/profile" aria-label="My profile"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
