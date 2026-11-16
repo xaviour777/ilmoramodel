@@ -1,11 +1,12 @@
-import { Tabs } from "./tabs";
+import { UnderTabs } from "./classes-tabs";
 
-// Staff, leave and attendance share one menu entry with the monthly salaries.
-export function StaffTabs({ current }: { current: "staff" | "salaries" }) {
+// Staff (design/Staff.dc.html): today, reports, and the monthly salaries page.
+export function StaffTabs({ current }: { current: "staff" | "reports" | "salaries" }) {
   return (
-    <Tabs current={current} tabs={[
-      { id: "staff", label: "Staff & leave", href: "/principal/staff" },
-      { id: "salaries", label: "Salaries", href: "/principal/staff/salaries" },
+    <UnderTabs current={current} tabs={[
+      { id: "staff", label: "Today", href: "/principal/staff" },
+      { id: "reports", label: "Reports", href: "/principal/staff?tab=reports" },
+      { id: "salaries", label: "Salaries & payroll", href: "/principal/staff/salaries" },
     ]} />
   );
 }
