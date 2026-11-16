@@ -48,7 +48,7 @@ export default async function StudentProfile({ params, searchParams }: { params:
           <h1 className="h1">{s.full_name}</h1>
           <p className="muted text-base">{s.sections ? `${s.sections.classes.name}-${s.sections.name}` : "No class"} · {STATUS[s.status]}{s.roll_no ? ` · Roll ${s.roll_no}` : ""}</p>
         </div>
-        <ClassesTabs current="students" />
+        <ClassesTabs current="" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved === "admitted" && (

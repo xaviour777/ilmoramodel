@@ -1,6 +1,8 @@
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
-import { shortDate } from "@/lib/format";
+import { pct, shortDate } from "@/lib/format";
+import Link from "next/link";
+import { PageHead, Stats, Stat, Insight, Empty, Bar, Row } from "@/components/ilm";
 import { CHANNEL_LABEL, CHOICE_LABEL } from "@/lib/messages";
 import { addInquiry, admitStudent, moveAdmission } from "../actions";
 
@@ -15,30 +17,54 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
   await requireRole("principal", "owner", "accountant");
   const sp = await searchParams;
   const supabase = await createClient();
-  const [{ data: rows }, { data: classes }, { data: sections }] = await Promise.all([
+  const [{ data: rows }, { data: classes }, { data: sections }, { data: year }, { data: enrolled }, { count: declined }] = await Promise.all([
     supabase.from("admissions").select("*, classes(name)").neq("status", "declined").order("created_at", { ascending: false }),
     supabase.from("classes").select("id, name").order("sort"),
-    supabase.from("sections").select("id, name, class_id, classes(name, sort)"),
+    supabase.from("sections").select("id, name, class_id, capacity, classes(name, sort)"),
+    supabase.from("academic_sessions").select("starts_on").eq("is_current", true).maybeSingle(),
+    supabase.from("students").select("section_id").eq("status", "enrolled"),
+    supabase.from("admissions").select("id", { count: "exact", head: true }).eq("status", "declined"),
   ]);
+  const since = year?.starts_on ?? "1900-01-01";
+  const thisSession = (rows ?? []).filter((r) => r.created_at.slice(0, 10) >= since);
+  const joined = thisSession.filter((r) => r.status === "admitted").length;
+  const open = (rows ?? []).filter((r) => r.status !== "admitted");
+  const perSec = new Map<string, number>();
+  for (const e of enrolled ?? []) perSec.set(e.section_id, (perSec.get(e.section_id) ?? 0) + 1);
+  const seatsByClass = new Map<string, { name: string; seats: number; taken: number }>();
+  for (const x of (sections ?? []) as unknown as { id: string; class_id: string; capacity: number | null; classes: { name: string } }[]) {
+    const c = seatsByClass.get(x.class_id) ?? { name: x.classes.name, seats: 0, taken: 0 };
+    c.seats += x.capacity ?? 0; c.taken += perSec.get(x.id) ?? 0; seatsByClass.set(x.class_id, c);
+  }
+  const free = [...seatsByClass.values()].reduce((t, c) => t + Math.max(0, c.seats - c.taken), 0);
+  const fullClasses = [...seatsByClass.values()].filter((c) => c.seats && c.taken >= c.seats);
+  const byClass = [...open.reduce((m, r) => m.set(r.classes?.name ?? "Not sure", (m.get(r.classes?.name ?? "Not sure") ?? 0) + 1), new Map<string, number>()).entries()].sort((a, b) => b[1] - a[1]);
+  const waitingFull = open.filter((r) => r.applying_class_id && fullClasses.some((c) => c.name === r.classes?.name)).length;
   type Sec = { id: string; name: string; class_id: string; classes: { name: string } };
   const secs = (sections ?? []) as unknown as Sec[];
 
   return (
     <>
-      <div>
-        <div className="kick">People</div><h1 className="h1">Admissions</h1>
-        <p className="muted text-base">From first call to first day. Admitting a child creates the family and student records.</p>
-      </div>
+      <PageHead kick="People" title="Admissions" sub="From first call to first day. Admitting a child creates the family and student records.">
+        <Link href="#inquiry" className="btn">New inquiry</Link>
+      </PageHead>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
+      <Stats>
+        <Stat label="Inquiries" value={thisSession.length} sub="this session" />
+        <Stat label="Joined" value={joined} tone="#15803d" sub={thisSession.length ? `${pct(joined / thisSession.length)} conversion · ${declined ?? 0} declined` : "no inquiries yet"} />
+        <Stat label="Seats free" value={free.toLocaleString("en-IN")} sub={fullClasses.length ? `${fullClasses.map((c) => c.name).slice(0, 2).join(", ")} full${waitingFull ? ` · ${waitingFull} waiting` : ""}` : "no class is full"} />
+        <Stat label="In progress" value={open.length} sub="inquiry, test or offer" />
+      </Stats>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {COLS.map((c) => {
           const list = (rows ?? []).filter((r) => r.status === c.id);
           return (
-            <section key={c.id} className="card">
-              <div className="flex items-baseline justify-between"><h2 className="h2">{c.label}</h2><span className="pill pill-gray">{list.length}</span></div>
+            <section key={c.id} className="card flex flex-col gap-2.5" style={{ background: "#f8fafc" }}>
+              <div className="flex items-center justify-between"><h2 className="h2">{c.label}</h2><span className="tagx">{list.length}</span></div>
+              {list.length === 0 && <p className="muted text-[13px]">Nobody here.</p>}
               {list.map((a) => (
-                <div key={a.id} className="flex flex-col gap-2 rounded-2xl border-2 p-3" style={{ borderColor: "var(--line)" }}>
+                <div key={a.id} className="flex flex-col gap-2 rounded-[14px] border-2 border-[#e5e7eb] bg-white p-3 shadow-[0_3px_0_#e5e7eb]">
                   <div className="font-black">{a.child_name}</div>
                   <div className="muted text-xs">{a.classes?.name ?? "Class not set"} · {a.guardian_name} · {a.phone}</div>
                   {(a.reminder_phone || a.reminder_channel !== "auto") && (
@@ -81,7 +107,23 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
           );
         })}
       </div>
-      <form action={addInquiry} className="card max-w-3xl">
+      <section className="flex flex-wrap items-start gap-5">
+      <div className="card min-w-0 flex-[2_1_360px]">
+        <h2 className="h2">Which classes families want</h2>
+        <p className="muted text-[13px]">Open inquiries, tests and offers by class applied for</p>
+        {byClass.length === 0 && <div className="mt-2"><Empty>No open inquiries.</Empty></div>}
+        {byClass.map(([n, k]) => {
+          const seat = [...seatsByClass.values()].find((c) => c.name === n);
+          return (
+            <Row key={n}><span className="w-36 truncate font-black">{n}</span><div className="min-w-[80px] flex-1"><Bar value={k / byClass[0][1]} color="#db2777" /></div>
+              <span className="w-8 text-right font-black tabular-nums">{k}</span><span className="muted w-24 text-right text-[12px]">{seat?.seats ? `${Math.max(0, seat.seats - seat.taken)} seats free` : ""}</span></Row>
+          );
+        })}
+        {byClass.length > 0 && (
+          <div className="mt-3"><Insight>{byClass[0][0]} has the most families waiting ({byClass[0][1]}).{waitingFull ? ` ${waitingFull} ${waitingFull === 1 ? "family wants" : "families want"} a class that is already full: add a section in Classes or offer a waiting list.` : ""}</Insight></div>
+        )}
+      </div>
+      <form id="inquiry" action={addInquiry} className="card flex min-w-0 flex-[3_1_480px] scroll-mt-6 flex-col gap-3">
         <h2 className="h2">New inquiry</h2>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="field">Child&apos;s name<input className="input" name="child_name" required /></label>
@@ -113,6 +155,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
         </details>
         <button className="btn self-start" type="submit">Add inquiry</button>
       </form>
+      </section>
     </>
   );
 }
