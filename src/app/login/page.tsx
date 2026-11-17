@@ -27,6 +27,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         {error && (
           <div className="notice-bad">
             {error === "no-profile" ? "This login isn't linked to anyone at a school yet."
+              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Ilmora${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
+              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Ilmora to turn it back on."
               : error === "wrong-school" ? `This login belongs to another school. Use your own school's address${brand ? `, not ${brand.name}'s` : ""}.` : error}
           </div>
         )}
@@ -37,7 +39,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <input className="input" name="password" type="password" required autoComplete="current-password" />
         </label>
         <button className="btn" type="submit" style={brand ? { background: color, boxShadow: `0 4px 0 ${shade(color)}` } : undefined}>Sign in</button>
-        {error === "wrong-school" && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
+        {["wrong-school", "trial-ended", "school-suspended"].includes(error ?? "") && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
       </form>
       {brand ? (
         brand.support_email && <p className="muted text-center text-sm">Trouble signing in? Write to <a className="underline" href={`mailto:${brand.support_email}`}>{brand.support_email}</a></p>
