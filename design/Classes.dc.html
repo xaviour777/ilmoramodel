@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model School —Classes and sections</title>
+<title>Model School — Classes and sections</title>
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ilmora.css">
 </head>
@@ -10,52 +10,28 @@
 <x-dc>
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:#fdfdfd}
-a{color:#047857}a:hover{color:#065f46}
-.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:14px;min-height:24px}
-.nav a:hover{background:#1e293b;color:#fff}
-.nav a.on{background:#123326;color:#34d399;font-weight:600}
-.kick{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#475569}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-sizing:border-box}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:8px;border:1.5px solid #0f172a;background:#0f172a;color:#fff;font:600 14px Inter,sans-serif;cursor:pointer;box-shadow:2px 2px 0 #000,4px 4px 0 #000;text-decoration:none}
-.btn:hover{box-shadow:2px 2px 0 #000;transform:translate(2px,2px)}
-.btn.ghost{background:#fff;color:#0f172a}
-.btn.sm{min-height:36px;padding:0 12px;font-size:13px;box-shadow:2px 2px 0 #000}
-.tag{display:inline-block;font:600 11px 'IBM Plex Mono',monospace;padding:3px 8px;border-radius:4px;background:#f1f5f9;color:#334155;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-.tag.g{background:#d1fae5;color:#065f46}.tag.r{background:#fee2e2;color:#991b1b}.tag.b{background:#dbeafe;color:#1e40af}.tag.y{background:#fef3c7;color:#92400e}
-.tabbtn{min-height:44px;padding:0 18px;border:0;border-bottom:3px solid transparent;background:none;font:600 15px Inter,sans-serif;color:#475569;cursor:pointer}
-.tabbtn.on{color:#0f172a;border-bottom-color:#0f172a}
-.pill{min-height:36px;padding:0 14px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;font:600 13px Inter,sans-serif;color:#0f172a;cursor:pointer}
-.pill.on{background:#0f172a;color:#fff;border-color:#0f172a}
-.cc{display:flex;flex-direction:column;gap:10px;text-align:left;font-family:Inter,sans-serif;color:#0f172a;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;cursor:pointer}
-.cc:hover{border-color:#0f172a}
-.cc{border:2px solid #e5e7eb !important;border-radius:18px !important;box-shadow:0 4px 0 #e5e7eb}
-.cc.on{border-color:#7dd3fc !important;background:#f0f9ff !important;box-shadow:0 4px 0 #7dd3fc}
-.slot{border-radius:10px !important;background:#e0f2fe !important}
-.slot.x{background:#fee2e2 !important}
-.bar{height:6px;border-radius:99px;background:#e2e8f0;overflow:hidden}
-.bar span{display:block;height:100%;background:#0f172a}
-.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #e2e8f0}
-.num{font-family:'IBM Plex Mono',monospace;font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
-th{text-align:left;padding:8px}
-td{padding:6px;border-top:1px solid #e2e8f0;vertical-align:top}
-.slot{border-radius:6px;padding:8px;background:#f1f5f9;min-height:44px;box-sizing:border-box}
-.slot b{display:block;font-size:13px}.slot span{font-size:12px;color:#475569}
-.slot.x{background:#fee2e2;outline:1.5px solid #dc2626}
-.slot.f{background:#fff;border:1px dashed #94a3b8;color:#475569}
-.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500}
-.field input,.field select{min-height:44px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff;color:#0f172a}
+body{margin:0;background:#f7f9fc}
+.cc{display:flex;flex-direction:column;gap:8px;text-align:left;color:#1f2937;background:#fff;border:2px solid #e5e7eb;border-radius:18px;padding:14px;cursor:pointer;box-shadow:0 4px 0 #e5e7eb}
+.cc:hover{border-color:#7dd3fc}
+.cc.on{border-color:#7dd3fc;background:#f0f9ff;box-shadow:0 4px 0 #7dd3fc}
+.cc.empty{border-style:dashed;box-shadow:none;background:#fafafa}
+.st{display:flex;gap:0;border:2px solid #e5e7eb;border-radius:12px;overflow:hidden}
+.st button{min-height:36px;padding:0 10px;border:0;border-left:2px solid #e5e7eb;background:#fff;font-weight:800;font-size:12px;color:#6b7280;cursor:pointer}
+.st button:first-child{border-left:0}
+.st button.p{background:#dcfce7;color:#15803d}.st button.c{background:#fef3c7;color:#92400e}.st button.d{background:#fee2e2;color:#b91c1c}.st button.l{background:#e5e7eb;color:#374151}
+.step{flex:1;min-width:120px;border-top:5px solid #e5e7eb;padding-top:8px}
+.step.done{border-color:#16a34a}.step.now{border-color:#0ea5e9}
+.gap{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px;border:2px solid #e5e7eb;border-radius:14px;background:#fff}
+.sev{width:10px;align-self:stretch;border-radius:99px;flex:none}
 </style>
 </helmet>
-<div style="display:flex;flex-wrap:wrap;min-height:100vh;font-family:Inter,sans-serif;color:#0f172a;background:#fdfdfd">
+<div class="shell">
   <nav aria-label="Main" class="side">
     <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
     <div class="grp">Daily</div>
     <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
-    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">3</span></a>
     <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
     <div class="grp">Academics</div>
     <a class="it on" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
@@ -71,163 +47,290 @@ td{padding:6px;border-top:1px solid #e2e8f0;vertical-align:top}
     <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
     <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
   </nav>
-  <main style="flex:999 1 560px;min-width:0;padding:32px 32px 48px;box-sizing:border-box">
-    <div style="max-width:1180px;display:flex;flex-direction:column;gap:20px">
+
+  <main class="content">
+    <div class="wrap">
       <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
-        <div><div class="kick">School · Session 2026–27</div><h1 style="margin:6px 0 0;font-size:40px;line-height:44px;letter-spacing:-1px">Classes and sections</h1><p style="margin:8px 0 0;color:#475569">Each class at a glance: seats, attendance, results and fees. Click a class to manage it.</p></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn ghost">Promote to next session</button><button type="button" class="btn">Add class</button></div>
+        <div><div class="lbl">Academics · Session 2026–27</div><h1 class="title">Classes and sections</h1><p class="sub">From Play group to BS. Set up classes, promote students, and watch how every class is doing.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk w" onClick="{{goPromote}}">Promote to 2027–28</button><button type="button" class="chunk">Add class or program</button></div>
       </header>
 
-      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #e2e8f0">
-        <button type="button" role="tab" class="{{tCls}}" onClick="{{goCls}}">Classes</button>
-        <button type="button" role="tab" class="{{tTT}}" onClick="{{goTT}}">Timetable</button>
-        <button type="button" role="tab" class="{{tTm}}" onClick="{{goTm}}">Bell timings</button>
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid #e5e7eb">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="6"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
       </div>
 
-      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
-        <div class="card"><div class="kick">Students</div><div style="font-size:28px;font-weight:700;margin-top:6px">380</div><div style="font-size:13px;color:#475569">in 19 sections · 11 classes</div></div>
-        <div class="card"><div class="kick">Seats free</div><div style="font-size:28px;font-weight:700;margin-top:6px">440</div><div style="font-size:13px;color:#475569">54% empty · 3 sections full</div></div>
-        <div class="card"><div class="kick">Avg attendance</div><div style="font-size:28px;font-weight:700;margin-top:6px">89%</div><div style="font-size:13px;color:#475569">last 30 days</div></div>
-        <div class="card"><div class="kick">Avg result</div><div style="font-size:28px;font-weight:700;margin-top:6px">71%</div><div style="font-size:13px;color:#475569">October monthly test</div></div>
-        <div class="card" style="border-color:#f59e0b"><div class="kick">Need attention</div><div style="font-size:28px;font-weight:700;margin-top:6px;color:#92400e">7</div><div style="font-size:13px;color:#475569">no teacher · full · low marks</div></div>
-      </section>
-
-      <sc-if value="{{showCls}}" hint-placeholder-val="{{ true }}">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
-            <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Filter classes">
-              <sc-for list="{{filters}}" as="f" hint-placeholder-count="5"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
-            </div>
-            <button type="button" class="btn sm ghost">Balance sections with AI</button>
+      <sc-if value="{{s.overview}}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <section class="grid">
+            <div class="card"><div class="lbl">Students</div><div class="big">575</div><div class="muted">in 19 sections</div></div>
+            <div class="card"><div class="lbl">Seats used</div><div class="big">71%</div><div class="muted">575 of 810 seats</div></div>
+            <div class="card"><div class="lbl">Students per teacher</div><div class="big">34</div><div class="muted">goal 30 or less</div></div>
+            <div class="card"><div class="lbl">Programs offered</div><div class="big">12</div><div class="muted">4 not started yet</div></div>
+            <div class="card warm"><div class="lbl">Gaps to fix</div><div class="big warn">8</div><div class="muted">see Gaps and checks</div></div>
+          </section>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Level">
+            <sc-for list="{{levels}}" as="l" hint-placeholder-count="7"><button type="button" class="{{l.cls}}" onClick="{{l.pick}}">{{l.label}}</button></sc-for>
           </div>
-          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
-            <div style="flex:3 1 520px;min-width:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
+          <section class="cols">
+            <div class="c3" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
               <sc-for list="{{shown}}" as="c" hint-placeholder-count="8">
                 <button type="button" class="{{c.cls}}" onClick="{{c.pick}}">
-                  <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><span style="font-weight:700;font-size:16px">{{c.name}}</span><span class="{{c.tagCls}}">{{c.tag}}</span></div>
-                  <div style="font-size:12px;color:#475569">{{c.sections}} · {{c.board}}</div>
-                  <div style="width:100%"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Seats</span><span class="num">{{c.seats}}</span></div><div class="bar" style="margin-top:4px"><span style="width:{{c.fill}}"></span></div></div>
-                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%">
-                    <div><div class="kick" style="font-size:10px">Attend.</div><div class="num">{{c.att}}</div></div>
-                    <div><div class="kick" style="font-size:10px">Result</div><div class="num">{{c.res}}</div></div>
-                    <div><div class="kick" style="font-size:10px">Fees</div><div class="num">{{c.fee}}</div></div>
-                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><span style="font-weight:900;font-size:16px">{{c.name}}</span><span class="{{c.tagCls}}">{{c.tag}}</span></div>
+                  <div class="muted" style="font-size:12px">{{c.meta}}</div>
+                  <div class="bar" style="width:100%;height:8px"><span style="width:{{c.fill}};background:#0ea5e9"></span></div>
+                  <div style="display:flex;justify-content:space-between;width:100%;font-weight:800;font-size:12px"><span>Att. {{c.att}}</span><span>Result {{c.res}}</span><span>Fees {{c.fee}}</span></div>
                 </button>
               </sc-for>
             </div>
-
-            <aside class="card" style="flex:2 1 340px;min-width:0;border:1.5px solid #0f172a;display:flex;flex-direction:column;gap:14px">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-                <div><div class="kick">Class detail</div><h2 style="margin:4px 0 0;font-size:24px">{{sel.name}}</h2><div style="font-size:13px;color:#475569">{{sel.board}} · {{sel.seats}} seats</div></div>
-                <span class="{{sel.tagCls}}">{{sel.tag}}</span>
-              </div>
-              <div style="background:#0f172a;color:#fff;border-radius:8px;padding:14px;font-size:14px;line-height:22px"><span class="kick" style="color:#94a3b8">AI insight · </span>{{sel.ai}}</div>
-              <div>
-                <div class="kick" style="margin-bottom:4px">Sections</div>
-                <sc-for list="{{sel.secs}}" as="s" hint-placeholder-count="2">
-                  <div class="row"><span class="tag b">{{s.n}}</span><div style="flex:1;min-width:120px"><div style="font-weight:600;font-size:14px">{{s.t}}</div><div style="font-size:12px;color:#475569">{{s.info}}</div></div><button type="button" class="btn sm ghost">Open</button></div>
-                </sc-for>
-              </div>
-              <div>
-                <div class="kick" style="margin-bottom:4px">Subject teachers</div>
-                <sc-for list="{{sel.subs}}" as="s" hint-placeholder-count="4">
-                  <div class="row" style="padding:7px 0"><span style="flex:1;font-size:14px">{{s.s}}</span><span style="font-size:13px;font-weight:600">{{s.t}}</span><span class="kick">{{s.p}}/wk</span></div>
-                </sc-for>
+            <aside class="card c2" style="border-color:#7dd3fc;box-shadow:0 4px 0 #7dd3fc !important;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div class="lbl">{{sel.level}}</div><h2 class="h2" style="font-size:24px;margin-top:2px">{{sel.name}}</h2><div class="muted">{{sel.meta}}</div></div><span class="{{sel.tagCls}}">{{sel.tag}}</span></div>
+              <div class="card dark" style="padding:12px"><span class="lbl" style="color:#fcd34d">AI · </span><span style="font-weight:700">{{sel.ai}}</span></div>
+              <div><div class="lbl" style="margin-bottom:4px">Sections</div>
+                <sc-for list="{{sel.secs}}" as="x" hint-placeholder-count="2"><div class="row"><span class="tag b">{{x.n}}</span><div style="flex:1"><div style="font-weight:900;font-size:14px">{{x.t}}</div><div class="muted" style="font-size:12px">{{x.i}}</div></div></div></sc-for>
               </div>
               <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
-                <button type="button" class="btn sm ghost">Add section</button>
-                <button type="button" class="btn sm ghost">Move students</button>
-                <button type="button" class="btn sm ghost">Message parents</button>
-                <button type="button" class="btn sm ghost">Class report</button>
+                <button type="button" class="chunk w sm">Add section</button><button type="button" class="chunk w sm" onClick="{{goMove}}">Move students</button>
+                <button type="button" class="chunk w sm" onClick="{{goPromote}}">Promote class</button><button type="button" class="chunk w sm" onClick="{{goKpi}}">Performance</button>
               </div>
             </aside>
           </section>
         </div>
       </sc-if>
 
-      <sc-if value="{{showTT}}" hint-placeholder-val="{{ false }}">
-        <section class="card">
-          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h2 style="margin:0;font-size:18px">Weekly timetable</h2>
-              <select aria-label="Section" style="min-height:40px;border:1px solid #cbd5e1;border-radius:8px;padding:0 10px;font:14px Inter,sans-serif"><option>Class 9‑A</option><option>Class 9‑B</option><option>Class 10‑A</option></select>
-              <span class="tag r">1 clash</span><span class="tag y">2 free periods</span></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm ghost">Print</button><button type="button" class="btn sm">Generate with AI</button></div>
+      <sc-if value="{{s.promote}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <section class="card" style="display:flex;flex-wrap:wrap;gap:12px">
+            <div class="step done"><div class="lbl">1 · Results</div><div style="font-weight:800;font-size:13px">Annual exam published</div></div>
+            <div class="step now"><div class="lbl" style="color:#0369a1">2 · Decide</div><div style="font-weight:800;font-size:13px">Promote, conditional or detain</div></div>
+            <div class="step"><div class="lbl">3 · Place</div><div style="font-weight:800;font-size:13px">New class and section</div></div>
+            <div class="step"><div class="lbl">4 · Confirm</div><div style="font-weight:800;font-size:13px">Rolls, fees and parents told</div></div>
+          </section>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <span class="lbl">Promote from</span>
+            <sc-for list="{{pFrom}}" as="f" hint-placeholder-count="4"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
           </div>
-          <p style="margin:8px 0 0;font-size:13px;color:#475569">AI fills the week from subject hours and teacher availability, and never double-books a teacher. Drag a period to swap.</p>
-          <div style="overflow-x:auto;margin-top:12px">
-            <table>
-              <thead><tr class="kick"><th>Period</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead>
-              <tbody>
-                <tr><td class="num">1<br><span style="font-weight:400;color:#475569">8:00</span></td><td><div class="slot"><b>Physics</b><span>F. Akhtar</span></div></td><td><div class="slot"><b>Physics</b><span>F. Akhtar</span></div></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td><td><div class="slot"><b>Physics</b><span>F. Akhtar</span></div></td><td><div class="slot"><b>Islamiat</b><span>H. Qari</span></div></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td></tr>
-                <tr><td class="num">2<br><span style="font-weight:400;color:#475569">8:40</span></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td><td><div class="slot x"><b>Chemistry</b><span>U. Ghani · also in 10‑A</span></div></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td><td><div class="slot"><b>Maths</b><span>S. Malik</span></div></td><td><div class="slot"><b>Biology</b><span>A. Siddiqui</span></div></td></tr>
-                <tr><td class="num">3<br><span style="font-weight:400;color:#475569">9:20</span></td><td><div class="slot"><b>English</b><span>R. Noor</span></div></td><td><div class="slot"><b>Biology</b><span>A. Siddiqui</span></div></td><td><div class="slot"><b>English</b><span>R. Noor</span></div></td><td><div class="slot f"><b>Free</b><span>Assign</span></div></td><td><div class="slot"><b>English</b><span>R. Noor</span></div></td><td><div class="slot"><b>Urdu</b><span>N. Parveen</span></div></td></tr>
-                <tr><td class="num" colspan="7" style="text-align:center;background:#f8fafc;color:#475569">Break · 10:00 – 10:20</td></tr>
-                <tr><td class="num">4<br><span style="font-weight:400;color:#475569">10:20</span></td><td><div class="slot"><b>Chemistry</b><span>U. Ghani</span></div></td><td><div class="slot"><b>Urdu</b><span>N. Parveen</span></div></td><td><div class="slot"><b>Biology</b><span>A. Siddiqui</span></div></td><td><div class="slot"><b>Chemistry</b><span>U. Ghani</span></div></td><td><div class="slot f"><b>Free</b><span>Assign</span></div></td><td><div class="slot"><b>Comp. sci</b><span>B. Ahmed</span></div></td></tr>
-                <tr><td class="num">5<br><span style="font-weight:400;color:#475569">11:00</span></td><td><div class="slot"><b>Urdu</b><span>N. Parveen</span></div></td><td><div class="slot"><b>Comp. sci</b><span>B. Ahmed</span></div></td><td><div class="slot"><b>Pak studies</b><span>S. Kanwal</span></div></td><td><div class="slot"><b>English</b><span>R. Noor</span></div></td><td><div class="slot"><b>Chemistry</b><span>U. Ghani</span></div></td><td><div class="slot"><b>Physics</b><span>F. Akhtar</span></div></td></tr>
-              </tbody>
-            </table>
+          <section class="cols">
+            <div class="c3">
+              <div class="card">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+                  <h2 class="h2">{{pc.from}} → {{pc.to}}</h2>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="chunk w sm" onClick="{{allPromote}}">Promote whole class</button><button type="button" class="chunk w sm" onClick="{{bySuggest}}">Use AI suggestion</button></div>
+                </div>
+                <p class="muted" style="margin:6px 0 0">Suggestion uses your rules: pass mark 33% in every subject, attendance 75%+. One failed subject = conditional (supplementary exam).</p>
+                <sc-for list="{{kids}}" as="k" hint-placeholder-count="6">
+                  <div class="row"><div style="flex:1 1 200px"><div style="font-weight:900">{{k.n}}</div><div class="muted" style="font-size:12px">{{k.info}}</div></div>
+                    <sc-if value="{{k.stream}}" hint-placeholder-val="{{ false }}"><select class="inp" aria-label="Group in Class 11" style="min-height:36px"><option>{{k.grp}}</option><option>FSc Pre-Medical</option><option>FSc Pre-Engineering</option><option>ICS</option><option>FA</option><option>I.Com</option></select></sc-if>
+                    <div class="st" role="group" aria-label="Decision"><button type="button" class="{{k.cp}}" onClick="{{k.sp}}">Promote</button><button type="button" class="{{k.cc}}" onClick="{{k.sc}}">Conditional</button><button type="button" class="{{k.cd}}" onClick="{{k.sd}}">Detain</button><button type="button" class="{{k.cl}}" onClick="{{k.sl}}">Leaving</button></div>
+                  </div>
+                </sc-for>
+                <div class="muted" style="padding-top:10px">Showing 6 of {{pc.size}} students</div>
+              </div>
+            </div>
+            <div class="c2">
+              <div class="card" style="display:flex;flex-direction:column;gap:10px">
+                <h2 class="h2">Summary</h2>
+                <div class="row"><span style="flex:1;font-weight:800">Promote</span><span class="tag g">{{cnt.p}}</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Conditional</span><span class="tag y">{{cnt.c}}</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Detain (repeat class)</span><span class="tag r">{{cnt.d}}</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Leaving school</span><span class="tag">{{cnt.l}}</span></div>
+              </div>
+              <form class="card" style="display:flex;flex-direction:column;gap:12px">
+                <h2 class="h2">Place them</h2>
+                <label class="field">Move promoted students to<select><option>{{pc.to}} · same section letter</option><option>Balance sections by marks</option><option>Balance by boys and girls</option><option>One new section</option></select></label>
+                <label class="field">Roll numbers<select><option>Keep the same number</option><option>Renumber by merit</option><option>Renumber by name</option></select></label>
+                <label style="display:flex;gap:10px;align-items:center;font-weight:800;font-size:14px"><input type="checkbox" checked style="width:20px;height:20px"> Carry unpaid fees forward</label>
+                <label style="display:flex;gap:10px;align-items:center;font-weight:800;font-size:14px"><input type="checkbox" checked style="width:20px;height:20px"> Tell parents in the app and on WhatsApp</label>
+                <sc-if value="{{pc.board}}" hint-placeholder-val="{{ false }}"><label style="display:flex;gap:10px;align-items:center;font-weight:800;font-size:14px"><input type="checkbox" checked style="width:20px;height:20px"> Add to BISE Lahore registration list</label></sc-if>
+                <button type="button" class="chunk">Confirm {{cnt.p}} promotions</button>
+                <p class="muted" style="margin:0;font-size:12px">You can undo for 7 days. Results and marks stay on each student's record.</p>
+              </form>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{s.move}}" hint-placeholder-val="{{ false }}">
+        <section class="cols">
+          <form class="card c3" style="gap:14px">
+            <h2 class="h2">Move one student</h2>
+            <label class="field">Student<input value="Hamza Ali · Class 9‑C · Roll 2"></label>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <label class="field" style="flex:1 1 200px">Move to class<select><option>Class 9</option><option>Class 8 (repeat)</option><option>Class 10</option></select></label>
+              <label class="field" style="flex:1 1 140px">Section<select><option>9‑A (49/50)</option><option>9‑B (50/50, full)</option><option>9‑D (48/50)</option></select></label>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <label class="field" style="flex:1 1 200px">Reason<select><option>Parent request</option><option>Balancing sections</option><option>Change of group (e.g. Biology to Computer)</option><option>Mid-year promotion</option><option>Repeat the class</option><option>Discipline</option></select></label>
+              <label class="field" style="flex:1 1 160px">From date<input type="date" value="2026-11-18"></label>
+            </div>
+            <label class="field">Note for the record<input placeholder="Optional"></label>
+            <div class="card" style="background:#f0f9ff;border-color:#bae6fd;box-shadow:none !important;padding:12px"><div style="font-weight:800;font-size:14px">What moves with him</div><div class="muted">Attendance, marks and fee history stay with Hamza. Subject teachers and timetable switch to 9‑A. Class teachers of both sections and his parents get a message.</div></div>
+            <div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="chunk w">Cancel</button><button type="button" class="chunk">Move student</button></div>
+          </form>
+          <div class="c2">
+            <div class="card">
+              <h2 class="h2">Recent moves</h2>
+              <div class="row" style="margin-top:6px"><div style="flex:1"><div style="font-weight:900">Sana Javed</div><div class="muted" style="font-size:12px">9‑B → 9‑D · Biology to Computer · 12 Nov</div></div><button type="button" class="chunk w sm">Undo</button></div>
+              <div class="row"><div style="flex:1"><div style="font-weight:900">Ahmed Raza</div><div class="muted" style="font-size:12px">7‑A → 7‑B · parent request · 4 Nov</div></div><button type="button" class="chunk w sm">Undo</button></div>
+              <div class="row"><div style="flex:1"><div style="font-weight:900">Fatima Zahid</div><div class="muted" style="font-size:12px">Class 3 → Class 4 · mid-year promotion · 1 Oct</div></div><span class="tag">Locked</span></div>
+            </div>
+            <div class="card">
+              <h2 class="h2">Move a group</h2>
+              <p class="muted" style="margin:6px 0 10px">Pick several students and move them together, for example to open a new section.</p>
+              <button type="button" class="chunk w" style="width:100%">Choose students</button>
+            </div>
           </div>
         </section>
       </sc-if>
 
-      <sc-if value="{{showTm}}" hint-placeholder-val="{{ false }}">
-        <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
-          <div class="card" style="flex:3 1 480px;min-width:0">
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Bell schedule</h2><div style="display:flex;gap:8px"><button type="button" class="pill">Summer</button><button type="button" class="pill on">Winter · from 1 Nov</button><button type="button" class="pill">Ramadan</button></div></div>
-            <div class="row" style="margin-top:10px"><span class="num" style="width:120px">7:45 – 8:00</span><span style="flex:1">Assembly</span></div>
-            <div class="row"><span class="num" style="width:120px">8:00 – 8:40</span><span style="flex:1">Period 1</span><span class="kick">40 min</span></div>
-            <div class="row"><span class="num" style="width:120px">8:40 – 9:20</span><span style="flex:1">Period 2</span><span class="kick">40 min</span></div>
-            <div class="row"><span class="num" style="width:120px">9:20 – 10:00</span><span style="flex:1">Period 3</span><span class="kick">40 min</span></div>
-            <div class="row" style="background:#f8fafc"><span class="num" style="width:120px">10:00 – 10:20</span><span style="flex:1;font-weight:600">Break</span><span class="kick">20 min</span></div>
-            <div class="row"><span class="num" style="width:120px">10:20 – 11:00</span><span style="flex:1">Period 4</span><span class="kick">40 min</span></div>
-            <div class="row"><span class="num" style="width:120px">11:00 – 11:40</span><span style="flex:1">Period 5</span><span class="kick">40 min</span></div>
-            <div class="row"><span class="num" style="width:120px">11:40 – 1:30</span><span style="flex:1">Periods 6 – 8</span><span class="kick">3 × 35 min</span></div>
-            <div class="row"><span class="num" style="width:120px">1:30</span><span style="flex:1;font-weight:600">Home time</span><span class="kick">Fri 12:15</span></div>
+      <sc-if value="{{s.gaps}}" hint-placeholder-val="{{ false }}">
+        <section class="cols">
+          <div class="c3">
+            <div class="card">
+              <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Gaps and checks</h2><span class="muted">Ilmora checks every night</span></div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+                <sc-for list="{{gaps}}" as="g" hint-placeholder-count="8">
+                  <div class="gap"><span class="sev" style="background:{{g.c}}"></span><div style="flex:1 1 260px"><div style="font-weight:900">{{g.t}}</div><div class="muted" style="font-size:13px">{{g.d}}</div></div><span class="{{g.tc}}">{{g.sev}}</span><button type="button" class="chunk w sm">{{g.fix}}</button></div>
+                </sc-for>
+              </div>
+            </div>
           </div>
-          <form class="card" style="flex:2 1 300px;min-width:0;display:flex;flex-direction:column;gap:12px">
-            <h2 style="margin:0;font-size:18px">Change timings</h2>
-            <div style="display:flex;gap:10px"><label class="field" style="flex:1">School starts<input type="time" value="08:00"></label><label class="field" style="flex:1">Period length<input value="40 min"></label></div>
-            <div style="display:flex;gap:10px"><label class="field" style="flex:1">Break after<select><option>Period 3</option><option>Period 4</option></select></label><label class="field" style="flex:1">Break length<input value="20 min"></label></div>
-            <label style="display:flex;gap:10px;align-items:center;font-size:14px"><input type="checkbox" checked style="width:20px;height:20px"> Tell parents and staff in the app</label>
-            <button type="button" class="btn">Save and notify</button>
-          </form>
+          <div class="c2">
+            <div class="card dark"><div class="lbl" style="color:#fcd34d">Biggest win</div><p style="margin:8px 0 0;font-weight:700;line-height:22px">Opening Class 11 (FSc Pre-Medical and ICS) would keep about 60% of this year's Class 10 in the school. Last year 41 of 52 left after matric.</p></div>
+            <div class="card">
+              <h2 class="h2">Checks Ilmora runs</h2>
+              <div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">Section with no class teacher</span><span class="tag g">OK</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Subject with no teacher</span><span class="tag r">2</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Section over capacity</span><span class="tag r">4</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Teacher over 36 periods a week</span><span class="tag y">1</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Section without a timetable</span><span class="tag y">5</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Board form details missing</span><span class="tag y">17</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">No path after Class 10</span><span class="tag r">1</span></div>
+            </div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{s.kpi}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <section class="grid">
+            <div class="card"><div class="lbl">Pass rate</div><div class="big ok">87%</div><div class="muted">▲ 3 vs last term</div></div>
+            <div class="card"><div class="lbl">Attendance</div><div class="big">89.6%</div><div class="muted">goal 90%</div></div>
+            <div class="card"><div class="lbl">Fee collection</div><div class="big">88%</div><div class="muted">this term</div></div>
+            <div class="card"><div class="lbl">Homework done</div><div class="big">81%</div><div class="muted">on time</div></div>
+            <div class="card"><div class="lbl">Students kept</div><div class="big">96%</div><div class="muted">9 left this session</div></div>
+          </section>
+          <section class="card">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Class performance</h2>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ksorts}}" as="k" hint-placeholder-count="4"><button type="button" class="{{k.cls}}" onClick="{{k.pick}}" style="min-height:34px">{{k.label}}</button></sc-for></div></div>
+            <div class="tbl" style="margin-top:10px"><table style="min-width:900px">
+              <thead><tr><th>Class</th><th>Class teacher</th><th>Seats</th><th>Attendance</th><th>Avg result</th><th>Pass</th><th>Fees</th><th>Homework</th><th>Per teacher</th><th>Overall</th></tr></thead>
+              <tbody>
+                <sc-for list="{{krows}}" as="r" hint-placeholder-count="8">
+                  <tr><td>{{r.n}}</td><td>{{r.t}}</td><td>{{r.seat}}</td><td>{{r.att}}</td><td>{{r.res}}</td><td>{{r.pass}}</td><td>{{r.fee}}</td><td>{{r.hw}}</td><td>{{r.ratio}}</td><td><span class="{{r.sc}}">{{r.score}}</span></td></tr>
+                </sc-for>
+              </tbody>
+            </table></div>
+            <p class="muted" style="margin:10px 0 0">Overall score = attendance 25% + results 35% + fees 20% + homework 20%. Weights can be changed in Settings.</p>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{s.tt}}" hint-placeholder-val="{{ false }}">
+        <section class="cols">
+          <div class="card c3">
+            <h2 class="h2">Timetable and bell timings</h2>
+            <p class="muted" style="margin:6px 0 12px">Weekly timetable for every section, made with AI from subject hours and teacher free time, and summer, winter and Ramadan bell timings.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk">Open timetable</button><button type="button" class="chunk w">Generate with AI</button><button type="button" class="chunk w">Bell timings</button></div>
+          </div>
+          <div class="card c2"><h2 class="h2">Status</h2><div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">Sections with a timetable</span><span style="font-weight:900">14 of 19</span></div><div class="row"><span style="flex:1;font-weight:800">Clashes</span><span class="tag r">1</span></div><div class="row"><span style="flex:1;font-weight:800">Current timing</span><span style="font-weight:900">Winter · from 1 Nov</span></div></div>
         </section>
       </sc-if>
     </div>
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
 class Component extends DCLogic {
-  constructor(p){ super(p); this.state = { tab: 'cls', filter: 'all', sel: 'c9' }; }
+  constructor(p){ super(p); this.state = { tab:'overview', lv:'all', sel:'c9', pf:'c9', dec:{}, ks:'score' }; }
   renderVals() {
-    const { tab, filter, sel } = this.state;
+    const S0 = this.state; const set = (o) => this.setState(o);
+    const T = [['overview','Classes'],['promote','Promotion'],['move','Move a student'],['gaps','Gaps and checks'],['kpi','Performance'],['tt','Timetable']];
+    const tabs = T.map(([k,l]) => ({ label:l, cls: S0.tab===k ? 'tabbtn on':'tabbtn', pick:()=>set({ tab:k }) }));
+    const g = (tag) => ({ Good:'tag g', Full:'tag r', 'Not started':'tag', 'Low marks':'tag y', 'Board year':'tag b', New:'tag v' })[tag] || 'tag';
     const C = [
-      { id:'pg', g:'pri', name:'Play group', sections:'1 section', board:'Montessori', seats:'0 / 40', fill:'0%', att:'—', res:'—', fee:'—', tag:'No teacher', tagCls:'tag y',
-        ai:'Play group has no students and no class teacher. Start admissions before January intake.', secs:[{n:'Green',t:'No class teacher',info:'0 students'}], subs:[{s:'Activity',t:'—',p:0}] },
-      { id:'c1', g:'pri', name:'Class 1', sections:'1 section', board:'Punjab', seats:'0 / 40', fill:'0%', att:'—', res:'—', fee:'—', tag:'No teacher', tagCls:'tag y',
-        ai:'Empty section. Nazia Parveen has 6 free periods a week and could take it.', secs:[{n:'A',t:'No class teacher',info:'0 students'}], subs:[{s:'English',t:'—',p:6}] },
-      { id:'c5', g:'pri', name:'Class 5', sections:'2 sections', board:'Punjab', seats:'50 / 80', fill:'62%', att:'93%', res:'76%', fee:'88%', tag:'Good', tagCls:'tag g',
-        ai:'Strong class. 5‑B is 6 points behind 5‑A in Maths.', secs:[{n:'A',t:'Nazia Parveen',info:'25 students · 94% attendance'},{n:'B',t:'Shazia Kanwal',info:'25 students · 92% attendance'}], subs:[{s:'Maths',t:'Nazia Parveen',p:6},{s:'English',t:'Shazia Kanwal',p:6},{s:'Science',t:'Rabia Noor',p:4}] },
-      { id:'c7', g:'mid', name:'Class 7', sections:'2 sections', board:'Punjab', seats:'50 / 80', fill:'62%', att:'90%', res:'72%', fee:'81%', tag:'Good', tagCls:'tag g',
-        ai:'Areeba Noor (7‑B) has 3 absences in 3 weeks.', secs:[{n:'A',t:'Nazia Parveen',info:'25 students'},{n:'B',t:'Shazia Kanwal',info:'25 students'}], subs:[{s:'Maths',t:'Sadia Malik',p:6},{s:'English',t:'Rabia Noor',p:5}] },
-      { id:'c8', g:'mid', name:'Class 8', sections:'2 sections', board:'Punjab', seats:'15 / 80', fill:'19%', att:'88%', res:'64%', fee:'70%', tag:'Low marks', tagCls:'tag y',
-        ai:'Only 15 students in two sections. Merge 8‑A and 8‑B to free one teacher.', secs:[{n:'A',t:'Rabia Noor',info:'7 students'},{n:'B',t:'Ayesha Siddiqui',info:'8 students'}], subs:[{s:'Maths',t:'Sadia Malik',p:6},{s:'Science',t:'Ayesha Siddiqui',p:5}] },
-      { id:'c9', g:'mat', name:'Class 9', sections:'4 sections', board:'BISE Lahore', seats:'200 / 200', fill:'100%', att:'86%', res:'68%', fee:'74%', tag:'Full', tagCls:'tag r',
-        ai:'All 4 sections are full with 14 on the waiting list. 9‑C attendance fell to 84% this week, mostly Mondays. Consider opening 9‑E.', secs:[{n:'A',t:'Ayesha Siddiqui',info:'50 students · 89%'},{n:'B',t:'Sadia Malik',info:'50 students · 87%'},{n:'C',t:'Farhan Akhtar',info:'50 students · 84%'},{n:'D',t:'Mehwish Iqbal',info:'50 students · 88%'}], subs:[{s:'Physics',t:'Farhan Akhtar',p:6},{s:'Chemistry',t:'Usman Ghani',p:6},{s:'Biology',t:'Ayesha Siddiqui',p:6},{s:'Maths',t:'Sadia Malik',p:7}] },
-      { id:'c10', g:'mat', name:'Class 10', sections:'2 sections', board:'BISE Lahore', seats:'15 / 80', fill:'19%', att:'91%', res:'74%', fee:'93%', tag:'Board reg.', tagCls:'tag b',
-        ai:'Board registration closes 30 Nov. 3 students still missing B‑form copies.', secs:[{n:'A',t:'Usman Ghani',info:'8 students'},{n:'B',t:'Bilal Ahmed',info:'7 students'}], subs:[{s:'Chemistry',t:'Usman Ghani',p:6},{s:'Comp. sci',t:'Bilal Ahmed',p:5}] }
+      ['pg','pre','Pre-school','Play group','1 section · 25/40','62%','94%','—','91%','Good','Sumaira Javed','Play group is full of new families this year; 6 siblings of older students.',[['Green','Sumaira Javed','25 students']]],
+      ['c1','pri','Primary','Class 1 – 5','6 sections · 150/240','62%','94%','76%','88%','Good','—','Primary is steady. Class 4‑A teacher marks attendance late most days.',[['1‑A','Bushra Anwar','25'],['2‑A','Asma Rafiq','25'],['3‑A','Nadia Hameed','25'],['4‑A','Saba Kausar','25'],['5‑A/B','Nazia, Shazia','50']]],
+      ['c6','mid','Middle','Class 6 – 8','6 sections · 150/240','62%','90%','67%','79%','Low marks','—','Class 8 Maths average is 54%. Two sections of 25 each could be merged next year.',[['6‑A/B','Nazia, Shazia','50'],['7‑A/B','Nazia, Shazia','50'],['8‑A/B','Rabia, Ayesha','50']]],
+      ['c9','mat','Matric','Class 9','4 sections · 200/200','100%','86%','68%','74%','Full','Ayesha Siddiqui','All 4 sections are full with 14 waiting. 9‑C attendance fell to 84%. Open 9‑E next session.',[['A','Ayesha Siddiqui','50 · 89%'],['B','Sadia Malik','50 · 87%'],['C','Farhan Akhtar','50 · 84%'],['D','Mehwish Iqbal','50 · 88%']]],
+      ['c10','mat','Matric','Class 10','2 sections · 50/80','62%','91%','74%','93%','Board year','Usman Ghani','BISE registration closes 30 Nov. 3 students missing B-form copies.',[['A','Usman Ghani','25'],['B','Bilal Ahmed','25']]],
+      ['fsm','int','Intermediate','Class 11 · FSc Pre-Medical','Not started · BISE Lahore','0%','—','—','—','Not started','—','Most popular choice among your Class 10 girls. Needs a Biology and Chemistry lab teacher.',[['—','Add sections','0']]],
+      ['fse','int','Intermediate','Class 11 · FSc Pre-Engineering','Not started · BISE Lahore','0%','—','—','—','Not started','—','Needs a Physics and Maths teacher for 11 and 12.',[['—','Add sections','0']]],
+      ['ics','int','Intermediate','Class 11 · ICS','Not started · BISE Lahore','0%','—','—','—','Not started','—','Your Computer lab can take one ICS section of 35.',[['—','Add sections','0']]],
+      ['fa','int','Intermediate','Class 11 · FA / I.Com','Not started','0%','—','—','—','Not started','—','Low cost to start: uses existing English, Urdu and Islamiat teachers.',[['—','Add sections','0']]],
+      ['bs','grad','Graduate','BS Computer Science / ADP','Not started · affiliation needed','0%','—','—','—','New','—','Needs university affiliation (e.g. Punjab University) and semester-based fees. Plan after Class 12 is running.',[['—','Add program','0']]]
     ];
-    const F = [['all','All'],['pri','Primary'],['mid','Middle'],['mat','Matric'],['att','Needs attention']];
-    const filters = F.map(([k,l]) => ({ label:l, cls: filter===k ? 'pill on':'pill', pick: () => this.setState({ filter:k }) }));
-    const keep = (c) => filter==='all' || c.g===filter || (filter==='att' && c.tagCls!=='tag g');
-    const shown = C.filter(keep).map(c => ({ ...c, cls: c.id===sel ? 'cc on':'cc', pick: () => this.setState({ sel:c.id }) }));
-    const t = (k) => tab===k ? 'tabbtn on':'tabbtn';
+    const L = [['all','All'],['pre','Pre-school'],['pri','Primary'],['mid','Middle'],['mat','Matric'],['int','Intermediate (11–12)'],['grad','BS / ADP']];
+    const toObj = (c) => ({ id:c[0], lv:c[1], level:c[2], name:c[3], meta:c[4], fill:c[5], att:c[6], res:c[7], fee:c[8], tag:c[9], tagCls:g(c[9]), ai:c[11], secs:c[12].map(([n,t,i]) => ({ n, t, i })) });
+    const shown = C.filter(c => S0.lv==='all' || c[1]===S0.lv).map(c => { const o = toObj(c); return { ...o, cls: 'cc' + (c[9]==='Not started'||c[9]==='New' ? ' empty':'') + (c[0]===S0.sel ? ' on':''), pick:()=>set({ sel:c[0] }) }; });
+    const sel = toObj(C.find(c => c[0]===S0.sel));
+
+    const PF = { c5:['Class 5‑A','Class 6‑A',25,false,false], c8:['Class 8‑A','Class 9 (choose group)',25,false,false], c9:['Class 9‑C','Class 10‑C',50,true,false], c10:['Class 10‑A','Class 11 (choose group)',25,true,true] };
+    const pfk = S0.pf; const pc = { from:PF[pfk][0], to:PF[pfk][1], size:PF[pfk][2], board:PF[pfk][3] };
+    const K = [
+      ['a','Zainab Tariq','91% · attendance 98%','p','FSc Pre-Medical'],
+      ['b','Ahmed Raza','64% · attendance 93%','p','FSc Pre-Engineering'],
+      ['c','Hamza Ali','38% · failed Physics and Maths · attendance 71%','d','FA'],
+      ['d','Usama Iqbal','46% · failed English · attendance 76%','c','ICS'],
+      ['e','Maryam Khan','79% · attendance 95%','p','FSc Pre-Medical'],
+      ['f','Bilal Hassan','Family moving to Karachi','l','ICS']
+    ];
+    const dec = S0.dec;
+    const cur = (k, sug) => dec[k] || sug;
+    const mk = (k, v) => () => set({ dec:{ ...dec, [k]: v } });
+    const kids = K.map(([k,n,info,sug,grp]) => { const v = cur(k, sug); return { n, info, grp, stream: PF[pfk][4],
+      cp: v==='p'?'p':'', cc: v==='c'?'c':'', cd: v==='d'?'d':'', cl: v==='l'?'l':'',
+      sp: mk(k,'p'), sc: mk(k,'c'), sd: mk(k,'d'), sl: mk(k,'l') }; });
+    const vals = K.map(([k,,,sug]) => cur(k, sug));
+    const extra = pc.size - K.length;
+    const cnt = { p: vals.filter(v=>v==='p').length + extra, c: vals.filter(v=>v==='c').length, d: vals.filter(v=>v==='d').length, l: vals.filter(v=>v==='l').length };
+    const pFrom = [['c5','Class 5‑A'],['c8','Class 8‑A'],['c9','Class 9‑C'],['c10','Class 10‑A']].map(([k,l]) => ({ label:l, cls: pfk===k ? 'chip on':'chip', pick:()=>set({ pf:k, dec:{} }) }));
+
+    const G = [
+      ['No Class 11 after matric','Class 10 students have nowhere to go next year. Add FSc, ICS or FA.','High','#ef4444','tag r','Add Class 11'],
+      ['Class 9 sections over capacity','9‑A to 9‑D are full (200/200) and 14 children are waiting.','High','#ef4444','tag r','Open 9‑E'],
+      ['Computer Science in 9‑D has no teacher','Mehwish Iqbal left the subject on 1 Nov.','High','#ef4444','tag r','Assign teacher'],
+      ['Nazia Parveen teaches 38 periods a week','Above your limit of 36. She is class teacher of 3 sections.','Medium','#f59e0b','tag y','Rebalance'],
+      ['5 sections have no timetable','Play group, Class 1 to 4.','Medium','#f59e0b','tag y','Generate'],
+      ['17 Class 9 board forms incomplete','Missing B-form, photo or father CNIC. Closes 30 Nov.','Medium','#f59e0b','tag y','Open list'],
+      ['Class 8 has two small sections','25 + 25 students. Merging frees one teacher.','Low','#0ea5e9','tag b','Review'],
+      ['Seats and rooms do not match','Room 12 seats 35 but 9‑C has 50 students.','Low','#0ea5e9','tag b','Check rooms']
+    ];
+    const gaps = G.map(([t,d,sev,c,tc,fix]) => ({ t, d, sev, c, tc, fix }));
+
+    const KR = [
+      ['Class 1‑A','Bushra Anwar','25/40','96%','—','—','94%','90%','25',91],
+      ['Class 4‑A','Saba Kausar','25/40','92%','74%','92%','88%','84%','25',84],
+      ['Class 5‑A','Nazia Parveen','25/40','94%','76%','96%','90%','86%','25',86],
+      ['Class 7‑B','Shazia Kanwal','25/40','89%','69%','88%','80%','78%','25',77],
+      ['Class 8‑A','Rabia Noor','25/40','88%','64%','84%','70%','72%','25',71],
+      ['Class 9‑A','Ayesha Siddiqui','50/50','91%','74%','96%','82%','88%','50',84],
+      ['Class 9‑C','Farhan Akhtar','50/50','84%','58%','76%','68%','70%','50',66],
+      ['Class 10‑A','Usman Ghani','25/40','91%','74%','92%','93%','85%','25',85]
+    ];
+    const ks = S0.ks;
+    const keyIdx = { score:9, att:3, res:4, fee:6 }[ks];
+    const num = (x) => typeof x === 'number' ? x : (parseFloat(x) || 0);
+    const krows = KR.slice().sort((a,b) => num(b[keyIdx]) - num(a[keyIdx])).map(r => ({ n:r[0], t:r[1], seat:r[2], att:r[3], res:r[4], pass:r[5], fee:r[6], hw:r[7], ratio:r[8], score:r[9], sc: r[9]>=85 ? 'tag g' : r[9]>=75 ? 'tag y' : 'tag r' }));
+    const KS = [['score','Overall'],['att','Attendance'],['res','Results'],['fee','Fees']];
     return {
-      tCls:t('cls'), tTT:t('tt'), tTm:t('tm'),
-      goCls:()=>this.setState({tab:'cls'}), goTT:()=>this.setState({tab:'tt'}), goTm:()=>this.setState({tab:'tm'}),
-      showCls:tab==='cls', showTT:tab==='tt', showTm:tab==='tm',
-      filters, shown, sel: C.find(c => c.id===sel)
+      tabs, s:{ overview:S0.tab==='overview', promote:S0.tab==='promote', move:S0.tab==='move', gaps:S0.tab==='gaps', kpi:S0.tab==='kpi', tt:S0.tab==='tt' },
+      goPromote:()=>set({ tab:'promote' }), goMove:()=>set({ tab:'move' }), goKpi:()=>set({ tab:'kpi' }),
+      levels: L.map(([k,l]) => ({ label:l, cls: S0.lv===k ? 'chip on':'chip', pick:()=>set({ lv:k }) })),
+      shown, sel,
+      pFrom, pc, kids, cnt,
+      allPromote:()=>set({ dec:Object.fromEntries(K.map(([k])=>[k,'p'])) }), bySuggest:()=>set({ dec:{} }),
+      gaps,
+      ksorts: KS.map(([k,l]) => ({ label:l, cls: ks===k ? 'chip on':'chip', pick:()=>set({ ks:k }) })), krows
     };
   }
 }
