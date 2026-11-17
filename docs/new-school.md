@@ -49,3 +49,12 @@ In Cloudflare set the record to **DNS only** (grey cloud) until Vercel shows
 - `src/app/layout.tsx` sets the tab title, icon and the `--brand` colour.
 - `src/app/login/actions.ts` and `src/lib/me.ts` refuse a login from another school on a school's domain.
 - On a domain that isn't any school's (the `vercel.app` address), the plain Ilmora look and the demo logins show.
+
+## Easier: the super admin dashboard
+
+Sign in as the platform admin and open `/super` (for example `ilmoramodel.vercel.app/super`).
+**Add school** does step 1 above in one form (school, campus, school year, timings,
+Class 1–10, subjects, grading, fee heads and the principal's login), with an optional
+free trial. Each school's page lets you change branding and domain, extend a trial,
+activate or suspend, set a new password for the principal, and shows the DNS record to add.
+Add more platform admins in SQL: `insert into public.super_admins (user_id) select id from auth.users where email = '…';`

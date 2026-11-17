@@ -11,6 +11,9 @@ export async function signIn(formData: FormData) {
     password: String(formData.get("password") ?? ""),
   });
   if (error) redirect("/login?error=" + encodeURIComponent(error.message));
+  // the platform admin goes to the schools dashboard
+  const { data: superAdmin } = await supabase.rpc("am_i_super");
+  if (superAdmin === true) redirect("/super");
   const brand = await getBranding();
   if (brand) {
     const { data: p } = await supabase.from("profiles").select("campuses(school_id)").eq("user_id", auth.user!.id).eq("is_active", true).limit(1).maybeSingle();
