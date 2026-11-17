@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model School — Classes v2</title>
+<title>Model School — Classes v3</title>
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ilmora.css">
 </head>
@@ -65,6 +65,48 @@ body{margin:0;background:#f7f9fc}
         </label>
       </header>
 
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid #e5e7eb">
+        <sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button type="button" role="tab" class="{{m.cls}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for>
+      </div>
+
+      <sc-if value="{{isBell}}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+          <div class="card" style="flex:3 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Bell timings</h2><span class="tag g">In use: {{bell.inUse}}</span></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Schedule"><sc-for list="{{bellTabs}}" as="b" hint-placeholder-count="5"><button type="button" class="{{b.cls}}" onClick="{{b.pick}}">{{b.label}}</button></sc-for></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <label class="field" style="flex:1 1 120px">School starts<input type="time" value="{{bell.start}}"></label>
+              <label class="field" style="flex:1 1 120px">Period length<select><option>{{bell.len}}</option><option>35 min</option><option>40 min</option><option>45 min</option></select></label>
+              <label class="field" style="flex:1 1 120px">Periods a day<select><option>{{bell.count}}</option><option>6</option><option>7</option><option>8</option></select></label>
+              <label class="field" style="flex:1 1 140px">Break after<select><option>Period 4</option><option>Period 3</option><option>Period 5</option></select></label>
+              <label class="field" style="flex:1 1 120px">Break<select><option>{{bell.brk}}</option><option>20 min</option><option>30 min</option></select></label>
+            </div>
+            <div>
+              <sc-for list="{{bell.rows}}" as="r" hint-placeholder-count="10">
+                <div class="row"><span style="width:120px;font-weight:900">{{r.t}}</span><span style="flex:1;font-weight:800;color:{{r.c}}">{{r.n}}</span><span class="muted" style="font-size:12px">{{r.d}}</span></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center">
+              <label class="field" style="flex-direction:row;align-items:center;gap:6px">Use from<input type="date" value="{{bell.from}}"></label>
+              <button type="button" class="chunk w">Preview for parents</button><button type="button" class="chunk">Save and tell everyone</button>
+            </div>
+          </div>
+          <div style="flex:2 1 300px;min-width:0;display:flex;flex-direction:column;gap:16px">
+            <div class="card"><h2 class="h2">Switch automatically</h2>
+              <div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">Summer</span><span class="muted">1 Apr – 31 Oct</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Winter</span><span class="muted">1 Nov – 31 Mar</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Ramadan</span><span class="muted">dates from calendar</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Friday</span><span class="muted">every Friday, ends 12:15</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Exam days</span><span class="muted">from the Exams date sheet</span></div>
+            </div>
+            <div class="card dark"><div class="lbl" style="color:#fcd34d">Good to know</div><p style="margin:8px 0 0;font-weight:700;line-height:22px">Changing timings keeps every section's timetable; only the clock times move. Parents and teachers see the new times in the app from the date you choose.</p></div>
+            <div class="card warm"><div style="font-weight:900">Date sheets are in Exams</div><p class="muted" style="margin:4px 0 10px">Exam days use the "Exam days" bell schedule automatically.</p><a class="chunk w sm" href="Exams.dc.html">Open Exams</a></div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{isSec}}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px">
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
         <sc-for list="{{top}}" as="k" hint-placeholder-count="7">
           <div class="kp2"><span class="lbl" style="font-size:11px">{{k.l}}</span><span style="font-weight:900;font-size:24px;color:{{k.c}}">{{k.v}}</span><span class="muted" style="font-size:12px">{{k.n}}</span></div>
@@ -157,6 +199,36 @@ body{margin:0;background:#f7f9fc}
               </div>
             </sc-if>
 
+            <sc-if value="{{v.tt}}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+                  <span class="tag {{ttTagC}}">{{ttTag}}</span><span class="muted">Winter timings · 8 periods</span>
+                  <span style="flex:1"></span>
+                  <button type="button" class="chunk w sm" onClick="{{fixClash}}">Fix clash</button><button type="button" class="chunk w sm">Generate with AI</button><button type="button" class="chunk sm">Publish to teachers and parents</button>
+                </div>
+                <div class="tbl"><div style="display:grid;grid-template-columns:70px repeat(6,minmax(96px,1fr));gap:6px;min-width:700px">
+                  <span></span><span class="lbl" style="text-align:center">Mon</span><span class="lbl" style="text-align:center">Tue</span><span class="lbl" style="text-align:center">Wed</span><span class="lbl" style="text-align:center">Thu</span><span class="lbl" style="text-align:center">Fri</span><span class="lbl" style="text-align:center">Sat</span>
+                  <sc-for list="{{grid}}" as="g" hint-placeholder-count="6">
+                    <div style="display:contents"><span style="font-weight:900;font-size:12px;align-self:center">{{g.p}}<br><span class="muted">{{g.t}}</span></span><sc-for list="{{g.cells}}" as="c" hint-placeholder-count="6"><div style="border-radius:10px;padding:6px 8px;background:{{c.bg}};outline:{{c.ol}};min-height:40px"><div style="font-weight:900;font-size:13px">{{c.s}}</div><div class="muted" style="font-size:11px">{{c.t}}</div></div></sc-for></div>
+                  </sc-for>
+                </div></div>
+                <div style="display:flex;flex-wrap:wrap;gap:16px">
+                  <div style="flex:1 1 260px"><div class="lbl" style="margin-bottom:6px">Periods a week vs required</div><sc-for list="{{need}}" as="n" hint-placeholder-count="5"><div class="hbar"><span style="width:110px">{{n.s}}</span><div class="t"><i style="width:{{n.w}};background:{{n.c}}"></i></div><span style="width:50px;text-align:right">{{n.v}}</span></div></sc-for></div>
+                  <div class="card" style="flex:1 1 220px;padding:12px;box-shadow:none !important"><div style="font-weight:900;font-size:14px">How it works</div><p class="muted" style="margin:4px 0 0;font-size:13px">Set how many periods each subject needs in Subjects &amp; teachers. AI fills the week, never books a teacher twice, and keeps hard subjects early. Drag to swap; red means a clash.</p></div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{v.syl}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <p class="muted" style="margin:0 0 8px">From teachers' lesson diary · where each subject should be by today</p>
+                <sc-for list="{{syl}}" as="s" hint-placeholder-count="6">
+                  <div class="hbar"><span style="width:130px">{{s.s}}</span><div class="t" style="position:relative"><i style="width:{{s.w}};background:{{s.c}}"></i><b style="position:absolute;top:-4px;left:{{s.plan}};width:3px;height:20px;background:#1f2937;border-radius:2px"></b></div><span style="width:80px;text-align:right">{{s.v}}</span><span class="{{s.tc}}" style="width:90px;text-align:center">{{s.tag}}</span></div>
+                </sc-for>
+                <p class="muted" style="margin:8px 0 0;font-size:12px">Black mark = where the plan says the class should be today.</p>
+              </div>
+            </sc-if>
+
             <sc-if value="{{v.money}}" hint-placeholder-val="{{ false }}">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
                 <div class="kp2"><span class="lbl" style="font-size:11px">Billed this term</span><span style="font-weight:900;font-size:22px">{{x.billed}}</span></div>
@@ -168,6 +240,8 @@ body{margin:0;background:#f7f9fc}
           </div>
         </div>
       </section>
+      </div>
+      </sc-if>
     </div>
   </main>
 </div>
@@ -246,7 +320,45 @@ class Component extends DCLogic {
     const KD = [[1,'Ahmed Raza','93%','64%','Paid','—','tag'],[2,'Hamza Ali','71%','38%','Rs 9,500','At risk','tag r'],[3,'Fatima Zahid','98%','88%','Paid','Top','tag g'],[4,'Iqra Shah','92%','72%','Rs 4,750','Fee due','tag y'],[5,'Usama Iqbal','76%','46%','Paid','At risk','tag r'],[6,'Maryam Khan','95%','79%','Paid','Rising','tag b']];
     const keep = (q) => S0.sf==='all' || (S0.sf==='risk' && q[5]==='At risk') || (S0.sf==='fee' && q[4]!=='Paid') || (S0.sf==='top' && (q[5]==='Top'||q[5]==='Rising'));
     const kids = KD.filter(keep).map(q => ({ r:q[0], n:q[1], a:q[2], m:q[3], f:q[4], t:q[5], tc:q[6] }));
-    const SB = [['over','Overview'],['students','Students'],['teach','Subjects & teachers'],['results','Results'],['money','Fees']];
+    const SB = [['over','Overview'],['students','Students'],['teach','Subjects & teachers'],['tt','Timetable'],['syl','Syllabus'],['results','Results'],['money','Fees']];
+    // Bell schedules
+    const BS = {
+      winter:{ start:'08:00', len:'40 min', count:'8', brk:'20 min', from:'2026-11-01', ends:'1:40 pm' },
+      summer:{ start:'07:30', len:'40 min', count:'8', brk:'20 min', from:'2027-04-01', ends:'1:10 pm' },
+      ramadan:{ start:'08:30', len:'30 min', count:'7', brk:'none', from:'2027-02-18', ends:'12:00 pm' },
+      friday:{ start:'08:00', len:'35 min', count:'6', brk:'15 min', from:'every Friday', ends:'12:15 pm' },
+      exam:{ start:'08:30', len:'—', count:'2 papers', brk:'30 min', from:'from date sheet', ends:'12:30 pm' }
+    };
+    const bk = S0.bell || 'winter'; const b = BS[bk];
+    const toMin = (s) => { const [h,m] = s.split(':').map(Number); return h*60+m; };
+    const fmt = (m) => { let h = Math.floor(m/60), mm = m%60; const ap = h>=12 ? 'pm':'am'; if (h>12) h-=12; return h + ':' + String(mm).padStart(2,'0') + ' ' + ap; };
+    let rows = [];
+    if (bk === 'exam') {
+      rows = [{ t:'8:15 am', n:'Students seated', d:'15 min', c:'#1f2937' },{ t:'8:30 am', n:'Paper 1', d:'1 hr 30 min', c:'#7c3aed' },{ t:'10:00 am', n:'Break', d:'30 min', c:'#c2410c' },{ t:'10:30 am', n:'Paper 2', d:'1 hr 30 min', c:'#7c3aed' },{ t:'12:30 pm', n:'Home time', d:'', c:'#15803d' }];
+    } else {
+      let m = toMin(b.start); const len = parseInt(b.len); const n = parseInt(b.count);
+      rows.push({ t: fmt(m-15), n:'Assembly', d:'15 min', c:'#1f2937' });
+      for (let i = 1; i <= n; i++) {
+        rows.push({ t: fmt(m), n:'Period ' + i, d: len + ' min', c:'#1f2937' }); m += len;
+        if (i === 4 && b.brk !== 'none') { const bl = parseInt(b.brk); rows.push({ t: fmt(m), n:'Break', d: bl + ' min', c:'#c2410c' }); m += bl; }
+      }
+      rows.push({ t: fmt(m), n:'Home time', d:'', c:'#15803d' });
+    }
+    const BT = [['winter','Winter'],['summer','Summer'],['ramadan','Ramadan'],['friday','Friday'],['exam','Exam days']];
+    // Section timetable
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat'];
+    const subs = SUB.filter(q => q[1].indexOf('none') < 0);
+    const times = ['8:00','8:40','9:20','10:00','10:40','11:20'];
+    const clash = r[0]==='9C' && !S0.fixed;
+    const grid = times.map((t, pi) => ({ p:'P' + (pi+1 > 4 ? pi+1 : pi+1), t, cells: days.map((d, di) => {
+      const q = subs[(pi*2 + di*3) % subs.length]; const isClash = clash && pi===1 && di===2;
+      return { s: q[0].replace('General Knowledge','G.K.').replace('Computer Science','Computer'), t: isClash ? q[1] + ' · also in 10‑A' : q[1], bg: isClash ? '#fee2e2' : ['#e0f2fe','#dcfce7','#ede9fe','#ffedd5','#fce7f3','#fef9c3'][(pi*2+di*3) % 6], ol: isClash ? '2px solid #ef4444' : 'none' };
+    }) }));
+    const need = SUB.slice(0,5).map(q => { const got = q[1].indexOf('none')>=0 ? 0 : q[2] - (q[0]==='Mathematics' ? 1 : 0); return { s:q[0], v: got + '/' + q[2], w: Math.round(got/q[2]*100) + '%', c: got>=q[2] ? '#16a34a' : got===0 ? '#ef4444' : '#f59e0b' }; });
+    const SY = r[2]==='Matric'
+      ? [['Physics',38,55],['Chemistry',52,55],['Biology',60,55],['Mathematics',41,55],['English',57,55],['Computer Science',0,55]]
+      : [['English',58,55],['Urdu',55,55],['Mathematics',47,55],['Islamiat',62,55],['General Knowledge',50,55]];
+    const syl = SY.map(([s,v,plan]) => { const gap = v - plan; return { s, w: v+'%', plan: plan+'%', v: v + '% done', c: gap >= 0 ? '#16a34a' : gap >= -8 ? '#f59e0b' : '#ef4444', tag: gap >= 0 ? 'On track' : gap >= -8 ? 'Slightly behind' : 'Behind', tc: gap >= 0 ? 'tag g' : gap >= -8 ? 'tag y' : 'tag r' }; });
     const SF = [['all','All 50'],['risk','At risk'],['fee','Fee due'],['top','Top']];
     const totS = R.reduce((a,q)=>a+q[4],0);
     return {
@@ -261,7 +373,12 @@ class Component extends DCLogic {
       ],
       map, tree, x, kids,
       subs: SB.map(([k2,l]) => ({ label:l, cls: S0.sub===k2 ? 'subtab on':'subtab', pick:()=>set({ sub:k2 }) })),
-      v: { over:S0.sub==='over', students:S0.sub==='students', teach:S0.sub==='teach', results:S0.sub==='results', money:S0.sub==='money' },
+      v: { over:S0.sub==='over', students:S0.sub==='students', teach:S0.sub==='teach', results:S0.sub==='results', money:S0.sub==='money', tt:S0.sub==='tt', syl:S0.sub==='syl' },
+      modes: [['sec','Sections'],['bell','Bell timings']].map(([k2,l]) => ({ label:l, cls: (S0.mode||'sec')===k2 ? 'tabbtn on':'tabbtn', pick:()=>set({ mode:k2 }) })),
+      isSec: (S0.mode||'sec')==='sec', isBell: S0.mode==='bell',
+      bellTabs: BT.map(([k2,l]) => ({ label:l, cls: bk===k2 ? 'chip on':'chip', pick:()=>set({ bell:k2 }) })),
+      bell: { ...b, rows, inUse:'Winter since 1 Nov' },
+      grid, need, syl, ttTag: clash ? '1 clash' : 'No clashes', ttTagC: clash ? 'r' : 'g', fixClash:()=>set({ fixed:true }),
       sf: SF.map(([k2,l]) => ({ label:l, cls: S0.sf===k2 ? 'chip on':'chip', pick:()=>set({ sf:k2 }) })),
       goStudents:()=>set({ sub:'students' }), goTeach:()=>set({ sub:'teach' })
     };
