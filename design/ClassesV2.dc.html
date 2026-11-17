@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School — Classes v2</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.tree{display:flex;flex-direction:column;gap:2px}
+.lvl{font-weight:900;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;padding:12px 8px 4px}
+.sec{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:4px 10px;border:2px solid transparent;border-radius:12px;background:none;font-weight:800;font-size:14px;color:#374151;cursor:pointer;text-align:left}
+.sec:hover{background:#f1f5f9}
+.sec.on{background:#e0f2fe;border-color:#7dd3fc;color:#0369a1}
+.hd{width:10px;height:10px;border-radius:99px;flex:none}
+.hm{display:grid;gap:4px;min-width:760px;align-items:center}
+.hc{height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;border:0;cursor:pointer}
+.hrow{display:contents}
+.kp2{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.spark{display:flex;align-items:flex-end;gap:3px;height:28px}
+.spark i{flex:1;border-radius:3px 3px 0 0;display:block}
+.act{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:80px;padding:8px;border:2px solid #e5e7eb;border-radius:16px;background:#fff;font-weight:800;font-size:12px;color:#1f2937;cursor:pointer;box-shadow:0 3px 0 #e5e7eb;text-align:center}
+.act:hover{border-color:#7dd3fc}
+.subtab{min-height:38px;padding:0 14px;border:0;border-radius:10px;background:none;font-weight:800;font-size:14px;color:#6b7280;cursor:pointer}
+.subtab.on{background:#1f2937;color:#fff}
+.hbar{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;padding:5px 0}
+.hbar .t{flex:1;height:12px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.hbar .t i{display:block;height:100%;border-radius:99px}
+</style>
+</helmet>
+<div class="shell">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
+    <div class="grp">Daily</div>
+    <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">3</span></a>
+    <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
+    <div class="grp">Academics</div>
+    <a class="it on" href="ClassesV2.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
+    <a class="it" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
+    <div class="grp">People</div>
+    <a class="it" href="Students.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students</a>
+    <a class="it" href="Staff.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"></path></svg></span>Staff &amp; pay<span class="badge">1</span></a>
+    <a class="it" href="Admissions.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg></span>Admissions<span class="badge">6</span></a>
+    <div class="grp">Money</div>
+    <a class="it" href="Fees.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"></path></svg></span>Fees<span class="badge">117</span></a>
+    <a class="it" href="Reports.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span>Reports</a>
+    <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
+    <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
+  </nav>
+
+  <main class="content">
+    <div class="wrap">
+      <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+        <div><div class="lbl">Academics · Session 2026–27</div><h1 class="title">Classes and sections</h1><p class="sub">Pick a section on the left. Everything about it, and what to do next, is on one screen.</p></div>
+        <label style="flex:0 1 380px;display:flex;align-items:center;gap:10px;border:2px solid #e5e7eb;border-radius:14px;padding:0 12px;min-height:46px;background:#fff">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input aria-label="Find or do" placeholder="Find a class, or type: promote 9‑C, move Hamza…" style="border:0;outline:0;flex:1;font-weight:700;font-size:14px;background:transparent">
+        </label>
+      </header>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+        <sc-for list="{{top}}" as="k" hint-placeholder-count="7">
+          <div class="kp2"><span class="lbl" style="font-size:11px">{{k.l}}</span><span style="font-weight:900;font-size:24px;color:{{k.c}}">{{k.v}}</span><span class="muted" style="font-size:12px">{{k.n}}</span></div>
+        </sc-for>
+      </section>
+
+      <section class="card" style="padding:16px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+          <h2 class="h2">School health map</h2>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;font-weight:800;font-size:12px;color:#4b5563"><span><span class="hd" style="display:inline-block;background:#16a34a"></span> Strong</span><span><span class="hd" style="display:inline-block;background:#86efac"></span> OK</span><span><span class="hd" style="display:inline-block;background:#fcd34d"></span> Watch</span><span><span class="hd" style="display:inline-block;background:#f87171"></span> Act now</span><span>Click any cell to open that section</span></div>
+        </div>
+        <div class="tbl" style="margin-top:12px">
+          <div class="hm" style="grid-template-columns:120px repeat(8,minmax(70px,1fr))">
+            <span></span><span class="lbl" style="text-align:center">Seats</span><span class="lbl" style="text-align:center">Attend.</span><span class="lbl" style="text-align:center">Results</span><span class="lbl" style="text-align:center">Pass</span><span class="lbl" style="text-align:center">Fees</span><span class="lbl" style="text-align:center">Homework</span><span class="lbl" style="text-align:center">Teacher</span><span class="lbl" style="text-align:center">Overall</span>
+            <sc-for list="{{map}}" as="r" hint-placeholder-count="12">
+              <div class="hrow"><span style="font-weight:900;font-size:13px">{{r.n}}</span><sc-for list="{{r.cells}}" as="c" hint-placeholder-count="8"><button type="button" class="hc" style="background:{{c.bg}};color:{{c.fg}};outline:{{c.ol}}" onClick="{{r.pick}}" aria-label="{{c.aria}}">{{c.v}}</button></sc-for></div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+        <div class="card" style="flex:0 1 230px;min-width:200px;padding:10px">
+          <div class="tree">
+            <sc-for list="{{tree}}" as="g" hint-placeholder-count="5">
+              <div>
+                <div class="lvl">{{g.label}}</div>
+                <sc-for list="{{g.items}}" as="i" hint-placeholder-count="3"><button type="button" class="{{i.cls}}" onClick="{{i.pick}}"><span class="hd" style="background:{{i.dot}}"></span><span style="flex:1">{{i.n}}</span><span class="muted" style="font-size:12px">{{i.cnt}}</span></button></sc-for>
+              </div>
+            </sc-for>
+            <button type="button" class="chunk w sm" style="margin:12px 6px 4px">Add class or program</button>
+          </div>
+        </div>
+
+        <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px">
+          <div class="card" style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-start">
+              <div><div class="lbl">{{x.level}}</div><h2 class="h2" style="font-size:26px;margin-top:2px">{{x.n}}</h2><div class="muted">Class teacher <strong style="color:#1f2937">{{x.teacher}}</strong> · Room {{x.room}} · {{x.board}}</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:64px;height:64px;border-radius:99px;background:conic-gradient({{x.scoreC}} 0 {{x.scoreP}},#e5e7eb {{x.scoreP}} 100%);display:flex;align-items:center;justify-content:center"><div style="width:48px;height:48px;border-radius:99px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">{{x.score}}</div></div><div><div style="font-weight:900">Health score</div><div class="muted" style="font-size:12px">{{x.rank}}</div></div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px">
+              <button type="button" class="act" onClick="{{goStudents}}"><span class="tile t-g" style="width:34px;height:34px">+</span>Add student</button>
+              <button type="button" class="act"><span class="tile t-b" style="width:34px;height:34px">↗</span>Promote class</button>
+              <button type="button" class="act"><span class="tile t-v" style="width:34px;height:34px">⇄</span>Move students</button>
+              <button type="button" class="act" onClick="{{goTeach}}"><span class="tile t-o" style="width:34px;height:34px">T</span>Assign teachers</button>
+              <button type="button" class="act"><span class="tile t-p" style="width:34px;height:34px">@</span>Message parents</button>
+              <button type="button" class="act"><span class="tile t-n" style="width:34px;height:34px">P</span>Print list</button>
+            </div>
+
+            <div style="display:flex;gap:4px;flex-wrap:wrap;background:#f1f5f9;padding:4px;border-radius:12px" role="tablist">
+              <sc-for list="{{subs}}" as="t" hint-placeholder-count="5"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+            </div>
+
+            <sc-if value="{{v.over}}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+                  <sc-for list="{{x.kpis}}" as="k" hint-placeholder-count="8">
+                    <div class="kp2"><span class="lbl" style="font-size:11px">{{k.l}}</span><div style="display:flex;align-items:baseline;gap:6px"><span style="font-weight:900;font-size:22px">{{k.v}}</span><span style="font-weight:900;font-size:12px;color:{{k.dc}}">{{k.d}}</span></div><div class="spark"><sc-for list="{{k.sp}}" as="s" hint-placeholder-count="6"><i style="height:{{s.h}};background:{{s.c}}"></i></sc-for></div></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px">
+                  <div class="card dark" style="flex:2 1 320px;padding:14px"><div class="lbl" style="color:#fcd34d">What to do this week</div><ol style="margin:8px 0 0;padding-left:18px;line-height:24px;font-weight:700"><sc-for list="{{x.todo}}" as="t" hint-placeholder-count="3"><li>{{t}}</li></sc-for></ol></div>
+                  <div class="card" style="flex:1 1 220px;padding:14px"><div class="lbl">Seats</div><div style="font-weight:900;font-size:22px;margin:4px 0">{{x.seats}}</div><div class="bar"><span style="width:{{x.fill}};background:#0ea5e9"></span></div><div class="muted" style="margin-top:8px">{{x.boys}} boys · {{x.girls}} girls · {{x.wait}} waiting</div></div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{v.students}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><sc-for list="{{sf}}" as="f" hint-placeholder-count="4"><button type="button" class="{{f.cls}}" onClick="{{f.pick}}" style="min-height:34px">{{f.label}}</button></sc-for></div>
+                <div class="tbl"><table style="min-width:640px"><thead><tr><th>Roll</th><th>Student</th><th>Attendance</th><th>Average</th><th>Fee</th><th>Flag</th><th></th></tr></thead><tbody>
+                  <sc-for list="{{kids}}" as="k" hint-placeholder-count="6"><tr><td>{{k.r}}</td><td>{{k.n}}</td><td>{{k.a}}</td><td>{{k.m}}</td><td>{{k.f}}</td><td><span class="{{k.tc}}">{{k.t}}</span></td><td><button type="button" class="chunk w sm">Open</button></td></tr></sc-for>
+                </tbody></table></div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{v.teach}}" hint-placeholder-val="{{ false }}">
+              <div>
+                <sc-for list="{{x.subjects}}" as="s" hint-placeholder-count="6">
+                  <div class="row"><span style="width:150px;font-weight:900">{{s.s}}</span><select class="inp" aria-label="Teacher" style="min-height:38px;flex:1 1 180px"><option>{{s.t}}</option><option>Choose another</option></select><span class="muted" style="width:120px;font-size:12px">{{s.p}} periods · load {{s.load}}</span><span class="{{s.tc}}">{{s.tag}}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{v.results}}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-wrap:wrap;gap:16px">
+                <div style="flex:1 1 300px"><div class="lbl" style="margin-bottom:6px">Subject averages · this term</div><sc-for list="{{x.subjects}}" as="s" hint-placeholder-count="6"><div class="hbar"><span style="width:110px">{{s.s}}</span><div class="t"><i style="width:{{s.avg}};background:{{s.ac}}"></i></div><span style="width:40px;text-align:right">{{s.avg}}</span></div></sc-for></div>
+                <div style="flex:1 1 240px"><div class="lbl" style="margin-bottom:6px">Grade spread</div><sc-for list="{{x.grades}}" as="g" hint-placeholder-count="6"><div class="hbar"><span style="width:30px">{{g.g}}</span><div class="t"><i style="width:{{g.w}};background:{{g.c}}"></i></div><span style="width:30px;text-align:right">{{g.n}}</span></div></sc-for></div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{v.money}}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+                <div class="kp2"><span class="lbl" style="font-size:11px">Billed this term</span><span style="font-weight:900;font-size:22px">{{x.billed}}</span></div>
+                <div class="kp2"><span class="lbl" style="font-size:11px">Collected</span><span style="font-weight:900;font-size:22px;color:#15803d">{{x.coll}}</span></div>
+                <div class="kp2"><span class="lbl" style="font-size:11px">Families with balance</span><span style="font-weight:900;font-size:22px;color:#b91c1c">{{x.defs}}</span></div>
+                <div class="kp2"><span class="lbl" style="font-size:11px">Discounts</span><span style="font-weight:900;font-size:22px">{{x.disc}}</span></div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { sel:'9C', sub:'over', sf:'all' }; }
+  renderVals() {
+    const S0 = this.state; const set = (o) => this.setState(o);
+    // id, name, level, teacher, students, capacity, att, res, pass, fee, hw, teacherLoad
+    const R = [
+      ['PG','Play group · Green','Pre-school','Sumaira Javed',25,40,94,0,0,91,0,28],
+      ['1A','Class 1‑A','Primary','Bushra Anwar',25,40,96,78,98,94,90,30],
+      ['2A','Class 2‑A','Primary','Asma Rafiq',25,40,95,77,96,92,88,30],
+      ['3A','Class 3‑A','Primary','Nadia Hameed',25,40,93,75,95,90,86,30],
+      ['4A','Class 4‑A','Primary','Saba Kausar',25,40,92,74,92,88,84,30],
+      ['5A','Class 5‑A','Primary','Nazia Parveen',25,40,94,76,96,90,86,38],
+      ['6B','Class 6‑B','Middle','Shazia Kanwal',25,40,91,70,90,82,80,34],
+      ['7B','Class 7‑B','Middle','Shazia Kanwal',25,40,89,69,88,80,78,34],
+      ['8A','Class 8‑A','Middle','Rabia Noor',25,40,88,64,84,70,72,32],
+      ['9A','Class 9‑A','Matric','Ayesha Siddiqui',50,50,91,74,96,82,88,34],
+      ['9C','Class 9‑C','Matric','Farhan Akhtar',50,50,84,58,76,68,70,35],
+      ['10A','Class 10‑A','Matric','Usman Ghani',25,40,91,74,92,93,85,33]
+    ];
+    const band = (v, good, ok, warn) => v >= good ? ['#16a34a','#fff'] : v >= ok ? ['#86efac','#14532d'] : v >= warn ? ['#fcd34d','#78350f'] : ['#f87171','#7f1d1d'];
+    const score = (r) => r[7] ? Math.round(r[6]*0.25 + r[7]*0.35 + r[9]*0.2 + r[10]*0.2) : Math.round(r[6]*0.6 + r[9]*0.4);
+    const map = R.map(r => {
+      const seat = Math.round(r[4]/r[5]*100); const sc = score(r);
+      const cells = [
+        [seat+'%', seat>=100 ? ['#f87171','#7f1d1d'] : seat>=60 ? ['#86efac','#14532d'] : ['#fcd34d','#78350f'], 'seats'],
+        [r[6]+'%', band(r[6],95,90,85), 'attendance'],
+        [r[7] ? r[7]+'%' : '—', r[7] ? band(r[7],80,70,60) : ['#f1f5f9','#6b7280'], 'results'],
+        [r[8] ? r[8]+'%' : '—', r[8] ? band(r[8],95,88,80) : ['#f1f5f9','#6b7280'], 'pass rate'],
+        [r[9]+'%', band(r[9],90,85,75), 'fees'],
+        [r[10] ? r[10]+'%' : '—', r[10] ? band(r[10],88,80,72) : ['#f1f5f9','#6b7280'], 'homework'],
+        [r[11]+'p', r[11] > 36 ? ['#f87171','#7f1d1d'] : r[11] >= 35 ? ['#fcd34d','#78350f'] : ['#86efac','#14532d'], 'teacher periods a week'],
+        [String(sc), band(sc,88,80,72), 'overall']
+      ].map(([v,[bg,fg],a]) => ({ v, bg, fg, ol: r[0]===S0.sel ? '3px solid #0369a1' : 'none', aria: r[1] + ' ' + a + ' ' + v }));
+      return { n: r[1].replace(' · Green',''), cells, pick:()=>set({ sel:r[0] }) };
+    });
+    const LV = ['Pre-school','Primary','Middle','Matric'];
+    const tree = LV.map(l => ({ label:l, items: R.filter(r => r[2]===l).map(r => { const sc = score(r); return { n: r[1].replace('Class ','').replace(' · Green',''), cnt: r[4], dot: band(sc,88,80,72)[0], cls: r[0]===S0.sel ? 'sec on':'sec', pick:()=>set({ sel:r[0] }) }; }) }))
+      .concat([{ label:'Intermediate · BS', items:[{ n:'FSc, ICS, FA', cnt:'—', dot:'#e5e7eb', cls:'sec', pick:()=>{} },{ n:'BS / ADP', cnt:'—', dot:'#e5e7eb', cls:'sec', pick:()=>{} }] }]);
+
+    const r = R.find(q => q[0]===S0.sel); const sc = score(r);
+    const ranked = R.slice().sort((a,b) => score(b)-score(a)).findIndex(q => q[0]===r[0]) + 1;
+    const sp = (base, up) => [-6,-4,-3,-1,0,up?2:-2].map(d => { const v = Math.max(0, base + d); return { h: Math.max(4, Math.round((v-50)/50*28)) + 'px', c:'#93c5fd' }; }).map((s,i,a) => i===a.length-1 ? { ...s, c:'#0369a1' } : s);
+    const tr = (d) => ({ d: (d>0?'▲ ':'▼ ') + Math.abs(d), dc: d>0 ? '#15803d' : '#b91c1c' });
+    const k = (l, v, d, base) => ({ l, v, ...tr(d), sp: sp(base, d>0) });
+    const kpis = [
+      k('Attendance', r[6]+'%', r[0]==='9C' ? -6 : 1, r[6]),
+      k('Avg result', r[7] ? r[7]+'%' : '—', r[0]==='9C' ? -4 : 2, r[7] || 70),
+      k('Pass rate', r[8] ? r[8]+'%' : '—', r[0]==='9C' ? -5 : 1, r[8] || 80),
+      k('Fees collected', r[9]+'%', r[0]==='9C' ? -3 : 2, r[9]),
+      k('Homework done', r[10] ? r[10]+'%' : '—', 1, r[10] || 75),
+      k('Late arrivals', r[0]==='9C' ? '19' : '4', r[0]==='9C' ? -7 : 2, 70),
+      k('Parent app use', r[0]==='9C' ? '58%' : '81%', 3, 70),
+      k('Complaints', r[0]==='9C' ? '3' : '0', r[0]==='9C' ? -2 : 1, 60)
+    ];
+    const todo = r[0]==='9C'
+      ? ['Call the 7 students below 80% attendance; 5 share one van route.','Two extra Physics periods until 20 Dec (results 47%).','Ask Farhan Akhtar to mark attendance before 9:00 (on time 64%).']
+      : ['Keep weekly tests going; results are above the school average.','Send fee reminders to the families with a balance.','Recognise the 3 students with perfect attendance in assembly.'];
+    const SUB = r[2]==='Matric'
+      ? [['Physics','Farhan Akhtar',6,'35',r[0]==='9C'?47:72],['Chemistry','Usman Ghani',6,'33',63],['Biology','Ayesha Siddiqui',6,'34',74],['Mathematics','Sadia Malik',7,'32',55],['English','Rabia Noor',6,'32',61],['Urdu','Nazia Parveen',4,'38',70],['Computer Science','— none',4,'—',0]]
+      : [['English',r[3],6,'30',74],['Urdu',r[3],6,'30',76],['Mathematics',r[3],7,'30',70],['Islamiat',r[3],3,'30',80],['General Knowledge',r[3],3,'30',78],['Nazra Quran','Qari Abdul Basit',3,'26',85]];
+    const subjects = SUB.map(([s,t,p,load,avg]) => ({ s, t, p, load, avg: avg ? avg+'%' : '—', ac: band(avg,80,70,60)[0], tag: t.indexOf('none')>=0 ? 'No teacher' : parseInt(load)>36 ? 'Overloaded' : 'OK', tc: t.indexOf('none')>=0 ? 'tag r' : parseInt(load)>36 ? 'tag y' : 'tag g' }));
+    const GR = r[7] ? (r[0]==='9C' ? [8,6,12,10,6,8] : [5,6,7,4,2,1]) : [0,0,0,0,0,0];
+    const tot = GR.reduce((a,b)=>a+b,0) || 1;
+    const grades = ['A+','A','B','C','D','F'].map((g,i) => ({ g, n: GR[i], w: Math.round(GR[i]/tot*100)+'%', c: i<2 ? '#16a34a' : i<4 ? '#0ea5e9' : i===4 ? '#f59e0b' : '#ef4444' }));
+    const fill = Math.round(r[4]/r[5]*100);
+    const x = { n:r[1], level:r[2], teacher:r[3], room: { '9C':'12','9A':'10','10A':'14' }[r[0]] || '4', board: r[2]==='Matric' ? 'BISE Lahore' : 'Punjab Curriculum',
+      score: sc, scoreP: sc+'%', scoreC: band(sc,88,80,72)[0], rank: '#' + ranked + ' of ' + R.length + ' sections',
+      kpis, todo, seats: r[4] + ' / ' + r[5], fill: fill+'%', boys: Math.round(r[4]*0.54), girls: r[4]-Math.round(r[4]*0.54), wait: fill>=100 ? 14 : 0,
+      subjects, grades, billed: 'Rs ' + (r[4]*5.5).toFixed(0) + 'k', coll: r[9]+'%', defs: Math.round(r[4]*(100-r[9])/100), disc: 'Rs ' + Math.round(r[4]*0.4) + 'k' };
+
+    const KD = [[1,'Ahmed Raza','93%','64%','Paid','—','tag'],[2,'Hamza Ali','71%','38%','Rs 9,500','At risk','tag r'],[3,'Fatima Zahid','98%','88%','Paid','Top','tag g'],[4,'Iqra Shah','92%','72%','Rs 4,750','Fee due','tag y'],[5,'Usama Iqbal','76%','46%','Paid','At risk','tag r'],[6,'Maryam Khan','95%','79%','Paid','Rising','tag b']];
+    const keep = (q) => S0.sf==='all' || (S0.sf==='risk' && q[5]==='At risk') || (S0.sf==='fee' && q[4]!=='Paid') || (S0.sf==='top' && (q[5]==='Top'||q[5]==='Rising'));
+    const kids = KD.filter(keep).map(q => ({ r:q[0], n:q[1], a:q[2], m:q[3], f:q[4], t:q[5], tc:q[6] }));
+    const SB = [['over','Overview'],['students','Students'],['teach','Subjects & teachers'],['results','Results'],['money','Fees']];
+    const SF = [['all','All 50'],['risk','At risk'],['fee','Fee due'],['top','Top']];
+    const totS = R.reduce((a,q)=>a+q[4],0);
+    return {
+      top: [
+        { l:'Students', v: String(575), n:'19 sections', c:'#1f2937' },
+        { l:'Seats used', v:'71%', n:'235 free · 14 waiting', c:'#1f2937' },
+        { l:'Attendance', v:'89.6%', n:'goal 90%', c:'#c2410c' },
+        { l:'Avg result', v:'71%', n:'▲ 2 this term', c:'#15803d' },
+        { l:'Pass rate', v:'87%', n:'26 at risk', c:'#1f2937' },
+        { l:'Per teacher', v:'34', n:'goal 30', c:'#c2410c' },
+        { l:'Need action', v:'3', n:'red sections', c:'#b91c1c' }
+      ],
+      map, tree, x, kids,
+      subs: SB.map(([k2,l]) => ({ label:l, cls: S0.sub===k2 ? 'subtab on':'subtab', pick:()=>set({ sub:k2 }) })),
+      v: { over:S0.sub==='over', students:S0.sub==='students', teach:S0.sub==='teach', results:S0.sub==='results', money:S0.sub==='money' },
+      sf: SF.map(([k2,l]) => ({ label:l, cls: S0.sf===k2 ? 'chip on':'chip', pick:()=>set({ sf:k2 }) })),
+      goStudents:()=>set({ sub:'students' }), goTeach:()=>set({ sub:'teach' })
+    };
+  }
+}
+</script>
+</body>
+</html>
