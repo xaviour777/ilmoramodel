@@ -69,6 +69,50 @@ body{margin:0;background:#f7f9fc}
         <sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button type="button" role="tab" class="{{m.cls}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for>
       </div>
 
+      <sc-if value="{{isRooms}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+            <div class="kp2"><span class="lbl" style="font-size:11px">Rooms</span><span style="font-weight:900;font-size:24px">24</span><span class="muted" style="font-size:12px">18 classrooms · 3 labs · 3 other</span></div>
+            <div class="kp2"><span class="lbl" style="font-size:11px">In use</span><span style="font-weight:900;font-size:24px">19</span><span class="muted" style="font-size:12px">5 free rooms</span></div>
+            <div class="kp2"><span class="lbl" style="font-size:11px">Seats used</span><span style="font-weight:900;font-size:24px">71%</span><span class="muted" style="font-size:12px">235 empty seats</span></div>
+            <div class="kp2"><span class="lbl" style="font-size:11px">Lost revenue</span><span style="font-weight:900;font-size:24px;color:#b91c1c">Rs 1.2M</span><span class="muted" style="font-size:12px">a month from empty seats</span></div>
+            <div class="kp2"><span class="lbl" style="font-size:11px">Profit / month</span><span style="font-weight:900;font-size:24px;color:#15803d">Rs 612k</span><span class="muted" style="font-size:12px">all rooms after costs</span></div>
+          </section>
+
+          <section class="card">
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+              <h2 class="h2">Rooms · who sits where and what each room earns</h2>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{roomSorts}}" as="s" hint-placeholder-count="4"><button type="button" class="{{s.cls}}" onClick="{{s.pick}}" style="min-height:34px">{{s.label}}</button></sc-for><button type="button" class="chunk sm">Add room</button></div>
+            </div>
+            <div class="tbl" style="margin-top:10px"><table style="min-width:1000px">
+              <thead><tr><th>Room</th><th>Type</th><th>Section</th><th>Seats used</th><th>Empty</th><th>Fee income</th><th>Costs</th><th>Profit</th><th>Per seat</th><th></th></tr></thead>
+              <tbody><sc-for list="{{rooms}}" as="r" hint-placeholder-count="10">
+                <tr><td style="font-weight:900">{{r.n}}</td><td><span class="{{r.tc}}">{{r.type}}</span></td><td>{{r.sec}}</td>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:80px;height:8px"><span style="width:{{r.fill}};background:{{r.fc}}"></span></div><span>{{r.used}}</span></div></td>
+                  <td>{{r.empty}}</td><td>{{r.inc}}</td><td>{{r.cost}}</td><td style="color:{{r.pc}}">{{r.profit}}</td><td>{{r.per}}</td><td><button type="button" class="chunk w sm">Assign</button></td></tr>
+              </sc-for></tbody>
+            </table></div>
+            <p class="muted" style="margin:10px 0 0;font-size:12px">Fee income = students × monthly fee × collection rate. Costs = teachers' salary share by periods + room's share of rent, power and cleaning. Set these in Settings.</p>
+          </section>
+
+          <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+            <div class="card" style="flex:3 1 480px;min-width:0">
+              <h2 class="h2">Profit by room</h2>
+              <div style="margin-top:10px"><sc-for list="{{roomBars}}" as="b" hint-placeholder-count="8"><div class="hbar"><span style="width:110px">{{b.n}}</span><div class="t"><i style="width:{{b.w}};background:{{b.c}}"></i></div><span style="width:80px;text-align:right">{{b.v}}</span></div></sc-for></div>
+            </div>
+            <div class="card dark" style="flex:2 1 300px;min-width:0">
+              <div class="lbl" style="color:#fcd34d">AI suggestions for the director</div>
+              <ul style="margin:10px 0 0;padding-left:18px;line-height:24px;font-weight:700">
+                <li>Room 12 holds 50 of 9‑C in a 35-seat room. Move 9‑C to Hall B (60 seats).</li>
+                <li>Class 8‑A and 8‑B use two rooms for 50 students. Merge and free Room 7: saves Rs 58k a month.</li>
+                <li>Room 15 and 16 are empty. Opening Class 11 ICS there could add Rs 290k a month.</li>
+                <li>Primary rooms earn least per seat; 15 more admissions in Class 1–3 would make them profitable.</li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
       <sc-if value="{{isBell}}" hint-placeholder-val="{{ false }}">
         <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
           <div class="card" style="flex:3 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px">
@@ -321,6 +365,24 @@ class Component extends DCLogic {
     const keep = (q) => S0.sf==='all' || (S0.sf==='risk' && q[5]==='At risk') || (S0.sf==='fee' && q[4]!=='Paid') || (S0.sf==='top' && (q[5]==='Top'||q[5]==='Rising'));
     const kids = KD.filter(keep).map(q => ({ r:q[0], n:q[1], a:q[2], m:q[3], f:q[4], t:q[5], tc:q[6] }));
     const SB = [['over','Overview'],['students','Students'],['teach','Subjects & teachers'],['tt','Timetable'],['syl','Syllabus'],['results','Results'],['money','Fees']];
+    // Rooms: name, type, section, seats, students, fee/month, collection, costs (k)
+    const RM = [
+      ['Room 1','Classroom','Play group',40,25,4200,0.91,62],['Room 2','Classroom','Class 1‑A',40,25,4200,0.94,64],['Room 3','Classroom','Class 2‑A',40,25,4200,0.92,64],
+      ['Room 4','Classroom','Class 3‑A',40,25,4200,0.90,64],['Room 5','Classroom','Class 4‑A',40,25,4200,0.88,64],['Room 6','Classroom','Class 5‑A/B',45,50,4200,0.90,118],
+      ['Room 7','Classroom','Class 8‑A',40,25,4750,0.70,70],['Room 8','Classroom','Class 8‑B',40,25,4750,0.72,70],['Room 10','Classroom','Class 9‑A',50,50,5500,0.82,128],
+      ['Room 12','Classroom','Class 9‑C',35,50,5500,0.68,128],['Room 14','Classroom','Class 10‑A',40,25,5500,0.93,82],['Room 15','Classroom','— empty',40,0,0,0,9],
+      ['Room 16','Classroom','— empty',40,0,0,0,9],['Physics lab','Lab','Class 9–10 practicals',30,0,0,0,22],['Computer lab','Lab','Class 9–10, ICS',35,0,0,0,26]
+    ];
+    const kfmt = (v) => (v<0?'− ':'') + 'Rs ' + Math.abs(Math.round(v)) + 'k';
+    let rooms = RM.map(([n,type,sec,cap,stu,fee,col,cost]) => { const inc = stu*fee*col/1000; const profit = inc - cost; const fill = cap ? Math.round(stu/cap*100) : 0;
+      return { n, type, sec, cap, stu, inc, cost, profit, fillN: fill, tc: type==='Lab' ? 'tag v' : sec.indexOf('empty')>=0 ? 'tag' : 'tag b',
+        fill: Math.min(fill,100)+'%', fc: fill>100 ? '#ef4444' : fill>=60 ? '#16a34a' : fill>0 ? '#f59e0b' : '#e5e7eb', used: stu + '/' + cap + (fill>100 ? ' over' : ''),
+        empty: Math.max(0, cap-stu), pc: profit>=0 ? '#15803d' : '#b91c1c', per: stu ? 'Rs ' + Math.round(profit*1000/stu).toLocaleString() : '—' }; });
+    const rs = S0.rs || 'profit';
+    rooms.sort((a,b) => rs==='profit' ? b.profit-a.profit : rs==='empty' ? (b.cap-b.stu)-(a.cap-a.stu) : rs==='loss' ? a.profit-b.profit : a.type.localeCompare(b.type));
+    const maxP = Math.max(...rooms.map(q => Math.abs(q.profit)));
+    const roomBars = rooms.filter(q => q.type!=='Lab').slice(0,10).map(q => ({ n:q.n, v:kfmt(q.profit), w: Math.round(Math.abs(q.profit)/maxP*100)+'%', c: q.profit>=0 ? '#16a34a' : '#ef4444' }));
+    rooms = rooms.map(q => ({ ...q, inc: q.inc ? kfmt(q.inc) : '—', cost: kfmt(q.cost), profit: kfmt(q.profit) }));
     // Bell schedules
     const BS = {
       winter:{ start:'08:00', len:'40 min', count:'8', brk:'20 min', from:'2026-11-01', ends:'1:40 pm' },
@@ -374,7 +436,9 @@ class Component extends DCLogic {
       map, tree, x, kids,
       subs: SB.map(([k2,l]) => ({ label:l, cls: S0.sub===k2 ? 'subtab on':'subtab', pick:()=>set({ sub:k2 }) })),
       v: { over:S0.sub==='over', students:S0.sub==='students', teach:S0.sub==='teach', results:S0.sub==='results', money:S0.sub==='money', tt:S0.sub==='tt', syl:S0.sub==='syl' },
-      modes: [['sec','Sections'],['bell','Bell timings']].map(([k2,l]) => ({ label:l, cls: (S0.mode||'sec')===k2 ? 'tabbtn on':'tabbtn', pick:()=>set({ mode:k2 }) })),
+      isRooms: S0.mode==='rooms', rooms, roomBars,
+      roomSorts: [['profit','Most profit'],['empty','Most empty'],['loss','Losing money'],['type','By type']].map(([k2,l]) => ({ label:l, cls: (S0.rs||'profit')===k2 ? 'chip on':'chip', pick:()=>set({ rs:k2 }) })),
+      modes: [['sec','Sections'],['rooms','Rooms'],['bell','Bell timings']].map(([k2,l]) => ({ label:l, cls: (S0.mode||'sec')===k2 ? 'tabbtn on':'tabbtn', pick:()=>set({ mode:k2 }) })),
       isSec: (S0.mode||'sec')==='sec', isBell: S0.mode==='bell',
       bellTabs: BT.map(([k2,l]) => ({ label:l, cls: bk===k2 ? 'chip on':'chip', pick:()=>set({ bell:k2 }) })),
       bell: { ...b, rows, inUse:'Winter since 1 Nov' },
