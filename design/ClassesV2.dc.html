@@ -72,7 +72,7 @@ body{margin:0;background:#f7f9fc}
       <sc-if value="{{isRooms}}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:18px">
           <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-            <div class="kp2"><span class="lbl" style="font-size:11px">Rooms</span><span style="font-weight:900;font-size:24px">24</span><span class="muted" style="font-size:12px">18 classrooms · 3 labs · 3 other</span></div>
+            <div class="kp2"><span class="lbl" style="font-size:11px">Classrooms</span><span style="font-weight:900;font-size:24px">24</span><span class="muted" style="font-size:12px">18 classrooms · 3 labs · 3 other</span></div>
             <div class="kp2"><span class="lbl" style="font-size:11px">In use</span><span style="font-weight:900;font-size:24px">19</span><span class="muted" style="font-size:12px">5 free rooms</span></div>
             <div class="kp2"><span class="lbl" style="font-size:11px">Seats used</span><span style="font-weight:900;font-size:24px">71%</span><span class="muted" style="font-size:12px">235 empty seats</span></div>
             <div class="kp2"><span class="lbl" style="font-size:11px">Lost revenue</span><span style="font-weight:900;font-size:24px;color:#b91c1c">Rs 1.2M</span><span class="muted" style="font-size:12px">a month from empty seats</span></div>
@@ -81,11 +81,11 @@ body{margin:0;background:#f7f9fc}
 
           <section class="card">
             <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
-              <h2 class="h2">Rooms · who sits where and what each room earns</h2>
+              <h2 class="h2">Classrooms · who sits where and what each room earns</h2>
               <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{roomSorts}}" as="s" hint-placeholder-count="4"><button type="button" class="{{s.cls}}" onClick="{{s.pick}}" style="min-height:34px">{{s.label}}</button></sc-for><button type="button" class="chunk sm">Add room</button></div>
             </div>
             <div class="tbl" style="margin-top:10px"><table style="min-width:1000px">
-              <thead><tr><th>Room</th><th>Type</th><th>Section</th><th>Seats used</th><th>Empty</th><th>Fee income</th><th>Costs</th><th>Profit</th><th>Per seat</th><th></th></tr></thead>
+              <thead><tr><th>Classroom</th><th>Type</th><th>Section</th><th>Seats used</th><th>Empty</th><th>Fee income</th><th>Costs</th><th>Profit</th><th>Per seat</th><th></th></tr></thead>
               <tbody><sc-for list="{{rooms}}" as="r" hint-placeholder-count="10">
                 <tr><td style="font-weight:900">{{r.n}}</td><td><span class="{{r.tc}}">{{r.type}}</span></td><td>{{r.sec}}</td>
                   <td><div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:80px;height:8px"><span style="width:{{r.fill}};background:{{r.fc}}"></span></div><span>{{r.used}}</span></div></td>
@@ -162,6 +162,10 @@ body{margin:0;background:#f7f9fc}
           <h2 class="h2">School health map</h2>
           <div style="display:flex;gap:12px;flex-wrap:wrap;font-weight:800;font-size:12px;color:#4b5563"><span><span class="hd" style="display:inline-block;background:#16a34a"></span> Strong</span><span><span class="hd" style="display:inline-block;background:#86efac"></span> OK</span><span><span class="hd" style="display:inline-block;background:#fcd34d"></span> Watch</span><span><span class="hd" style="display:inline-block;background:#f87171"></span> Act now</span><span>Click any cell to open that section</span></div>
         </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px" role="group" aria-label="Show level">
+          <sc-for list="{{mapLevels}}" as="l" hint-placeholder-count="7"><button type="button" class="{{l.cls}}" onClick="{{l.pick}}">{{l.label}}</button></sc-for>
+        </div>
+        <sc-if value="{{mapEmpty}}" hint-placeholder-val="{{ false }}"><div class="card warm" style="margin-top:12px;padding:14px"><div style="font-weight:900">No sections at this level yet</div><div class="muted">Add Class 11 groups (FSc, ICS, FA, I.Com) or a BS program from "Add class or program".</div></div></sc-if>
         <div class="tbl" style="margin-top:12px">
           <div class="hm" style="grid-template-columns:120px repeat(8,minmax(70px,1fr))">
             <span></span><span class="lbl" style="text-align:center">Seats</span><span class="lbl" style="text-align:center">Attend.</span><span class="lbl" style="text-align:center">Results</span><span class="lbl" style="text-align:center">Pass</span><span class="lbl" style="text-align:center">Fees</span><span class="lbl" style="text-align:center">Homework</span><span class="lbl" style="text-align:center">Teacher</span><span class="lbl" style="text-align:center">Overall</span>
@@ -312,7 +316,8 @@ class Component extends DCLogic {
     ];
     const band = (v, good, ok, warn) => v >= good ? ['#16a34a','#fff'] : v >= ok ? ['#86efac','#14532d'] : v >= warn ? ['#fcd34d','#78350f'] : ['#f87171','#7f1d1d'];
     const score = (r) => r[7] ? Math.round(r[6]*0.25 + r[7]*0.35 + r[9]*0.2 + r[10]*0.2) : Math.round(r[6]*0.6 + r[9]*0.4);
-    const map = R.map(r => {
+    const lvm = S0.lvm || 'all';
+    const map = R.filter(r => lvm==='all' || r[2]===lvm).map(r => {
       const seat = Math.round(r[4]/r[5]*100); const sc = score(r);
       const cells = [
         [seat+'%', seat>=100 ? ['#f87171','#7f1d1d'] : seat>=60 ? ['#86efac','#14532d'] : ['#fcd34d','#78350f'], 'seats'],
@@ -437,8 +442,10 @@ class Component extends DCLogic {
       subs: SB.map(([k2,l]) => ({ label:l, cls: S0.sub===k2 ? 'subtab on':'subtab', pick:()=>set({ sub:k2 }) })),
       v: { over:S0.sub==='over', students:S0.sub==='students', teach:S0.sub==='teach', results:S0.sub==='results', money:S0.sub==='money', tt:S0.sub==='tt', syl:S0.sub==='syl' },
       isRooms: S0.mode==='rooms', rooms, roomBars,
+      mapLevels: [['all','All'],['Pre-school','Pre-school'],['Primary','Primary'],['Middle','Middle'],['Matric','Matric'],['Intermediate','Intermediate (11–12)'],['BS','BS / ADP']].map(([k2,l]) => ({ label:l, cls: lvm===k2 ? 'chip on':'chip', pick:()=>set({ lvm:k2 }) })),
+      mapEmpty: map.length === 0,
       roomSorts: [['profit','Most profit'],['empty','Most empty'],['loss','Losing money'],['type','By type']].map(([k2,l]) => ({ label:l, cls: (S0.rs||'profit')===k2 ? 'chip on':'chip', pick:()=>set({ rs:k2 }) })),
-      modes: [['sec','Sections'],['rooms','Rooms'],['bell','Bell timings']].map(([k2,l]) => ({ label:l, cls: (S0.mode||'sec')===k2 ? 'tabbtn on':'tabbtn', pick:()=>set({ mode:k2 }) })),
+      modes: [['sec','Sections'],['rooms','Classrooms'],['bell','Bell timings']].map(([k2,l]) => ({ label:l, cls: (S0.mode||'sec')===k2 ? 'tabbtn on':'tabbtn', pick:()=>set({ mode:k2 }) })),
       isSec: (S0.mode||'sec')==='sec', isBell: S0.mode==='bell',
       bellTabs: BT.map(([k2,l]) => ({ label:l, cls: bk===k2 ? 'chip on':'chip', pick:()=>set({ bell:k2 }) })),
       bell: { ...b, rows, inUse:'Winter since 1 Nov' },

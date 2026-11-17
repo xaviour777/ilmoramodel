@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School — Check result</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.rc td,.rc th{padding:9px 10px;border-top:2px solid #f1f5f9;font-weight:800;font-size:14px;text-align:left}
+.rc th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;border-top:0}
+</style>
+</helmet>
+<div style="min-height:100vh;color:#1f2937;background:#f7f9fc">
+  <header style="background:#fff;border-bottom:2px solid #e5e7eb">
+    <div style="max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+      <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2937"><div class="logo">M</div><div><div style="font-weight:900;font-size:19px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">modelschool.edu.pk</div></div></a>
+      <nav aria-label="Website" style="display:flex;gap:18px;flex-wrap:wrap;font-weight:800;font-size:14px"><a href="#">Home</a><a href="#">Admissions</a><a href="#" style="color:#15803d">Results</a><a href="#">Fee payment</a><a href="#">Contact</a></nav>
+    </div>
+  </header>
+
+  <main style="max-width:1100px;margin:0 auto;padding:28px 20px 48px;display:flex;flex-direction:column;gap:22px;box-sizing:border-box">
+    <section style="text-align:center">
+      <h1 class="title">Check your result</h1>
+      <p class="sub">Enter the roll number from the admit card. Parents can download the result card or send it on WhatsApp.</p>
+    </section>
+
+    <form class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;max-width:820px;margin:0 auto;width:100%">
+      <label class="field" style="flex:2 1 200px">Roll number<input value="{{roll}}" placeholder="MS-0001" aria-describedby="rollhelp"></label>
+      <label class="field" style="flex:1 1 150px">Exam<select><option>Mid-term 2026</option><option>First term 2026</option><option>Annual 2026</option></select></label>
+      <label class="field" style="flex:1 1 150px">Date of birth<input type="date" value="2011-06-14"></label>
+      <button type="button" class="chunk" onClick="{{check}}">Show result</button>
+      <div id="rollhelp" class="muted" style="width:100%;font-size:12px">Students start with MS-, for example MS-0001. Date of birth keeps results private.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%"><span class="muted" style="font-size:12px;align-self:center">Try:</span><sc-for list="{{tries}}" as="t" hint-placeholder-count="3"><button type="button" class="chip" style="min-height:32px" onClick="{{t.pick}}">{{t.r}}</button></sc-for></div>
+    </form>
+
+    <sc-if value="{{notFound}}" hint-placeholder-val="{{ false }}">
+      <div class="card warm" style="max-width:820px;margin:0 auto;width:100%;text-align:center"><div style="font-weight:900;font-size:18px">No result for {{roll}}</div><div class="muted">Check the roll number and date of birth, or the result may not be published yet. Call the school office: 042 3500 0000.</div></div>
+    </sc-if>
+
+    <sc-if value="{{found}}" hint-placeholder-val="{{ true }}">
+      <article class="card" style="max-width:900px;margin:0 auto;width:100%;padding:0;overflow:hidden" aria-label="Result card">
+        <div style="background:#15803d;color:#fff;padding:18px 22px;display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+          <div style="width:56px;height:56px;border-radius:16px;background:#fff;color:#15803d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px">M</div>
+          <div style="flex:1"><div style="font-weight:900;font-size:22px">Model School</div><div style="font-weight:700;font-size:13px;opacity:.9">Main Campus, Lahore · Affiliated with BISE Lahore</div></div>
+          <div style="text-align:right"><div style="font-weight:900">RESULT CARD</div><div style="font-weight:700;font-size:13px;opacity:.9">{{s.exam}} · Session 2026–27</div></div>
+        </div>
+        <div style="padding:20px 22px;display:flex;flex-wrap:wrap;gap:20px">
+          <div style="width:120px;height:150px;border-radius:14px;background:{{s.pbg}};border:3px solid #fff;box-shadow:0 0 0 2px #e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:40px;color:{{s.pfg}}" role="img" aria-label="Student photo">{{s.ini}}</div>
+          <div style="flex:1 1 280px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;align-content:start">
+            <div><div class="lbl">Student</div><div style="font-weight:900;font-size:18px">{{s.n}}</div></div>
+            <div><div class="lbl">Roll number</div><div style="font-weight:900;font-size:18px;color:#15803d">{{s.roll}}</div></div>
+            <div><div class="lbl">Father's name</div><div style="font-weight:800">{{s.f}}</div></div>
+            <div><div class="lbl">Class</div><div style="font-weight:800">{{s.c}}</div></div>
+            <div><div class="lbl">Class teacher</div><div style="font-weight:800">{{s.t}}</div></div>
+            <div><div class="lbl">Attendance</div><div style="font-weight:800">{{s.att}}</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="width:112px;height:112px;border-radius:99px;background:conic-gradient({{s.gc}} 0 {{s.pct}},#e5e7eb {{s.pct}} 100%);display:flex;align-items:center;justify-content:center"><div style="width:86px;height:86px;border-radius:99px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-weight:900;font-size:26px">{{s.grade}}</span><span class="muted" style="font-size:12px">{{s.pct}}</span></div></div>
+            <span class="tag g">{{s.status}}</span>
+          </div>
+        </div>
+        <div style="padding:0 22px 8px" class="tbl">
+          <table class="rc" style="min-width:560px"><thead><tr><th>Subject</th><th>Total</th><th>Obtained</th><th>%</th><th>Grade</th><th>Teacher's remark</th></tr></thead>
+            <tbody><sc-for list="{{s.subs}}" as="x" hint-placeholder-count="6"><tr><td>{{x.s}}</td><td>{{x.t}}</td><td>{{x.o}}</td><td>{{x.p}}</td><td><span class="{{x.gc}}">{{x.g}}</span></td><td class="muted" style="font-weight:700">{{x.r}}</td></tr></sc-for></tbody>
+            <tfoot><tr><td style="font-weight:900">Total</td><td style="font-weight:900">{{s.tot}}</td><td style="font-weight:900">{{s.obt}}</td><td style="font-weight:900">{{s.pct}}</td><td style="font-weight:900">{{s.grade}}</td><td style="font-weight:900">Position in class: {{s.pos}}</td></tr></tfoot>
+          </table>
+        </div>
+        <div style="padding:14px 22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;border-top:2px solid #f1f5f9;background:#fafafa">
+          <div style="width:64px;height:64px;background:repeating-conic-gradient(#1f2937 0 25%,#fff 0 50%) 0 0/16px 16px;border:4px solid #fff;outline:2px solid #e5e7eb" role="img" aria-label="QR code to verify this result"></div>
+          <div style="flex:1 1 240px"><div style="font-weight:900">Verified result</div><div class="muted" style="font-size:12px">Scan to check this card at modelschool.edu.pk/verify/{{s.roll}}</div></div>
+          <div style="text-align:center"><div style="font-family:cursive;font-size:20px">Dr Saim</div><div class="muted" style="font-size:12px;border-top:2px solid #d1d5db;padding-top:2px">Principal</div></div>
+        </div>
+      </article>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <button type="button" class="chunk">Download PDF</button>
+        <button type="button" class="chunk" style="background:#25a244 !important">Share on WhatsApp</button>
+        <button type="button" class="chunk w">Print</button>
+        <button type="button" class="chunk w">Copy link</button>
+      </div>
+    </sc-if>
+  </main>
+  <footer style="border-top:2px solid #e5e7eb;background:#fff"><div class="muted" style="max-width:1100px;margin:0 auto;padding:16px 20px;font-size:13px">© Model School · Results are published by the school. Questions? 042 3500 0000 · info@modelschool.edu.pk</div></footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { roll:'MS-0001', shown:'MS-0001' }; }
+  renderVals() {
+    const { roll, shown } = this.state;
+    const DB = {
+      'MS-0001':{ n:'Zainab Tariq', f:'Tariq Mehmood', c:'Class 9‑A', t:'Ayesha Siddiqui', att:'98% (106 of 108 days)', pos:'1st of 50', pbg:'#dcfce7', pfg:'#15803d',
+        subs:[['English',75,68,'Excellent writing'],['Urdu',75,64,'Very good'],['Mathematics',75,71,'Outstanding'],['Physics',75,69,'Strong in numericals'],['Chemistry',75,63,'Revise chapter 2'],['Biology',75,70,'Excellent diagrams'],['Islamiat',50,46,'Very good']] },
+      'MS-0002':{ n:'Hamza Ali', f:'Ali Akbar', c:'Class 9‑C', t:'Farhan Akhtar', att:'71% (77 of 108 days)', pos:'44th of 50', pbg:'#fee2e2', pfg:'#b91c1c',
+        subs:[['English',75,33,'Needs regular practice'],['Urdu',75,38,'Fair'],['Mathematics',75,26,'Practise daily'],['Physics',75,21,'Weak in numericals'],['Chemistry',75,30,'Revise'],['Biology',75,46,'Good effort'],['Islamiat',50,31,'Fair']] },
+      'MS-0003':{ n:'Maryam Khan', f:'Imran Khan', c:'Class 9‑D', t:'Mehwish Iqbal', att:'95% (103 of 108 days)', pos:'6th of 50', pbg:'#e0f2fe', pfg:'#075985',
+        subs:[['English',75,61,'Very good'],['Urdu',75,58,'Good'],['Mathematics',75,57,'Good'],['Physics',75,60,'Improving fast'],['Chemistry',75,59,'Good'],['Computer Science',75,66,'Excellent'],['Islamiat',50,41,'Very good']] }
+    };
+    const gr = (p) => p>=80 ? ['A+','tag g','#16a34a'] : p>=70 ? ['A','tag g','#16a34a'] : p>=60 ? ['B','tag b','#0ea5e9'] : p>=50 ? ['C','tag b','#0ea5e9'] : p>=33 ? ['D','tag y','#f59e0b'] : ['F','tag r','#ef4444'];
+    const found = !!DB[shown];
+    const d = DB[shown] || DB['MS-0001'];
+    let s = null;
+    {
+      const tot = d.subs.reduce((a,x)=>a+x[1],0), obt = d.subs.reduce((a,x)=>a+x[2],0), p = Math.round(obt/tot*1000)/10;
+      const fails = d.subs.filter(x => x[2]/x[1] < 0.33).length;
+      s = { ...d, roll: found ? shown : 'MS-0001', exam:'Mid-term exam', ini: d.n.split(' ').map(w=>w[0]).join(''), tot, obt, pct: p+'%', grade: gr(p)[0], gc: gr(p)[2],
+        status: fails ? 'Promoted with ' + fails + ' re-sit' + (fails>1?'s':'') : 'Passed',
+        subs: d.subs.map(([sb,t,o,r]) => { const pp = Math.round(o/t*100); const g = gr(pp); return { s:sb, t, o, p: pp+'%', g:g[0], gc:g[1], r }; }) };
+    }
+    return {
+      roll, s, found, notFound: !found,
+      check: () => this.setState({ shown: roll }),
+      tries: ['MS-0001','MS-0002','MS-0003','MS-9999'].map(r => ({ r, pick: () => this.setState({ roll:r, shown:r }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
