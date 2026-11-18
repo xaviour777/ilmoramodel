@@ -1,5 +1,4 @@
 import { signIn, signOut } from "./actions";
-import { InstallAppButton } from "@/components/pwa";
 import { getBranding, DEFAULT_COLOR, shade } from "@/lib/branding";
 
 const demo = [
@@ -42,7 +41,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <button className="btn" type="submit" style={brand ? { background: color, boxShadow: `0 4px 0 ${shade(color)}` } : undefined}>Sign in</button>
         {["wrong-school", "trial-ended", "school-suspended"].includes(error ?? "") && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
       </form>
-      <InstallAppButton className="btn-ghost inline-flex min-h-11 items-center justify-center gap-2" />
       {brand ? (
         brand.support_email && <p className="muted text-center text-sm">Trouble signing in? Write to <a className="underline" href={`mailto:${brand.support_email}`}>{brand.support_email}</a></p>
       ) : (

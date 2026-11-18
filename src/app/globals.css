@@ -331,3 +331,5 @@ body {
 .tagx.y { background: #fef3c7; color: #92400e; } .tagx.p { background: #fce7f3; color: #9d174d; } .tagx.v { background: #ede9fe; color: #5b21b6; }
 .kick { display: block; color: #6b7280; font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
 }
+
+[lang="ur"] { font-family: "Noto Nastaliq Urdu", serif; line-height: 2; }

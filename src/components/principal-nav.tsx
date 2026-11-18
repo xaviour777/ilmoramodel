@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { InstallAppButton } from "@/components/pwa";
 
 // Principal and owner menu: sidebar on desktop, bottom bar on phones
 // (design/Sidebar.dc.html and design/Mobile.dc.html).
@@ -32,6 +31,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
     { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
+    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
   ] },
   { label: "Academics", items: [
     { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },
@@ -133,7 +133,6 @@ export function PrincipalBottomBar({ badges }: { badges: Record<string, number> 
               </div>
             </div>
           ))}
-          <InstallAppButton className="btn-ghost mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2" />
         </div>
       )}
       <nav aria-label="Main" className="ilm-tabs lg:hidden">

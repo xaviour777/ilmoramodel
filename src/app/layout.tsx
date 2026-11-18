@@ -1,8 +1,8 @@
-import type { Metadata, Viewport } from "next";
-import { RegisterSW } from "@/components/pwa";
+import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { getBranding, shade } from "@/lib/branding";
+import { Pwa } from "@/components/pwa";
 
 const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
 
@@ -12,13 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: brand?.name ?? "Ilmora",
     description: brand ? `${brand.name} · school app` : "School management for Pakistani schools",
-    applicationName: brand?.name ?? "Ilmora",
-    appleWebApp: { capable: true, title: brand?.name ?? "Ilmora", statusBarStyle: "default" },
-    icons: { apple: "/icons/apple-touch-icon.png", ...(brand?.logo_url ? { icon: brand.logo_url } : {}) },
+    icons: { icon: brand?.logo_url ?? "/icon-192.png", apple: "/icon-192.png" },
   };
 }
-
-export const viewport: Viewport = { themeColor: "#16a34a" };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const brand = await getBranding();
@@ -36,10 +32,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@500&display=swap"
         />
       </head>
-      <body className={`${nunito.className} antialiased`}>
-        <RegisterSW />
-        {children}
-      </body>
+      <body className={`${nunito.className} antialiased`}>{children}<Pwa /></body>
     </html>
   );
 }

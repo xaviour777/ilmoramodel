@@ -1,8 +1,8 @@
+import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
 import { Avatar } from "@/components/avatar";
-import { InstallAppButton } from "@/components/pwa";
 import Link from "next/link";
 import { PrincipalSidebar, PrincipalBottomBar } from "@/components/principal-nav";
 import { createClient } from "@/lib/supabase/server";
@@ -18,6 +18,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
     { href: "/settings", label: "Settings", icon: "gear", also: ["/accounts/messages", "/profile"] },
@@ -34,18 +35,29 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher", label: "Attendance", icon: "check" },
     { href: "/teacher/homework", label: "Homework", icon: "book" },
     { href: "/teacher/marks", label: "Marks", icon: "star" },
+    { href: "/teacher/class", label: "My class", icon: "people" },
+    { href: "/teacher/plans", label: "Lesson plans", icon: "book" },
     { href: "/teacher/paper-check", label: "Paper checking", icon: "check" },
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
-    { href: "/teacher/leave", label: "Leave", icon: "clock" },
+    { href: "/teacher/leave", label: "Leave & pay", icon: "clock" },
+    { href: "/teacher/requests", label: "Parents' requests", icon: "people" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
   parent: [
     { href: "/parent", label: "My children", icon: "home" },
     { href: "/parent/tutor", label: "Homework tutor", icon: "chat" },
+    { href: "/parent/progress", label: "Progress & practice", icon: "star" },
+    { href: "/parent/exams", label: "Exams & report card", icon: "star" },
+    { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
+    { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
     { href: "/student", label: "Home", icon: "home" },
     { href: "/student/tutor", label: "Homework tutor", icon: "chat" },
+    { href: "/student/progress", label: "My progress", icon: "star" },
+    { href: "/student/exams", label: "My exams", icon: "star" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
 };
 NAV.owner = NAV.principal;
@@ -65,11 +77,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "ilmora"}</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
-            <InstallAppButton className="btn-ghost inline-flex min-h-10 items-center gap-1 px-2 text-sm" />
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
           </div>
         </div>
         <Nav items={NAV[me.role]} />
+        {(me.role === "parent" || me.role === "student") && <div className="px-3"><UrduSwitch /></div>}
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
           <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
             <Avatar name={me.full_name} url={me.avatar_url} size={40} />

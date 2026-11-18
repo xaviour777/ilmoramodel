@@ -5,11 +5,11 @@ import { pct, shortDate, time, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Chips, Insight, Empty, Bar, Bars, Row } from "@/components/ilm";
 import { UnderTabs } from "@/components/classes-tabs";
 import { fetchAll } from "@/lib/fetch-all";
-import { BoardTarget, ExamDayTab, ExamGapsTab } from "./day";
+import { BoardTarget, ExamDayTab, ExamGapsTab, MarksLogTab } from "./day";
 import { PrintButton } from "@/app/print/paper-check/[id]/print-button";
 import { addPaper, addStandardClasses, createExam, setExamStatus } from "../actions";
 
-type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string };
+type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string; q?: string };
 const KIND: Record<string, string> = { class_test: "Class test", monthly: "Monthly test", term: "Term exam", sendup: "Send-up", final: "Final", other: "Other" };
 // Ideas for the name box; the principal can type any name instead.
 const NAME_IDEAS = ["Weekly test", "Monthly test · November", "December test", "Mid-term exam", "Pre-board test", "Send-up exam", "Final exam", "Surprise quiz", "Chapter 3 test", "Summer homework test"];
@@ -28,7 +28,7 @@ const NEXT: Record<string, [string, string] | undefined> = {
 export default async function ExamsPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
-  const tab = ["results", "board", "day", "gaps"].includes(sp.tab ?? "") ? sp.tab! : "plan";
+  const tab = ["results", "board", "day", "gaps", "log"].includes(sp.tab ?? "") ? sp.tab! : "plan";
   const q = (o: Record<string, string | undefined>) => "/principal/exams?" + new URLSearchParams(Object.entries({ ...o }).filter(([, v]) => v) as [string, string][]);
   return (
     <>
@@ -42,6 +42,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
         { id: "board", label: "BISE board prep · 9–12", href: q({ tab: "board" }) },
         { id: "day", label: "Exam day", href: q({ tab: "day" }) },
         { id: "gaps", label: "Gaps and checks", href: q({ tab: "gaps" }) },
+        { id: "log", label: "Marks log", href: q({ tab: "log" }) },
       ]} />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
@@ -50,6 +51,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
       {tab === "board" && <BoardTab sp={sp} />}
       {tab === "day" && <ExamDayTab date={sp.date} roomId={sp.room} />}
       {tab === "gaps" && <ExamGapsTab />}
+      {tab === "log" && <MarksLogTab q={sp.q} />}
     </>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { mySections } from "@/lib/teacher";
@@ -65,7 +66,8 @@ export default async function HomeworkPage({ searchParams }: { searchParams: Pro
                   <span className={`pill ${badge[1]}`}>{badge[0]}</span>
                 </div>
                 <div className="track"><i style={{ width: `${Math.round(r * 100)}%`, background: r < 0.5 ? "var(--orange)" : undefined }} /></div>
-                <div className="muted">{t.submitted} of {t.students} submitted · {t.checked} checked</div>
+                <div className="flex items-center justify-between gap-2"><span className="muted">{t.submitted} of {t.students} submitted · {t.checked} checked</span>
+                  <Link href={`/teacher/homework/${t.homework_id}`} className="btn-ghost min-h-10 px-3 text-sm">Check</Link></div>
               </div>
             );
           })}

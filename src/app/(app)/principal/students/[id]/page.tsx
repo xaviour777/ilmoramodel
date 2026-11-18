@@ -65,6 +65,13 @@ export default async function StudentProfile({ params, searchParams }: { params:
         <div className="tile"><span className="muted">Brothers / sisters here</span><b>{siblings?.length ?? 0}</b><span className="muted text-xs">same family</span></div>
         <Link href={`/print/report-card/${id}`} className="tile hover:border-[var(--blue-ring)]"><span className="muted">Report card</span><b>Print</b><span className="muted text-xs">all exams this year</span></Link>
       </div>
+      <div className="flex flex-wrap gap-2 text-sm font-extrabold">
+        <span className="muted">Print:</span>
+        <Link href={`/print/id-card/${id}`} target="_blank" className="underline">ID card</Link>
+        <Link href={`/print/certificate/${id}?type=character`} target="_blank" className="underline">Character certificate</Link>
+        <Link href={`/print/certificate/${id}?type=leaving`} target="_blank" className="underline">School leaving certificate</Link>
+        <Link href={`/print/certificate/${id}?type=fee`} target="_blank" className="underline">Fee clearance</Link>
+      </div>
 
       <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
         <form action={saveStudent} className="card">

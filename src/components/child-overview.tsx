@@ -4,6 +4,7 @@ import { maxMarksOf } from "@/lib/paper-check/data";
 import type { WrittenQuestion } from "@/lib/paper-check/rubric";
 import { publishedWeek, weekdayOf } from "@/lib/timetable";
 import { WeekGrid } from "./week-grid";
+import { HomeworkSubmit } from "./homework-submit";
 
 type Child = { id: string; full_name: string; section_id: string | null; sections: { name: string; classes: { name: string } } | null };
 
@@ -27,6 +28,9 @@ export async function ChildOverview({ child }: { child: Child }) {
     supabase.from("paper_sheets").select("id, total, status, paper_tests(title, test_date, mcq_key, mcq_marks_each, questions, subjects(name))")
       .eq("student_id", child.id).in("status", ["reviewed", "absent"]).order("reviewed_at", { ascending: false }).limit(8),
   ]);
+  const hwIds = ((homework ?? []) as { id: string }[]).map((h) => h.id);
+  const { data: subs } = hwIds.length ? await supabase.from("homework_submissions").select("homework_id, submitted_at, checked_at, marks, remark").eq("student_id", child.id).in("homework_id", hwIds) : { data: [] };
+  const subOf = new Map((subs ?? []).map((x) => [x.homework_id, x]));
   const week = child.section_id ? await publishedWeek(supabase, child.section_id) : null;
   const dayNo = weekdayOf(today);
   const todays = (week?.cells ?? []).filter((c) => c.weekday === dayNo).sort((a, b) => a.sort - b.sort);
@@ -61,7 +65,9 @@ export async function ChildOverview({ child }: { child: Child }) {
           {((homework ?? []) as unknown as { id: string; title: string; due_on: string; subjects: { name: string } | null }[]).map((h) => (
             <div key={h.id} className="row-box">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: h.due_on === today ? "var(--orange)" : "var(--blue)" }} />
-              <div className="flex-1"><div className="font-extrabold">{h.title}</div><div className="muted text-xs">{h.subjects?.name} · due {shortDate(h.due_on)}</div></div>
+              <div className="flex-1"><div className="font-extrabold">{h.title}</div><div className="muted text-xs">{h.subjects?.name} · due {shortDate(h.due_on)}
+                {subOf.get(h.id)?.checked_at ? ` · checked${subOf.get(h.id)!.marks != null ? `: ${subOf.get(h.id)!.marks}` : ""}${subOf.get(h.id)!.remark ? ` · "${subOf.get(h.id)!.remark}"` : ""}` : subOf.get(h.id)?.submitted_at ? " · handed in" : ""}</div></div>
+              {!subOf.get(h.id)?.checked_at && <HomeworkSubmit homeworkId={h.id} studentId={child.id} done={!!subOf.get(h.id)?.submitted_at} />}
             </div>
           ))}
         </section>
