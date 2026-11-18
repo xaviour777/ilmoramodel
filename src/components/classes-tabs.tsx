@@ -3,16 +3,17 @@ import Link from "next/link";
 // Tabs under Classes (design/Classes.dc.html): Classes, Timetable, Bell timings, plus board registration.
 // Classes (design/Classes.dc.html): six tabs. Bell timings and board registration sit under Timetable.
 const TABS = [
-  { id: "classes", label: "Classes", href: "/principal/classes" },
+  { id: "sections", label: "Sections", href: "/principal/classes" },
+  { id: "rooms", label: "Classrooms", href: "/principal/classes?tab=rooms" },
+  { id: "bells", label: "Bell timings", href: "/principal/classes?tab=bells" },
   { id: "promote", label: "Promotion", href: "/principal/classes?tab=promote" },
   { id: "move", label: "Move a student", href: "/principal/classes?tab=move" },
   { id: "gaps", label: "Gaps and checks", href: "/principal/classes?tab=gaps" },
-  { id: "kpi", label: "Performance", href: "/principal/classes?tab=kpi" },
-  { id: "timetable", label: "Timetable", href: "/principal/classes?tab=timetable" },
+  { id: "classes", label: "Set up classes", href: "/principal/classes?tab=classes" },
 ];
 
 export function ClassesTabs({ current }: { current: string }) {
-  const id = current === "timings" || current === "board" ? "timetable" : current;
+  const id = current === "timings" ? "bells" : current === "board" || current === "timetable" || current === "kpi" ? "sections" : current;
   return <UnderTabs tabs={TABS} current={id} />;
 }
 
