@@ -13,12 +13,13 @@ export default async function OnlinePayments({ searchParams }: { searchParams: P
   const me = await requireRole("accountant", "principal", "owner");
   const sp = await searchParams;
   const supabase = await createClient();
-  const [{ data: wallet }, { data: pending }, { data: done }] = await Promise.all([
+  const [{ data: wallet }, { data: pending }, { data: done }, { data: gw }] = await Promise.all([
     supabase.from("school_wallets").select("*").maybeSingle(),
     supabase.from("payment_claims").select("id, amount_paisa, mode, txn_id, paid_on, sender_phone, created_at, families(name, phone), invoices(challan_no)")
       .eq("status", "pending").order("created_at"),
     supabase.from("payment_claims").select("id, amount_paisa, mode, txn_id, status, reason, decided_at, families(name)")
       .neq("status", "pending").order("decided_at", { ascending: false }).limit(20),
+    supabase.from("online_payments").select("id, ref, amount_paisa, status, response_message, created_at, families(name)").order("created_at", { ascending: false }).limit(30),
   ]);
   type Claim = { id: string; amount_paisa: number; mode: string; txn_id: string; paid_on: string; sender_phone: string | null; created_at: string; families: { name: string; phone: string | null } | null; invoices: { challan_no: string } | null };
   type Done = { id: string; amount_paisa: number; mode: string; txn_id: string; status: string; reason: string | null; decided_at: string | null; families: { name: string } | null };
@@ -85,6 +86,15 @@ export default async function OnlinePayments({ searchParams }: { searchParams: P
           <button className="btn" type="submit">Save</button>
         </form>
       </div>
+      <section className="card">
+        <h2 className="h2">Paid through JazzCash page</h2>
+        <p className="muted text-sm">These are recorded with a receipt automatically when JazzCash confirms them.</p>
+        {(gw ?? []).length === 0 && <p className="muted">None yet.</p>}
+        {((gw ?? []) as unknown as { id: string; ref: string; amount_paisa: number; status: string; response_message: string | null; created_at: string; families: { name: string } | null }[]).map((g) => (
+          <div key={g.id} className="row-box"><div className="flex-1"><div className="font-extrabold">{g.families?.name} · {rupees(Number(g.amount_paisa))}</div><div className="muted text-xs">{g.ref} · {shortDate(g.created_at)}{g.response_message ? ` · ${g.response_message}` : ""}</div></div>
+            <span className={`pill ${g.status === "paid" ? "pill-green" : g.status === "failed" ? "pill-red" : "pill-gray"}`}>{g.status}</span></div>
+        ))}
+      </section>
     </>
   );
 }

@@ -1,5 +1,7 @@
 "use server";
 
+import { pushTo } from "@/lib/push";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +18,8 @@ export async function replyFeedback(f: FormData) {
   await requireRole("principal", "owner");
   const sb = await createClient();
   const reply = str(f, "reply");
-  const { error } = await sb.from("feedback").update({ status: str(f, "status") || "in_progress", ...(reply ? { reply, replied_at: new Date().toISOString() } : {}) }).eq("id", str(f, "id"));
+  const { data: row, error } = await sb.from("feedback").update({ status: str(f, "status") || "in_progress", ...(reply ? { reply, replied_at: new Date().toISOString() } : {}) }).eq("id", str(f, "id")).select("from_profile").maybeSingle();
+  if (!error && reply && row?.from_profile) await pushTo({ profiles: [row.from_profile] }, { title: "The school replied", body: reply, url: "/feedback" });
   go("feedback", error?.message);
 }
 
