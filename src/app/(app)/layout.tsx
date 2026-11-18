@@ -35,10 +35,12 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
     { href: "/teacher/leave", label: "Leave", icon: "clock" },
+    { href: "/teacher/requests", label: "Parents' requests", icon: "people" },
   ],
   parent: [
     { href: "/parent", label: "My children", icon: "home" },
     { href: "/parent/tutor", label: "Homework tutor", icon: "chat" },
+    { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
   ],
   student: [
     { href: "/student", label: "Home", icon: "home" },
