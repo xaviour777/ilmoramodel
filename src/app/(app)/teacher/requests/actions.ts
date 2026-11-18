@@ -1,5 +1,7 @@
 "use server";
 
+import { pushTo } from "@/lib/push";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -15,6 +17,10 @@ export async function decideLeave(f: FormData) {
   await requireRole("teacher", "principal", "owner");
   const supabase = await createClient();
   const { error } = await supabase.rpc("decide_student_leave", { p_id: str(f, "leave_id"), p_status: str(f, "status") });
+  if (!error) {
+    const { data: l } = await supabase.from("student_leave").select("student_id").eq("id", str(f, "leave_id")).maybeSingle();
+    if (l) await pushTo({ students: [l.student_id] }, { title: `Leave ${str(f, "status")}`, body: `Your leave request was ${str(f, "status")}.`, url: "/parent/requests" });
+  }
   back(error?.message, "decided");
 }
 

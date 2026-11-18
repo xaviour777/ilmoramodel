@@ -1,3 +1,4 @@
+import { PushToggle } from "@/components/push-toggle";
 import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
@@ -82,7 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <Nav items={NAV[me.role]} />
-        {(me.role === "parent" || me.role === "student") && <div className="px-3"><UrduSwitch /></div>}
+        <div className="flex flex-wrap items-center gap-2 px-3">{(me.role === "parent" || me.role === "student") && <UrduSwitch />}<PushToggle /></div>
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
           <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
             <Avatar name={me.full_name} url={me.avatar_url} size={40} />
@@ -130,6 +131,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
       </header>
       <div className="lg:pl-[264px]">
         <div className="hidden justify-end gap-3 px-7 pt-4 text-[13px] font-extrabold lg:flex">
+          <PushToggle />
           <Link href="/profile" className="text-[#0369a1] hover:underline">My profile</Link>
           <form action={signOut}><button type="submit" className="cursor-pointer text-[#0369a1] hover:underline">Sign out</button></form>
         </div>

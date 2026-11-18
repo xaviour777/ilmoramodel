@@ -1,5 +1,7 @@
 "use server";
 
+import { pushTo } from "@/lib/push";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -222,6 +224,7 @@ export async function assignSubstitute(f: FormData) {
     campus_id: me.campus_id, date: str(f, "date"), timetable_slot_id: str(f, "slot_id"),
     absent_teacher_id: str(f, "absent_teacher_id") || null, substitute_id: str(f, "substitute_id") || null, created_by: me.id,
   }, { onConflict: "date,timetable_slot_id" });
+  if (!error && str(f, "substitute_id")) await pushTo({ profiles: [str(f, "substitute_id")] }, { title: "Extra period (substitution)", body: `You have a substitution period on ${str(f, "date")}. Open the app to see the class.`, url: "/teacher" });
   back("/principal/staff", error?.message, "sub");
 }
 
@@ -350,6 +353,10 @@ async function publishNotice(supabase: Awaited<ReturnType<typeof createClient>>,
     class_id: n.classId, section_id: n.sectionId, created_by: me.id,
   }).select("id").single();
   if (error) return { error: error.message, saved: "" };
+  if (n.audience !== "staff") {
+    const { data: secs } = n.sectionId ? { data: [{ id: n.sectionId }] } : n.classId ? await supabase.from("sections").select("id").eq("class_id", n.classId) : await supabase.from("sections").select("id");
+    await pushTo({ sections: (secs ?? []).map((x) => x.id) }, { title: n.title, body: n.body, url: "/" });
+  }
   if (!n.toPhones) return { error: null, saved: "notice" };
   const families = await familiesForAudience(supabase, n.audience, n.classId, n.sectionId);
   const q = await queueForFamilies(supabase, {
