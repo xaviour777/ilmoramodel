@@ -40,11 +40,13 @@ const NAV: Record<Role, NavItem[]> = {
   parent: [
     { href: "/parent", label: "My children", icon: "home" },
     { href: "/parent/tutor", label: "Homework tutor", icon: "chat" },
+    { href: "/parent/exams", label: "Exams & report card", icon: "star" },
     { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
   ],
   student: [
     { href: "/student", label: "Home", icon: "home" },
     { href: "/student/tutor", label: "Homework tutor", icon: "chat" },
+    { href: "/student/exams", label: "My exams", icon: "star" },
   ],
 };
 NAV.owner = NAV.principal;
