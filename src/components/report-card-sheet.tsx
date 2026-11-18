@@ -16,7 +16,7 @@ export function ReportCardSheet({ c, school, campus, session, section, classTeac
       <table style={{ width: "100%", margin: "4mm 0", borderCollapse: "collapse" }}>
         <tbody>
           <tr><td>Name: <b>{c.student.full_name}</b></td><td>Class: <b>{section}</b></td></tr>
-          <tr><td>Roll no: <b>{c.student.roll_no ?? ""}</b></td><td>Admission no: <b>{c.student.admission_no ?? ""}</b></td></tr>
+          <tr><td>Roll no: <b>{c.student.roll_no ?? ""}</b></td><td>Student ID: <b>{c.student.admission_no ?? ""}</b></td></tr>
         </tbody>
       </table>
       {c.exams.length === 0 ? <p>No published results yet this session.</p> : (

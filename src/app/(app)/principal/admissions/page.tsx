@@ -25,6 +25,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
     supabase.from("students").select("section_id").eq("status", "enrolled"),
     supabase.from("admissions").select("id", { count: "exact", head: true }).eq("status", "declined"),
   ]);
+  const { data: nextId } = await supabase.rpc("peek_student_code");
   const since = year?.starts_on ?? "1900-01-01";
   const thisSession = (rows ?? []).filter((r) => r.created_at.slice(0, 10) >= since);
   const joined = thisSession.filter((r) => r.status === "admitted").length;
@@ -91,7 +92,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                         </select>
                         <input className="input min-h-10 w-20 py-1 text-sm" name="roll_no" placeholder="Roll" aria-label="Roll number" />
                       </div>
-                      <input className="input min-h-10 py-1 text-sm" name="admission_no" placeholder="Admission no" aria-label="Admission number" />
+                      <p className="muted text-xs">Student ID will be <b>{nextId ?? "given automatically"}</b>.</p>
                       <label className="flex items-center gap-2 text-xs font-extrabold"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
                       <button className="btn min-h-10 text-sm" type="submit">Admit</button>
                       </form>

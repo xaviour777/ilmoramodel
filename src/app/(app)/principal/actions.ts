@@ -308,7 +308,7 @@ export async function admitStudent(f: FormData) {
   if (a.address) await supabase.from("families").update({ address: a.address }).eq("id", fam.id).is("address", null);
   const { data: stu, error: e2 } = await supabase.from("students").insert({
     campus_id: me.campus_id, family_id: fam.id, section_id: str(f, "section_id"), full_name: a.child_name,
-    roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null,
+    roll_no: str(f, "roll_no") || null,
     father_name: a.guardian_name, father_cnic: a.father_cnic, b_form: a.b_form, gender: a.gender, date_of_birth: a.date_of_birth,
     address: a.address, previous_school: a.previous_school, last_class_passed: a.last_class_passed,
   }).select("id").single();
