@@ -27,7 +27,9 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const isLogin = request.nextUrl.pathname.startsWith("/login");
+  // the login page and the public result check need no login
+  const path = request.nextUrl.pathname;
+  const isLogin = path.startsWith("/login") || path === "/results" || path.startsWith("/results/") || path.startsWith("/verify/");
   if (!user && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
