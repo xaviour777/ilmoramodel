@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { rupees } from "@/lib/format";
 import { allRows } from "@/lib/outbox";
-import { ClassesTabs } from "@/components/classes-tabs";
+import { PageHead, Stats, Stat } from "@/components/ilm";
 import { AutoSubmitSelect } from "@/components/auto-submit";
 
 type Search = { q?: string; kids?: string; due?: string; class?: string; sort?: string; page?: string };
@@ -92,33 +92,27 @@ export default async function FamiliesPage({ searchParams }: { searchParams: Pro
     const s = p.toString();
     return `/principal/families${s ? `?${s}` : ""}`;
   };
-  const chip = (on: boolean) => `inline-flex min-h-9 items-center rounded-full border px-3 text-label-md font-semibold ${on ? "border-primary bg-primary text-on-primary" : "border-outline-variant bg-surface-container-lowest text-on-surface-variant"}`;
+  const chip = (on: boolean) => `inline-flex min-h-9 items-center rounded-full border px-3 text-[13px] font-semibold ${on ? "border-[#1f2937] bg-[#1f2937] text-white" : "border-[#e5e7eb] bg-[#f1f5f9]est text-[#6b7280]"}`;
   const phoneOf = (f: Fam) => f.reminder_phone || f.phone;
   const kidLabel = (k: Kid) => `${k.full_name.split(" ")[0]} · ${k.sections ? `${k.sections.classes.name}-${k.sections.name}` : "no class"}`;
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="h1">Families</h1>
-          <p className="muted text-base">Brothers and sisters together: their classes, monthly fee, what is due and results.</p>
-        </div>
-        <ClassesTabs current="families" />
-      </div>
+      <PageHead kick="People" title="Families" sub="Brothers and sisters together: their classes, monthly fee, what is due and results." />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <Stats>
         <Stat label="Families with a child studying" value={stats.families.toLocaleString("en-PK")} />
         <Stat label="2 or more children" value={stats.two.toLocaleString("en-PK")} />
         <Stat label="3 or more children" value={stats.three.toLocaleString("en-PK")} />
         <Stat label="Due from all families" value={rupees(stats.due)} warn={stats.due > 0} />
-      </div>
+      </Stats>
 
       <div className="card flex flex-col gap-3">
         <form className="flex flex-wrap items-end gap-2" action="/principal/families">
           <label className="relative min-w-0 flex-1 basis-64">
             <span className="sr-only">Search families</span>
-            <span className="msym pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant" aria-hidden="true">search</span>
-            <input className="input w-full pl-10" name="q" defaultValue={sp.q} placeholder="Father / guardian name, phone or child's name" />
+            
+            <input className="input w-full" name="q" defaultValue={sp.q} placeholder="Father / guardian name, phone or child's name" />
           </label>
           {sp.kids && <input type="hidden" name="kids" value={sp.kids} />}
           {sp.due && <input type="hidden" name="due" value={sp.due} />}
@@ -138,7 +132,7 @@ export default async function FamiliesPage({ searchParams }: { searchParams: Pro
           <Link className={chip(sp.kids === "2")} href={link({ kids: sp.kids === "2" ? undefined : "2", page: undefined })}>2+ children</Link>
           <Link className={chip(sp.kids === "3")} href={link({ kids: sp.kids === "3" ? undefined : "3", page: undefined })}>3+ children</Link>
           <Link className={chip(!!sp.due)} href={link({ due: sp.due ? undefined : "1", page: undefined })}>Fee due</Link>
-          {(sp.q || sp.class) && <Link className="inline-flex min-h-9 items-center px-2 text-label-md font-semibold text-primary underline" href="/principal/families">Clear search</Link>}
+          {(sp.q || sp.class) && <Link className="inline-flex min-h-9 items-center px-2 text-[13px] font-semibold text-[#1f2937] underline" href="/principal/families">Clear search</Link>}
         </div>
         <p className="muted text-sm">{ids.length.toLocaleString("en-PK")} {ids.length === 1 ? "family" : "families"}</p>
       </div>
@@ -156,17 +150,17 @@ export default async function FamiliesPage({ searchParams }: { searchParams: Pro
                 <li key={f.id} className="card flex flex-col gap-2 !p-3">
                   <div className="flex items-start gap-2">
                     <Link href={`/principal/families/${f.id}`} className="min-w-0 flex-1">
-                      <span className="block truncate text-title-md font-bold text-primary">{f.name}</span>
-                      <span className="block text-body-sm text-on-surface-variant">{ks.length} {ks.length === 1 ? "child" : "children"} · {rupees(monthly(f.id))}/month</span>
+                      <span className="block truncate text-[16px] font-bold text-[#1f2937]">{f.name}</span>
+                      <span className="block text-[13px] text-[#6b7280]">{ks.length} {ks.length === 1 ? "child" : "children"} · {rupees(monthly(f.id))}/month</span>
                     </Link>
-                    {phoneOf(f) && <a href={`tel:${phoneOf(f)!.replace(/[^\d+]/g, "")}`} aria-label={`Call ${f.name}`} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-container-low text-primary"><span className="msym text-[20px]">call</span></a>}
+                    {phoneOf(f) && <a href={`tel:${phoneOf(f)!.replace(/[^\d+]/g, "")}`} aria-label={`Call ${f.name}`} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f1f5f9] text-[#1f2937]"></a>}
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {ks.map((k) => <span key={k.id} className="rounded-full bg-surface-container-low px-2 py-0.5 text-label-sm text-primary">{kidLabel(k)}</span>)}
+                    {ks.map((k) => <span key={k.id} className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[12px] text-[#1f2937]">{kidLabel(k)}</span>)}
                   </div>
-                  <div className="flex items-center justify-between border-t border-surface-variant pt-2 text-body-sm">
-                    <span className={due > 0 ? "font-bold text-error" : "text-secondary"}>{due > 0 ? `Due ${rupees(due)}` : "Nothing due"}</span>
-                    <Link href={`/principal/families/${f.id}`} className="inline-flex items-center gap-0.5 font-semibold text-primary">Open<span className="msym text-[18px]">chevron_right</span></Link>
+                  <div className="flex items-center justify-between border-t border-[#e5e7eb] pt-2 text-[13px]">
+                    <span className={due > 0 ? "font-bold text-[#dc2626]" : "text-[#15803d]"}>{due > 0 ? `Due ${rupees(due)}` : "Nothing due"}</span>
+                    <Link href={`/principal/families/${f.id}`} className="inline-flex items-center gap-0.5 font-semibold text-[#1f2937]">Open</Link>
                   </div>
                 </li>
               );
@@ -183,10 +177,10 @@ export default async function FamiliesPage({ searchParams }: { searchParams: Pro
                   const due = balance.get(f.id) ?? 0;
                   return (
                     <tr key={f.id}>
-                      <td><Link href={`/principal/families/${f.id}`} className="font-bold text-primary hover:underline">{f.name}</Link><span className="block text-body-sm text-on-surface-variant">{ks.length} {ks.length === 1 ? "child" : "children"}</span></td>
-                      <td><div className="flex max-w-xl flex-wrap gap-1">{ks.map((k) => <span key={k.id} className="rounded-full bg-surface-container-low px-2 py-0.5 text-label-sm text-primary">{kidLabel(k)}</span>)}</div></td>
+                      <td><Link href={`/principal/families/${f.id}`} className="font-bold text-[#1f2937] hover:underline">{f.name}</Link><span className="block text-[13px] text-[#6b7280]">{ks.length} {ks.length === 1 ? "child" : "children"}</span></td>
+                      <td><div className="flex max-w-xl flex-wrap gap-1">{ks.map((k) => <span key={k.id} className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[12px] text-[#1f2937]">{kidLabel(k)}</span>)}</div></td>
                       <td className="text-right tabular-nums">{rupees(monthly(f.id))}</td>
-                      <td className={`text-right tabular-nums ${due > 0 ? "font-bold text-error" : "text-secondary"}`}>{due > 0 ? rupees(due) : "—"}</td>
+                      <td className={`text-right tabular-nums ${due > 0 ? "font-bold text-[#dc2626]" : "text-[#15803d]"}`}>{due > 0 ? rupees(due) : "—"}</td>
                       <td>{phoneOf(f) ? <a className="hover:underline" href={`tel:${phoneOf(f)!.replace(/[^\d+]/g, "")}`}>{phoneOf(f)}</a> : <span className="muted">none</span>}</td>
                     </tr>
                   );
@@ -205,14 +199,5 @@ export default async function FamiliesPage({ searchParams }: { searchParams: Pro
         </>
       )}
     </>
-  );
-}
-
-function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
-  return (
-    <div className="card !p-4">
-      <div className="text-label-md text-on-surface-variant">{label}</div>
-      <div className={`mt-1 text-headline-sm font-extrabold ${warn ? "text-error" : "text-primary"}`}>{value}</div>
-    </div>
   );
 }

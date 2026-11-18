@@ -2,37 +2,42 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { ClassesTabs } from "@/components/classes-tabs";
-import { Tabs } from "@/components/tabs";
+import { PageHead, Chips, Empty, Row as Line } from "@/components/ilm";
+import { ClassesOverview, GapsTab, MoveTab, PerformanceTab, PromotionTab, TimetableStatus } from "./views";
 import { shortDate, time, todayPK } from "@/lib/format";
 import {
-  activateTiming, addPeriod, addSection, addStandardClasses, assignSubjectTeacher, createClass, createSubject, editClass, editSection,
-  createTimingProfile, deletePeriod, setClassTeacher, setSlot, autoFillSection, sendTimetableForReview, confirmTimetable,
+  activateTiming, addPeriod, assignSubjectTeacher,
+  createTimingProfile, deletePeriod, setSlot, autoFillSection, sendTimetableForReview, confirmTimetable,
 } from "../actions";
 import { WeekGrid } from "@/components/week-grid";
-import { AutoSubmitSelect } from "@/components/auto-submit";
 import { liveWeek, weekdayOf } from "@/lib/timetable";
 
-type Search = { tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
+type Search = { class?: string; f?: string; lv?: string; batch?: string; all?: string; q?: string; from?: string; sort?: string; tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default async function ClassesPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
   const tab = sp.tab ?? "classes";
+  const supabase = await createClient();
+  const { data: year } = await supabase.from("academic_sessions").select("name").eq("is_current", true).maybeSingle();
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <div>
-          <h1 className="h1">Students & Classes</h1>
-          <p className="muted">Classes, sections, timings and the timetable. Teachers and parents see changes straight away.</p>
-        </div>
-        <ClassesTabs current={tab} />
-      </div>
+      <PageHead kick={`Academics${year?.name ? ` · Session ${year.name}` : ""}`} title="Classes and sections"
+        sub="From Play group to BS. Set up classes, promote students, and watch how every class is doing.">
+        <Link href="/principal/classes?tab=promote" className="btn-ghost">Promote students</Link>
+        <Link href="/principal/classes#add-class" className="btn">Add class or program</Link>
+      </PageHead>
+      <ClassesTabs current={tab} />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">{savedText(sp.saved)}</div>}
-      {tab === "classes" && <ClassesTab />}
+      {tab === "classes" && <ClassesOverview classId={sp.class} level={sp.lv} />}
+      {tab === "promote" && <PromotionTab sectionId={sp.section} batch={sp.batch} all={sp.all === "1"} />}
+      {tab === "move" && <MoveTab q={sp.q} fromSection={sp.from} />}
+      {tab === "gaps" && <GapsTab />}
+      {tab === "kpi" && <PerformanceTab sort={sp.sort} />}
       {tab === "timings" && <TimingsTab profileId={sp.profile} />}
-      {tab === "timetable" && <TimetableViews sp={sp} />}
+      {tab === "timetable" && (sp.view || sp.section ? <TimetableViews sp={sp} /> : <><TimetableStatus /><TimetableViews sp={sp} /></>)}
     </>
   );
 }
@@ -41,160 +46,6 @@ async function teachersList() {
   const supabase = await createClient();
   const { data } = await supabase.from("profiles").select("id, full_name").in("role", ["teacher", "principal"]).eq("is_active", true).order("full_name");
   return data ?? [];
-}
-
-async function ClassesTab() {
-  const supabase = await createClient();
-  const [{ data: classes }, teachers, { data: counts }, { data: subjects }] = await Promise.all([
-    supabase.from("classes").select("id, name, board, sort, sections(id, name, capacity, class_teacher_id)").order("sort"),
-    teachersList(),
-    supabase.from("students").select("section_id").eq("status", "enrolled"),
-    supabase.from("subjects").select("id, name").order("name"),
-  ]);
-  const perSection = new Map<string, number>();
-  for (const s of counts ?? []) perSection.set(s.section_id, (perSection.get(s.section_id) ?? 0) + 1);
-  const teacherName = new Map(teachers.map((t) => [t.id, t.full_name]));
-  const allSecs = (classes ?? []).flatMap((c) => c.sections);
-  const students = allSecs.reduce((t, s) => t + (perSection.get(s.id) ?? 0), 0);
-  const seats = allSecs.reduce((t, s) => t + (s.capacity ?? 0), 0);
-  const noTeacher = allSecs.filter((s) => !s.class_teacher_id).length;
-  const full = allSecs.filter((s) => s.capacity && (perSection.get(s.id) ?? 0) >= s.capacity).length;
-
-  return (
-    <>
-      {/* the whole school at a glance */}
-      <section className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
-        <Stat label="Classes" value={String((classes ?? []).length)} sub={`${allSecs.length} sections`} />
-        <Stat label="Students" value={students.toLocaleString("en-IN")} sub={seats ? `${Math.round((students / seats) * 100)}% of ${seats.toLocaleString("en-IN")} seats` : "No seats set"} />
-        <Stat label="No class teacher" value={String(noTeacher)} sub={noTeacher ? "Pick one below" : "Every section has one"} warn={noTeacher > 0} />
-        <Stat label="Full sections" value={String(full)} sub={full ? "Add a section or seats" : "Room in every section"} warn={full > 0} />
-      </section>
-
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-        <section className="card flex-[2]">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="h2">Classes and sections</h2>
-            <span className="muted text-xs">Tap a section to see its students. Changing the class teacher saves straight away.</span>
-          </div>
-          {(classes ?? []).length === 0 && <p className="muted">No classes yet. Use “Add Class 1 to 10” to start.</p>}
-          <div className="flex flex-col gap-3">
-            {(classes ?? []).map((c) => {
-              const secs = [...c.sections].sort((a, b) => a.name.localeCompare(b.name));
-              const n = secs.reduce((t, s) => t + (perSection.get(s.id) ?? 0), 0);
-              return (
-                <div key={c.id} className="rounded-xl bg-surface-container-low p-3 sm:p-4">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                    <div className="flex items-baseline gap-2">
-                      <b className="text-title-md font-bold text-primary">{c.name}</b>
-                      <span className="text-body-sm text-on-surface-variant">{n} student{n === 1 ? "" : "s"}{c.board ? ` · ${c.board}` : ""}</span>
-                    </div>
-                    <Link href={`/principal/students?${new URLSearchParams({ class: c.id })}`} className="text-label-sm font-bold text-secondary hover:underline">All students</Link>
-                  </div>
-                  <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                    {secs.map((s) => {
-                      const k = perSection.get(s.id) ?? 0;
-                      const r = s.capacity ? k / s.capacity : 0;
-                      return (
-                        <div key={s.id} className="flex flex-col gap-2 rounded-lg bg-surface-container-lowest p-2.5 shadow-sm">
-                          <Link href={`/principal/students?section=${s.id}`} className="flex items-center gap-2.5 rounded hover:bg-surface-container-low">
-                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-container text-label-md font-bold text-on-primary">{s.name}</span>
-                            <span className="min-w-0 flex-1">
-                              <span className="flex justify-between text-label-sm"><span className="text-on-surface">{k} / {s.capacity} seats</span>
-                                <span className={r >= 1 ? "text-error" : "text-on-surface-variant"}>{r >= 1 ? "Full" : `${s.capacity - k} free`}</span></span>
-                              <span className="mt-1 block h-1.5 rounded-full bg-surface-container-high"><span className={`block h-1.5 rounded-full ${r >= 1 ? "bg-error" : "bg-secondary"}`} style={{ width: `${Math.min(100, r * 100)}%` }} /></span>
-                            </span>
-                            <span className="msym text-[18px] text-outline">chevron_right</span>
-                          </Link>
-                          <form action={setClassTeacher} className="flex items-center gap-2">
-                            <input type="hidden" name="section_id" value={s.id} />
-                            <span className="msym text-[18px] text-outline" aria-hidden="true">person</span>
-                            <AutoSubmitSelect name="teacher_id" defaultValue={s.class_teacher_id ?? ""} aria-label={`Class teacher for ${c.name}-${s.name}`}
-                              className={`min-h-9 w-full min-w-0 rounded-md border bg-surface-container-lowest px-2 text-body-sm ${s.class_teacher_id ? "border-surface-variant text-on-surface" : "border-error/50 text-error"}`}>
-                              <option value="">No class teacher</option>
-                              {teachers.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}
-                            </AutoSubmitSelect>
-                            <noscript><button className="eyebrow" type="submit">Save</button></noscript>
-                          </form>
-                          {s.class_teacher_id && !teacherName.has(s.class_teacher_id) && <span className="text-[11px] text-error">Teacher no longer active</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <details className="mt-2.5 group">
-                    <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-label-sm font-bold text-on-surface-variant hover:text-primary">
-                      <span className="msym text-[16px]">edit_note</span>Add section, rename or remove
-                    </summary>
-                    <div className="mt-2 flex flex-col gap-2 rounded-lg bg-surface-container-lowest p-3">
-                      <form action={addSection} className="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="class_id" value={c.id} />
-                        <input className="input w-24" name="name" placeholder="Section" required aria-label="New section name" />
-                        <input className="input w-24" name="capacity" type="number" placeholder="Seats" aria-label="Seats" />
-                        <button className="btn-ghost" type="submit">Add section</button>
-                      </form>
-                      <form action={editClass} className="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="class_id" value={c.id} />
-                        <input className="input min-w-40 flex-1" name="name" defaultValue={c.name} required aria-label="Class name" />
-                        <input className="input w-32" name="board" defaultValue={c.board ?? ""} placeholder="Board" aria-label="Board" />
-                        <input className="input w-20" name="sort" type="number" defaultValue={c.sort} aria-label="Order on lists" />
-                        <button className="btn-ghost" type="submit">Save</button>
-                        <button className="text-label-sm text-error underline" type="submit" name="remove" value="1">Remove class</button>
-                      </form>
-                      {secs.map((s) => (
-                        <form key={s.id} action={editSection} className="flex flex-wrap items-center gap-2">
-                          <input type="hidden" name="section_id" value={s.id} />
-                          <input className="input w-24" name="name" defaultValue={s.name} required aria-label="Section name" />
-                          <input className="input w-24" name="capacity" type="number" defaultValue={s.capacity} aria-label="Seats" />
-                          <button className="btn-ghost" type="submit">Save</button>
-                          <button className="text-label-sm text-error underline" type="submit" name="remove" value="1">Remove {s.name}</button>
-                        </form>
-                      ))}
-                      <p className="muted text-xs">A class or section can be removed only when no student is in it.</p>
-                    </div>
-                  </details>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-        <div className="flex flex-1 flex-col gap-5">
-          <details className="card group" open={(classes ?? []).length === 0}>
-            <summary className="flex cursor-pointer list-none items-center justify-between">
-              <h2 className="h2">Add a class</h2><span className="msym text-[20px] text-outline transition-transform group-open:rotate-90">chevron_right</span>
-            </summary>
-            <form action={createClass} className="mt-3 flex flex-col gap-3">
-              <label className="field">Class name<input className="input" name="name" required placeholder="Class 11 (FSc Pre-Medical)" /></label>
-              <label className="field">Sections<input className="input" name="sections" placeholder="A, B" /></label>
-              <div className="grid grid-cols-3 gap-3">
-                <label className="field">Seats<input className="input" name="capacity" type="number" placeholder="40" /></label>
-                <label className="field col-span-2">Board<input className="input" name="board" placeholder="BISE Lahore" /></label>
-              </div>
-              <label className="field">Order on lists<input className="input" name="sort" type="number" placeholder="11" /></label>
-              <button className="btn" type="submit">Create class</button>
-            </form>
-            <form action={addStandardClasses} className="mt-4 flex flex-col gap-2 border-t border-surface-variant pt-4">
-              <p className="muted text-sm">Or add Class 1 to Class 10 in one go. Each gets section A; classes you already have stay as they are.</p>
-              <button className="btn-ghost" type="submit">Add Class 1 to 10</button>
-            </form>
-          </details>
-          <form action={createSubject} className="card">
-            <h2 className="h2">Subjects</h2>
-            <div className="flex flex-wrap gap-1.5">{(subjects ?? []).map((s) => <span key={s.id} className="pill pill-gray">{s.name}</span>)}</div>
-            <div className="flex gap-2"><input className="input" name="name" required placeholder="Computer Science" aria-label="New subject" /><button className="btn-ghost" type="submit">Add</button></div>
-          </form>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function Stat({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
-  return (
-    <div className="rounded-xl bg-surface-container-lowest p-3 shadow-sm ring-1 ring-surface-variant/70 sm:p-4">
-      <div className="text-label-sm uppercase tracking-wider text-on-surface-variant">{label}</div>
-      <div className={`text-headline-md font-bold tabular-nums ${warn ? "text-error" : "text-primary"}`}>{value}</div>
-      <div className="text-[12px] text-on-surface-variant">{sub}</div>
-    </div>
-  );
 }
 
 async function TimingsTab({ profileId }: { profileId?: string }) {
@@ -206,57 +57,76 @@ async function TimingsTab({ profileId }: { profileId?: string }) {
     : { data: [] };
   const mins = (a: string, b: string) => (Date.parse(`1970-01-01T${b}Z`) - Date.parse(`1970-01-01T${a}Z`)) / 60000;
 
+  const classMins = (periods ?? []).filter((p) => p.kind === "class").map((p) => mins(p.starts_at, p.ends_at));
   return (
-    <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-      <section className="card flex-[2]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="h2">Bell timings</h2>
-          <Tabs current={profile?.id ?? ""} tabs={(profiles ?? []).map((p) => ({ id: p.id, label: p.name + (p.is_active ? " ✓" : ""), href: `/principal/classes?tab=timings&profile=${p.id}` }))} />
+    <section className="flex flex-wrap items-start gap-5">
+      <div className="card flex min-w-0 flex-[3_1_480px] flex-col">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <h2 className="h2">Bell schedule</h2>
+          <Chips label="Timing" current={profile?.id ?? ""} items={(profiles ?? []).map((p) => ({ id: p.id, label: p.name + (p.is_active ? " · in use" : ""), href: `/principal/classes?tab=timings&profile=${p.id}` }))} />
         </div>
+        {!profile && <div className="mt-3"><Empty>No bell timings yet. Create one on the right.</Empty></div>}
         {profile && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="muted">{profile.active_from ? `${profile.active_from} to ${profile.active_to}` : "No dates set"} · {profile.is_active ? "in use now" : "not in use"}</span>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2.5">
+              <span className="muted text-[13px]">{profile.active_from ? `${shortDate(profile.active_from)} to ${profile.active_to ? shortDate(profile.active_to) : "—"}` : "No dates set"} · {profile.is_active ? "in use now" : "not in use"}
+                {classMins.length ? ` · ${classMins.length} periods` : ""}</span>
               {!profile.is_active && (
-                <form action={activateTiming}><input type="hidden" name="timing_profile_id" value={profile.id} /><button className="btn-ghost" type="submit">Use these timings now</button></form>
+                <form action={activateTiming}><input type="hidden" name="timing_profile_id" value={profile.id} /><button className="btn" style={{ minHeight: 36, fontSize: 12 }} type="submit">Use these timings now</button></form>
               )}
             </div>
-            {(periods ?? []).map((p) => (
-              <form key={p.id} action={deletePeriod} className="row-box"
-                style={p.kind === "break" ? { background: "var(--orange-soft)" } : p.kind === "assembly" ? { background: "var(--purple-soft)" } : undefined}>
-                <input type="hidden" name="period_id" value={p.id} /><input type="hidden" name="timing_profile_id" value={profile.id} />
-                <b className="w-28">{p.name}</b>
-                <span className="flex-1 font-extrabold tabular-nums">{time(p.starts_at)} to {time(p.ends_at)}</span>
-                <span className="muted">{mins(p.starts_at, p.ends_at)} min</span>
-                <button className="muted px-2 underline" type="submit" aria-label={`Remove ${p.name}`}>Remove</button>
-              </form>
-            ))}
-            <form action={addPeriod} className="grid grid-cols-2 items-end gap-2 md:grid-cols-6">
-              <input type="hidden" name="timing_profile_id" value={profile.id} />
-              <label className="field col-span-2">Name<input className="input" name="name" required placeholder="Period 9" /></label>
-              <label className="field">Type<select className="input" name="kind"><option value="class">Class</option><option value="break">Break</option><option value="assembly">Assembly</option></select></label>
-              <label className="field">Starts<input className="input" name="starts_at" type="time" required /></label>
-              <label className="field">Ends<input className="input" name="ends_at" type="time" required /></label>
-              <label className="field">Order<input className="input" name="sort" type="number" placeholder="90" /></label>
-              <button className="btn col-span-2 md:col-span-6 md:justify-self-start" type="submit">Add period</button>
-            </form>
+            <div className="mt-2">
+              {(periods ?? []).map((p) => (
+                <form key={p.id} action={deletePeriod}>
+                  <Line className={p.kind === "break" ? "rounded-xl bg-[#fff7ed] px-2" : p.kind === "assembly" ? "rounded-xl bg-[#f5f3ff] px-2" : ""}>
+                    <input type="hidden" name="period_id" value={p.id} /><input type="hidden" name="timing_profile_id" value={profile.id} />
+                    <span className="w-32 font-black tabular-nums">{time(p.starts_at)} – {time(p.ends_at)}</span>
+                    <span className={`flex-1 ${p.kind === "class" ? "font-bold" : "font-black"}`}>{p.name}</span>
+                    <span className="kick">{mins(p.starts_at, p.ends_at)} min</span>
+                    <button className="text-[12px] font-extrabold text-[#6b7280] underline" type="submit" aria-label={`Remove ${p.name}`}>Remove</button>
+                  </Line>
+                </form>
+              ))}
+              {(periods ?? []).length === 0 && <Empty>No periods in this timing yet.</Empty>}
+            </div>
           </>
         )}
-      </section>
-      <form action={createTimingProfile} className="card flex-1">
-        <h2 className="h2">New timing</h2>
-        <label className="field">Name<input className="input" name="name" required placeholder="Ramadan" /></label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="field">From<input className="input" name="active_from" type="date" /></label>
-          <label className="field">To<input className="input" name="active_to" type="date" /></label>
-        </div>
-        <button className="btn" type="submit">Create</button>
-      </form>
-    </div>
+      </div>
+      <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-5">
+        {profile && (
+          <form action={addPeriod} className="card flex flex-col gap-3">
+            <h2 className="h2">Change timings · add a period</h2>
+            <input type="hidden" name="timing_profile_id" value={profile.id} />
+            <label className="field">Name<input className="input" name="name" required placeholder="Period 9" /></label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <label className="field">Type<select className="input" name="kind"><option value="class">Class</option><option value="break">Break</option><option value="assembly">Assembly</option></select></label>
+              <label className="field">Order<input className="input" name="sort" type="number" placeholder="90" /></label>
+              <label className="field">Starts<input className="input" name="starts_at" type="time" required /></label>
+              <label className="field">Ends<input className="input" name="ends_at" type="time" required /></label>
+            </div>
+            <button className="btn" type="submit">Add period</button>
+          </form>
+        )}
+        <form action={createTimingProfile} className="card flex flex-col gap-3">
+          <h2 className="h2">New timing</h2>
+          <label className="field">Name<input className="input" name="name" required placeholder="Ramadan" /></label>
+          <div className="grid grid-cols-2 gap-2.5">
+            <label className="field">From<input className="input" name="active_from" type="date" /></label>
+            <label className="field">To<input className="input" name="active_to" type="date" /></label>
+          </div>
+          <button className="btn-ghost" type="submit">Create</button>
+        </form>
+      </div>
+    </section>
   );
 }
 
 function savedText(v: string) {
+  if (v.startsWith("promoted-")) return `${v.slice(9)} students promoted. You can undo this for 7 days.`;
+  if (v.startsWith("moved-")) return `${v.slice(6)} student${v.slice(6) === "1" ? "" : "s"} moved. Undo is under Recent moves.`;
+  if (v.startsWith("undone-")) return `Undone for ${v.slice(7)} student${v.slice(7) === "1" ? "" : "s"}.`;
+  if (v === "rules") return "Rules saved.";
+  if (v === "program") return "Added. It shows as Not started until it has a section.";
   if (v.startsWith("filled-")) return `Filled ${v.slice(7)} free periods. Check them, then change any period below.`;
   return ({ full: "No free periods left to fill.", sent: "Sent. Each teacher sees it on their dashboard and can accept it or report a problem.",
     confirmed: "Confirmed. Parents and students now see the new timetable." } as Record<string, string>)[v] ?? "Saved.";
@@ -425,22 +295,29 @@ async function TimetableTab({ sectionId }: { sectionId?: string }) {
   ]);
   type Slot = { weekday: number; period_id: string; subject_id: string; teacher_id: string | null; subjects: { name: string }; profiles: { full_name: string } | null };
   const at = new Map(((slots ?? []) as unknown as Slot[]).map((s) => [`${s.weekday}-${s.period_id}`, s]));
+  const workDays = new Set(((slots ?? []) as unknown as { weekday: number }[]).map((x) => x.weekday)).has(6) ? 6 : 5;
+  const freeCount = Math.max(0, (periods ?? []).length * workDays - ((slots ?? []) as unknown as { weekday: number }[]).filter((x) => x.weekday <= workDays).length);
+  const noTeacherCount = ((slots ?? []) as unknown as { teacher_id: string | null }[]).filter((x) => !x.teacher_id).length;
   const palette = ["var(--blue-soft)", "var(--purple-soft)", "var(--orange-soft)", "var(--green-soft)", "var(--red-soft)", "#f2f2f2"];
   const color = new Map((subjects ?? []).map((s, i) => [s.id, palette[i % palette.length]]));
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap gap-2">
-        {list.map((s) => (
-          <Link key={s.id} href={`/principal/classes?tab=timetable&section=${s.id}`}
-            className="inline-flex min-h-10 items-center rounded-full border-2 px-3.5 text-sm font-extrabold"
-            style={s.id === section.id ? { borderColor: "var(--blue-ring)", background: "var(--blue-soft)", color: "var(--blue-ink)" } : { borderColor: "var(--line)", background: "#fff" }}>
-            {s.classes.name}-{s.name}
-          </Link>
-        ))}
-      </div>
       <section className="card">
-        <h2 className="h2">Weekly timetable · {section.classes.name}-{section.name}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <form className="flex flex-wrap items-center gap-2.5">
+            <input type="hidden" name="tab" value="timetable" />
+            <h2 className="h2">Weekly timetable</h2>
+            <select className="input" style={{ minHeight: 40 }} name="section" defaultValue={section.id} aria-label="Section">
+              {list.map((s) => <option key={s.id} value={s.id}>{s.classes.name}-{s.name}</option>)}
+            </select>
+            <button className="btn-ghost" style={{ minHeight: 36, fontSize: 12 }} type="submit">Show</button>
+            {freeCount > 0 ? <span className="tagx y">{freeCount} free period{freeCount === 1 ? "" : "s"}</span> : (periods ?? []).length > 0 && <span className="tagx g">Every period filled</span>}
+            {noTeacherCount > 0 && <span className="tagx r">{noTeacherCount} without a teacher</span>}
+          </form>
+          <Link href="/principal/classes?tab=timetable&view=school" className="btn-ghost" style={{ minHeight: 36, fontSize: 12 }}>Whole school</Link>
+        </div>
+        <p className="muted text-[13px]">Fill free periods fills the week from this section&apos;s subject teachers and never double-books a teacher.</p>
         <div className="overflow-x-auto">
           <div className="grid min-w-[760px] gap-1.5" style={{ gridTemplateColumns: `90px repeat(6, minmax(110px, 1fr))` }}>
             <div />

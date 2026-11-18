@@ -1,5 +1,6 @@
 "use server";
 
+import { SUPABASE_URL } from "@/lib/supabase/env";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +30,7 @@ export async function saveAvatar(url: string | null) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const mine = `/storage/v1/object/public/avatars/${user!.id}/`;
-  if (url && !url.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL + mine)) return { error: "That photo is not yours." };
+  if (url && !url.startsWith(SUPABASE_URL + mine)) return { error: "That photo is not yours." };
   const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", me.id);
   revalidatePath("/", "layout");
   return { error: error?.message ?? null };

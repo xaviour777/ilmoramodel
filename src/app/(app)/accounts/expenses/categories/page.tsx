@@ -17,7 +17,7 @@ export default async function ExpenseCategories({ searchParams }: { searchParams
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <Link href="/accounts/expenses" className="eyebrow">‹ Expenses</Link>
-          <h1 className="h1">Expense categories</h1>
+          <div className="kick">Money</div><h1 className="h1">Expense categories</h1>
           <p className="muted text-base">Main groups with sub-categories. Add your own, rename them, or hide the ones you don&apos;t use.</p>
         </div>
         <FeesTabs current="expenses" salaries={me.role === "accountant"} />

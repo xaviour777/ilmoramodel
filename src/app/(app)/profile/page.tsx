@@ -45,7 +45,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       {sp.saved === "details" && <div className="notice-ok">Saved.</div>}
       {gateQr && (
         <details className="card max-w-md" id="gate">
-          <summary className="flex cursor-pointer items-center gap-2 font-bold"><span className="msym text-[22px]" aria-hidden="true">qr_code_2</span>My gate QR (show it at the gate to check in)</summary>
+          <summary className="flex cursor-pointer items-center gap-2 font-bold">My gate QR (show it at the gate to check in)</summary>
           <div className="mx-auto mt-3 w-64 max-w-full rounded-xl bg-white p-3" dangerouslySetInnerHTML={{ __html: gateQr }} />
           <p className="muted mt-2 text-center text-sm">Turn the screen brightness up. Do not share a photo of this code.</p>
         </details>

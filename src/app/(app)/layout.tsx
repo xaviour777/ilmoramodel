@@ -1,44 +1,13 @@
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
-import { InstallAppButton } from "@/components/pwa";
 import { Avatar } from "@/components/avatar";
+import { InstallAppButton } from "@/components/pwa";
 import Link from "next/link";
-import { StitchNav, StitchBottomNav, type StitchGroup, type StitchItem } from "@/components/stitch-nav";
+import { PrincipalSidebar, PrincipalBottomBar } from "@/components/principal-nav";
 import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
-
-// Principal and owner sidebar (Stitch design). Every link is an existing page.
-const STITCH_GROUPS: StitchGroup[] = [
-  { title: "Overview", items: [{ href: "/principal", label: "Today", icon: "dashboard" }] },
-  { title: "School", items: [
-    { href: "/principal/classes", label: "Students & Classes", icon: "school", also: ["/principal/students"] },
-    { href: "/principal/families", label: "Families", icon: "family_restroom" },
-    { href: "/principal/attendance", label: "Attendance", icon: "how_to_reg" },
-    { href: "/principal/exams", label: "Exams", icon: "assignment" },
-    { href: "/principal/admissions", label: "Admissions", icon: "person_add" },
-    { href: "/principal/staff", label: "Staff & leave", icon: "badge" },
-    { href: "/principal/notices", label: "Notices", icon: "campaign" },
-  ] },
-  // one entry for money: fee desk, challans, online payments, defaulters, day close and expenses are tabs inside
-  { title: "Finance", items: [
-    { href: "/accounts", label: "Fees & money", icon: "payments" },
-  ] },
-  { title: "Learning", items: [
-    { href: "/teacher/paper-check", label: "Paper checking", icon: "fact_check" },
-    { href: "/teacher/tutor-report", label: "Tutor report", icon: "cast_for_education" },
-  ] },
-];
-// the phone's bottom bar: the places a principal opens most
-const STITCH_MAIN: StitchItem[] = [
-  { href: "/principal", label: "Today", icon: "dashboard", exact: true },
-  { href: "/principal/attendance", label: "Attendance", icon: "how_to_reg" },
-  { href: "/accounts", label: "Fees", icon: "payments" },
-  { href: "/principal/students", label: "Students", icon: "school", also: ["/principal/classes", "/principal/families"] },
-];
-const STITCH_FOOTER: StitchItem[] = [
-  { href: "/settings", label: "Settings", icon: "settings", also: ["/profile"] },
-];
+import { getBranding } from "@/lib/branding";
 
 const NAV: Record<Role, NavItem[]> = {
   principal: [
@@ -93,10 +62,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="mx-auto flex max-w-[1440px] flex-col gap-6 p-4 lg:flex-row lg:items-start lg:p-6">
       <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
         <div className="flex items-center justify-between lg:block">
-          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>ilmora</div>
+          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "ilmora"}</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
-            <InstallAppButton className="btn-ghost inline-flex min-h-10 items-center gap-1 px-2 text-sm" iconClass="msym text-[18px]" />
+            <InstallAppButton className="btn-ghost inline-flex min-h-10 items-center gap-1 px-2 text-sm" />
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
           </div>
         </div>
@@ -116,64 +85,44 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
 async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof getMe>>; children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: year } = await supabase.from("academic_sessions").select("name").eq("is_current", true).maybeSingle();
-  const today = new Date(todayPK() + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const today = todayPK();
+  const [year, campus, sections, sectionToday, leave, admissions, owing] = await Promise.all([
+    supabase.from("academic_sessions").select("name").eq("is_current", true).maybeSingle(),
+    supabase.from("campuses").select("name, schools(name)").eq("id", me.campus_id).maybeSingle(),
+    supabase.from("sections").select("id", { count: "exact", head: true }),
+    supabase.from("attendance_by_section_day").select("section_id, marked").eq("date", today),
+    supabase.from("leave_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("admissions").select("id", { count: "exact", head: true }).in("status", ["inquiry", "test", "offered"]),
+    supabase.from("family_balances").select("family_id", { count: "exact", head: true }).gt("balance_paisa", 0),
+  ]);
+  const markedSections = (sectionToday.data ?? []).filter((s) => s.marked > 0).length;
+  // only count unmarked sections once the school day has started (someone has marked)
+  const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
+  const badges = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
+  const brand = await getBranding();
+  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
+  const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
-    <div className="stitch min-h-screen bg-surface-container-lowest font-manrope text-body-md text-on-surface">
-      {/* sidebar, large screens */}
-      <aside className="fixed top-0 left-0 z-50 hidden h-screen w-60 flex-col bg-primary text-on-primary select-none lg:flex">
-        <div className="border-b border-on-primary/10 p-space-md">
-          <div className="flex items-center gap-space-sm">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-container text-headline-sm font-extrabold text-secondary-fixed">i</span>
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-headline-sm font-bold tracking-tight">Ilmora</span>
-              <span className="mt-0.5 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-secondary-fixed" />
-                <span className="truncate text-[11px] font-semibold text-on-primary-container">{me.campus_name}</span></span>
-            </div>
-          </div>
-        </div>
-        <StitchNav groups={STITCH_GROUPS} footer={STITCH_FOOTER} />
-        <div className="border-t border-on-primary/5 p-space-sm">
-          <div className="flex items-center justify-between rounded-lg bg-primary-container/40 px-2 py-1.5">
-            <Link href="/profile" className="flex min-w-0 items-center gap-2">
-              <Avatar name={me.full_name} url={me.avatar_url} size={28} />
-              <span className="flex min-w-0 flex-col"><span className="truncate text-label-sm">{me.full_name}</span>
-                <span className="truncate text-[10px] text-on-primary-container">{ROLE_LABEL[me.role]}</span></span>
-            </Link>
-            <form action={signOut}><button type="submit" aria-label="Sign out" title="Sign out" className="p-1 text-primary-fixed-dim hover:text-on-primary"><span className="msym text-[18px]">logout</span></button></form>
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex min-h-screen flex-col lg:pl-60">
-        <header className="sticky top-0 z-40 border-b border-surface-variant bg-surface-container-lowest/90 backdrop-blur-md">
-          <div className="flex h-16 items-center justify-between gap-space-md px-4 lg:px-gutter-desktop">
-            <div className="flex max-w-xl flex-1 items-center gap-space-md">
-              <div className="flex min-w-0 flex-col text-body-sm text-on-surface-variant sm:flex-row sm:items-center sm:gap-2">
-                <span className="font-bold text-primary">Ilmora</span>
-                <span className="hidden text-outline-variant sm:inline">/</span>
-                <span className="truncate text-[11px] text-on-surface sm:text-body-sm">{me.campus_name}</span>
-              </div>
-              <form action="/principal/students" className="relative hidden max-w-md flex-1 md:block" role="search">
-                <span className="msym absolute top-2.5 left-3 text-[18px] text-outline" aria-hidden="true">search</span>
-                <input name="q" aria-label="Search students" placeholder="Search student, roll no, B-form, 0300..."
-                  className="h-9 w-full rounded border border-surface-variant bg-surface pr-3 pl-9 text-body-sm text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none" />
-              </form>
-            </div>
-            <div className="flex items-center gap-space-sm">
-              {year?.name && <span className="hidden items-center gap-1.5 rounded border border-surface-variant bg-surface px-2.5 py-1 text-label-sm xl:flex">
-                <span className="msym text-[16px] text-outline" aria-hidden="true">calendar_month</span>{year.name}</span>}
-              <span className="hidden rounded border border-surface-variant bg-surface px-2.5 py-1 text-label-sm text-on-surface-variant 2xl:inline">Today, {today}</span>
-              <Link href="/principal/students" aria-label="Find a student" className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface md:hidden"><span className="msym text-[22px]">search</span></Link>
-              <Link href="/principal#actions" aria-label="What needs you today" className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface">
-                <span className="msym text-[20px]">notifications</span></Link>
-              <Link href="/profile" aria-label="My profile" className="border-l border-surface-variant pl-2"><Avatar name={me.full_name} url={me.avatar_url} size={32} /></Link>
-            </div>
-          </div>
-        </header>
-        <main className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-1 flex-col gap-5 px-4 pt-space-lg pb-28 lg:px-gutter-desktop lg:pb-space-lg">{children}</main>
-        <StitchBottomNav groups={STITCH_GROUPS} footer={STITCH_FOOTER} main={STITCH_MAIN} />
+    <div className="ilm min-h-screen">
+      <div className="hidden lg:block">
+        <PrincipalSidebar badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
       </div>
+      {/* phone header */}
+      <header className="sticky top-0 z-30 flex items-center gap-2.5 border-b-2 border-[#e5e7eb] bg-white px-4 pt-4 pb-2.5 lg:hidden">
+        <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl text-xl font-black text-white" style={{ background: "var(--brand, #16a34a)", boxShadow: "0 3px 0 var(--brand-lip, #15803d)" }}>{schoolName[0].toUpperCase()}</div>
+        <div className="min-w-0 flex-1"><div className="truncate text-[17px] font-black">{schoolName}</div>
+          <div className="truncate text-[12px] font-bold text-[#6b7280]">{me.campus_name}{year.data?.name ? ` · ${year.data.name}` : ""}</div></div>
+        <Link href="/profile" aria-label="My profile"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
+        <form action={signOut}><button type="submit" className="text-[12px] font-extrabold text-[#0369a1] underline">Sign out</button></form>
+      </header>
+      <div className="lg:pl-[264px]">
+        <div className="hidden justify-end gap-3 px-7 pt-4 text-[13px] font-extrabold lg:flex">
+          <Link href="/profile" className="text-[#0369a1] hover:underline">My profile</Link>
+          <form action={signOut}><button type="submit" className="cursor-pointer text-[#0369a1] hover:underline">Sign out</button></form>
+        </div>
+        <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12">{children}</main>
+      </div>
+      <PrincipalBottomBar badges={badges} />
     </div>
   );
 }

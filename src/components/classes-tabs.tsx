@@ -1,15 +1,30 @@
-import { Tabs } from "./tabs";
+import Link from "next/link";
 
-// Classes, students, board registration, timings and timetable sit under one menu entry.
+// Tabs under Classes (design/Classes.dc.html): Classes, Timetable, Bell timings, plus board registration.
+// Classes (design/Classes.dc.html): six tabs. Bell timings and board registration sit under Timetable.
+const TABS = [
+  { id: "classes", label: "Classes", href: "/principal/classes" },
+  { id: "promote", label: "Promotion", href: "/principal/classes?tab=promote" },
+  { id: "move", label: "Move a student", href: "/principal/classes?tab=move" },
+  { id: "gaps", label: "Gaps and checks", href: "/principal/classes?tab=gaps" },
+  { id: "kpi", label: "Performance", href: "/principal/classes?tab=kpi" },
+  { id: "timetable", label: "Timetable", href: "/principal/classes?tab=timetable" },
+];
+
 export function ClassesTabs({ current }: { current: string }) {
+  const id = current === "timings" || current === "board" ? "timetable" : current;
+  return <UnderTabs tabs={TABS} current={id} />;
+}
+
+export function UnderTabs({ tabs, current }: { tabs: { id: string; label: string; href: string }[]; current: string }) {
   return (
-    <Tabs current={current} tabs={[
-      { id: "classes", label: "Classes", href: "/principal/classes" },
-      { id: "students", label: "Students", href: "/principal/students" },
-      { id: "families", label: "Families", href: "/principal/families" },
-      { id: "board", label: "Board registration", href: "/principal/students/board" },
-      { id: "timings", label: "Timings", href: "/principal/classes?tab=timings" },
-      { id: "timetable", label: "Timetable", href: "/principal/classes?tab=timetable" },
-    ]} />
+    <nav className="flex flex-wrap gap-1 border-b-2 border-[#e5e7eb]" aria-label="Sections of this page">
+      {tabs.map((t) => (
+        <Link key={t.id} href={t.href} aria-current={t.id === current ? "page" : undefined}
+          className={`-mb-0.5 inline-flex min-h-11 items-center border-b-4 px-4 text-[15px] font-black ${t.id === current ? "border-[#38bdf8] text-[#0369a1]" : "border-transparent text-[#6b7280] hover:text-[#1f2937]"}`}>
+          {t.label}
+        </Link>
+      ))}
+    </nav>
   );
 }

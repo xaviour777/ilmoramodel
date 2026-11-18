@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHead, Stats, Stat } from "@/components/ilm";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -91,33 +92,26 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
   const phone = fam.reminder_phone || fam.phone;
   const digits = phone?.replace(/[^\d]/g, "") ?? "";
   const wa = digits ? `https://wa.me/${digits.startsWith("0") ? "92" + digits.slice(1) : digits}` : null;
-  const tone = (p: number | null) => (p === null ? "text-on-surface-variant" : p >= 80 ? "text-secondary" : p >= 50 ? "text-primary" : "text-error");
+  const tone = (p: number | null) => (p === null ? "text-[#6b7280]" : p >= 80 ? "text-[#15803d]" : p >= 50 ? "text-[#1f2937]" : "text-[#dc2626]");
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <Link href="/principal/families" className="eyebrow">‹ All families</Link>
-          <h1 className="h1">{fam.name}</h1>
-          <p className="muted text-base">
-            {studying.length} {studying.length === 1 ? "child" : "children"} studying{phone ? ` · ${phone}` : ""}{fam.address ? ` · ${fam.address}` : ""}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {phone && <a className="btn-ghost inline-flex items-center gap-1" href={`tel:${digits}`}><span className="msym text-[18px]">call</span>Call</a>}
-          {wa && <a className="btn-ghost inline-flex items-center gap-1" href={wa} target="_blank" rel="noreferrer"><span className="msym text-[18px]">forum</span>WhatsApp</a>}
-          <Link className="btn inline-flex items-center gap-1" href={`/accounts?family=${fam.id}`}><span className="msym text-[18px]">point_of_sale</span>Take fee</Link>
-        </div>
-      </div>
+      <Link href="/principal/families" className="text-[13px] font-extrabold text-[#0369a1]">‹ All families</Link>
+      <PageHead kick="Family" title={fam.name}
+        sub={`${studying.length} ${studying.length === 1 ? "child" : "children"} studying${phone ? ` · ${phone}` : ""}${fam.address ? ` · ${fam.address}` : ""}`}>
+          {phone && <a className="btn-ghost inline-flex items-center gap-1" href={`tel:${digits}`}>Call</a>}
+          {wa && <a className="btn-ghost inline-flex items-center gap-1" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
+          <Link className="btn inline-flex items-center gap-1" href={`/accounts?family=${fam.id}`}>Take fee</Link>
+      </PageHead>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <Stats>
         <Stat label="Children studying" value={String(studying.length)} />
         <Stat label="Monthly fee (all children)" value={rupees(monthlyTotal)} />
         <Stat label="Due now" value={balance > 0 ? rupees(balance) : "Nothing"} warn={balance > 0} />
-        <Stat label="Last payment" value={payments?.[0] ? `${rupees(Number(payments[0].amount_paisa))}` : "None yet"} note={payments?.[0] ? shortDate(payments[0].received_at.slice(0, 10)) : undefined} />
-      </div>
+        <Stat label="Last payment" value={payments?.[0] ? `${rupees(Number(payments[0].amount_paisa))}` : "None yet"} sub={payments?.[0] ? shortDate(payments[0].received_at.slice(0, 10)) : undefined} />
+      </Stats>
 
       <section className="flex flex-col gap-3">
         <h2 className="h2">Children</h2>
@@ -131,20 +125,20 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
               <>
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="truncate text-title-md font-bold text-primary">{k.full_name}</div>
-                    <div className="text-body-sm text-on-surface-variant">{k.sections ? `${k.sections.classes.name}-${k.sections.name}` : "No class"}{k.roll_no ? ` · Roll ${k.roll_no}` : ""}</div>
+                    <div className="truncate text-[16px] font-bold text-[#1f2937]">{k.full_name}</div>
+                    <div className="text-[13px] text-[#6b7280]">{k.sections ? `${k.sections.classes.name}-${k.sections.name}` : "No class"}{k.roll_no ? ` · Roll ${k.roll_no}` : ""}</div>
                   </div>
-                  <span className={`rounded-full px-2 py-0.5 text-label-sm ${k.status === "enrolled" ? "bg-secondary-fixed/50 text-secondary" : "bg-surface-variant text-on-surface-variant"}`}>{STATUS[k.status] ?? k.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[12px] ${k.status === "enrolled" ? "bg-[#dcfce7] text-[#15803d]" : "bg-[#f2f2f2] text-[#6b7280]"}`}>{STATUS[k.status] ?? k.status}</span>
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                   <Mini label="Attendance 30 days" value={ap === null ? "—" : `${ap}%`} cls={tone(ap)} />
                   <Mini label={last ? last.exam : "Last result"} value={last ? `${last.p}%` : "—"} cls={tone(last?.p ?? null)} />
-                  <Mini label="Fee / month" value={k.status === "enrolled" ? rupees(feeOf(k)) : "—"} cls="text-primary" />
+                  <Mini label="Fee / month" value={k.status === "enrolled" ? rupees(feeOf(k)) : "—"} cls="text-[#1f2937]" />
                 </div>
               </>
             );
             return canOpenStudent
-              ? <Link key={k.id} href={`/principal/students/${k.id}`} className="card block !p-4 transition hover:border-primary">{inner}</Link>
+              ? <Link key={k.id} href={`/principal/students/${k.id}`} className="card block !p-4 transition hover:border-[#1f2937]">{inner}</Link>
               : <div key={k.id} className="card !p-4">{inner}</div>;
           })}
         </div>
@@ -159,7 +153,7 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
               <tbody>
                 {recentExams.map((e) => (
                   <tr key={e.id}>
-                    <td><span className="font-semibold">{e.name}</span>{e.date && <span className="block text-body-sm text-on-surface-variant">{shortDate(e.date)}</span>}</td>
+                    <td><span className="font-semibold">{e.name}</span>{e.date && <span className="block text-[13px] text-[#6b7280]">{shortDate(e.date)}</span>}</td>
                     {kids.map((k) => { const p = pctOf(e.id, k.id); return <td key={k.id} className={`text-right font-bold tabular-nums ${tone(p)}`}>{p === null ? "—" : `${p}%`}</td>; })}
                   </tr>
                 ))}
@@ -173,28 +167,28 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
         <section className="card flex flex-col gap-3">
           <div className="flex items-center justify-between gap-2">
             <h2 className="h2">Fee</h2>
-            {invoice && <Link className="text-label-md font-semibold text-primary underline" target="_blank" href={`/print/challans?month=${invoice.billing_month.slice(0, 7)}&family=${fam.id}`}>Print challan</Link>}
+            {invoice && <Link className="text-[13px] font-semibold text-[#1f2937] underline" target="_blank" href={`/print/challans?month=${invoice.billing_month.slice(0, 7)}&family=${fam.id}`}>Print challan</Link>}
           </div>
           {invoice ? (
             <div>
-              <div className="text-body-sm text-on-surface-variant">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)}</div>
-              <ul className="mt-2 divide-y divide-surface-variant">
+              <div className="text-[13px] text-[#6b7280]">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)}</div>
+              <ul className="mt-2 divide-y divide-[#e5e7eb]">
                 {((invoice.invoice_lines ?? []) as { student_id: string | null; description: string; amount_paisa: number }[]).map((l, i) => (
-                  <li key={i} className="flex justify-between gap-2 py-1.5 text-body-md">
-                    <span className="min-w-0">{l.description}{l.student_id && <span className="text-on-surface-variant"> · {kids.find((k) => k.id === l.student_id)?.full_name.split(" ")[0] ?? ""}</span>}</span>
-                    <span className={`tabular-nums ${Number(l.amount_paisa) < 0 ? "text-secondary" : ""}`}>{rupees(Number(l.amount_paisa))}</span>
+                  <li key={i} className="flex justify-between gap-2 py-1.5 text-[14px]">
+                    <span className="min-w-0">{l.description}{l.student_id && <span className="text-[#6b7280]"> · {kids.find((k) => k.id === l.student_id)?.full_name.split(" ")[0] ?? ""}</span>}</span>
+                    <span className={`tabular-nums ${Number(l.amount_paisa) < 0 ? "text-[#15803d]" : ""}`}>{rupees(Number(l.amount_paisa))}</span>
                   </li>
                 ))}
               </ul>
             </div>
           ) : <p className="muted">No challan yet.</p>}
-          <h3 className="text-title-md font-bold text-primary">Recent payments</h3>
+          <h3 className="text-[16px] font-bold text-[#1f2937]">Recent payments</h3>
           {payments?.length ? (
-            <ul className="divide-y divide-surface-variant">
+            <ul className="divide-y divide-[#e5e7eb]">
               {payments.map((p) => (
-                <li key={p.id} className="flex justify-between gap-2 py-1.5 text-body-md">
+                <li key={p.id} className="flex justify-between gap-2 py-1.5 text-[14px]">
                   <span>{shortDate(p.received_at.slice(0, 10))} · {MODE[p.mode] ?? p.mode}{p.receipt_no ? ` · ${p.receipt_no}` : ""}</span>
-                  <span className="font-semibold tabular-nums text-secondary">{rupees(Number(p.amount_paisa))}</span>
+                  <span className="font-semibold tabular-nums text-[#15803d]">{rupees(Number(p.amount_paisa))}</span>
                 </li>
               ))}
             </ul>
@@ -205,11 +199,11 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
           <section className="card flex flex-col gap-2">
             <h2 className="h2">Parents and guardians</h2>
             {(guardians ?? []).length === 0 && <p className="muted">No parent login linked yet. Phone on file: {phone ?? "none"}.</p>}
-            <ul className="divide-y divide-surface-variant">
+            <ul className="divide-y divide-[#e5e7eb]">
               {((guardians ?? []) as unknown as { relation: string; is_fee_contact: boolean; profiles: { full_name: string; phone: string | null } | null }[]).map((g, i) => (
                 <li key={i} className="flex items-center justify-between gap-2 py-1.5">
-                  <span><span className="font-semibold">{g.profiles?.full_name}</span><span className="text-body-sm text-on-surface-variant"> · {g.relation}{g.is_fee_contact ? " · pays the fee" : ""}</span></span>
-                  {g.profiles?.phone && <a className="text-primary hover:underline" href={`tel:${g.profiles.phone.replace(/[^\d+]/g, "")}`}>{g.profiles.phone}</a>}
+                  <span><span className="font-semibold">{g.profiles?.full_name}</span><span className="text-[13px] text-[#6b7280]"> · {g.relation}{g.is_fee_contact ? " · pays the fee" : ""}</span></span>
+                  {g.profiles?.phone && <a className="text-[#1f2937] hover:underline" href={`tel:${g.profiles.phone.replace(/[^\d+]/g, "")}`}>{g.profiles.phone}</a>}
                 </li>
               ))}
             </ul>
@@ -217,9 +211,9 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
 
           <section className="card flex flex-col gap-3">
             <h2 className="h2">Referral</h2>
-            <div className="text-body-md">
+            <div className="text-[14px]">
               Brought by:{" "}
-              {referrer ? <Link className="font-semibold text-primary hover:underline" href={`/principal/families/${referrer.id}`}>{referrer.name}</Link> : <span className="muted">not recorded</span>}
+              {referrer ? <Link className="font-semibold text-[#1f2937] hover:underline" href={`/principal/families/${referrer.id}`}>{referrer.name}</Link> : <span className="muted">not recorded</span>}
             </div>
             <form action={setReferrer} className="flex flex-wrap items-end gap-2">
               <input type="hidden" name="family_id" value={fam.id} />
@@ -228,12 +222,12 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
               </label>
               <button className="btn-ghost" type="submit">Save</button>
             </form>
-            <div className="text-body-md">
+            <div className="text-[14px]">
               Families they brought: {brought?.length ? <b>{brought.length}</b> : <span className="muted">none yet</span>}
             </div>
             {!!brought?.length && (
               <div className="flex flex-wrap gap-1">
-                {brought.map((b) => <Link key={b.id} href={`/principal/families/${b.id}`} className="rounded-full bg-surface-container-low px-2 py-0.5 text-label-md text-primary hover:underline">{b.name}</Link>)}
+                {brought.map((b) => <Link key={b.id} href={`/principal/families/${b.id}`} className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[13px] text-[#1f2937] hover:underline">{b.name}</Link>)}
               </div>
             )}
           </section>
@@ -243,21 +237,11 @@ export default async function FamilyPage({ params, searchParams }: { params: Pro
   );
 }
 
-function Stat({ label, value, warn, note }: { label: string; value: string; warn?: boolean; note?: string }) {
-  return (
-    <div className="card !p-4">
-      <div className="text-label-md text-on-surface-variant">{label}</div>
-      <div className={`mt-1 text-headline-sm font-extrabold ${warn ? "text-error" : "text-primary"}`}>{value}</div>
-      {note && <div className="text-body-sm text-on-surface-variant">{note}</div>}
-    </div>
-  );
-}
-
 function Mini({ label, value, cls }: { label: string; value: string; cls: string }) {
   return (
-    <div className="rounded-lg bg-surface-container-low px-1 py-2">
-      <div className={`text-title-md font-extrabold ${cls}`}>{value}</div>
-      <div className="truncate text-[11px] text-on-surface-variant">{label}</div>
+    <div className="rounded-lg bg-[#f1f5f9] px-1 py-2">
+      <div className={`text-[16px] font-extrabold ${cls}`}>{value}</div>
+      <div className="truncate text-[11px] text-[#6b7280]">{label}</div>
     </div>
   );
 }

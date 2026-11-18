@@ -65,28 +65,28 @@ export function GateScanner() {
     : r.action === "in" ? `${r.status === "late" ? "Late" : "On time"} · checked in ${t(r.at)}`
     : r.action === "out" ? `Checked out ${t(r.at)} · came at ${t(r.in_at)}`
     : `Already checked in at ${t(r.at)}${r.out_at ? `, out ${t(r.out_at)}` : ""}`;
-  const tone = (r: Shown) => !r.ok ? "bg-error text-on-error" : r.action === "in" && r.status === "late" ? "bg-tertiary-fixed text-primary" : r.action === "already" ? "bg-surface-variant text-primary" : "bg-secondary text-on-secondary";
+  const tone = (r: Shown) => !r.ok ? "bg-[#dc2626] text-white" : r.action === "in" && r.status === "late" ? "bg-[#fef3c7] text-[#1f2937]" : r.action === "already" ? "bg-[#f2f2f2] text-[#1f2937]" : "bg-secondary text-on-secondary";
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative overflow-hidden rounded-2xl bg-primary">
+      <div className="relative overflow-hidden rounded-2xl bg-[#1f2937]">
         <video ref={video} playsInline muted className={`aspect-[4/3] w-full object-cover ${camera === "on" ? "" : "hidden"}`} />
         <canvas ref={canvas} className="hidden" />
         {camera !== "on" && (
-          <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 p-6 text-center text-on-primary">
-            <span className="msym text-[48px]" aria-hidden="true">qr_code_scanner</span>
+          <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 p-6 text-center text-white">
+            
             <p>{camera === "denied" ? "The camera is blocked. Allow the camera for this site in the browser settings, or type the code below." : "Keep this phone at the gate. Staff show the QR on their card or phone."}</p>
-            <button type="button" className="btn !bg-secondary-fixed !text-primary" onClick={() => setCamera("on")}>Start camera</button>
+            <button type="button" className="btn !bg-[#dcfce7] !text-[#1f2937]" onClick={() => setCamera("on")}>Start camera</button>
           </div>
         )}
-        {camera === "on" && <div className="pointer-events-none absolute inset-[18%] rounded-2xl border-4 border-secondary-fixed/80" />}
-        {busy && <div className="absolute inset-x-0 top-0 bg-primary/70 py-1 text-center text-label-md text-on-primary">Checking…</div>}
+        {camera === "on" && <div className="pointer-events-none absolute inset-[18%] rounded-2xl border-4 border-[#4ade80]" />}
+        {busy && <div className="absolute inset-x-0 top-0 bg-black/60 py-1 text-center text-[13px] text-white">Checking…</div>}
       </div>
 
       {shown && (
         <div key={shown.key} role="status" className={`rounded-2xl p-4 ${tone(shown)}`}>
-          <div className="text-headline-sm font-extrabold">{shown.ok ? shown.name : "Not checked in"}</div>
-          <div className="text-title-md">{message(shown)}</div>
+          <div className="text-[24px] font-extrabold">{shown.ok ? shown.name : "Not checked in"}</div>
+          <div className="text-[16px]">{message(shown)}</div>
         </div>
       )}
 
@@ -98,11 +98,11 @@ export function GateScanner() {
       {log.length > 0 && (
         <section className="card flex flex-col gap-2">
           <h2 className="h2">On this phone today</h2>
-          <ul className="divide-y divide-surface-variant">
+          <ul className="divide-y divide-[#e5e7eb]">
             {log.map((r) => r.ok && (
-              <li key={r.key} className="flex justify-between gap-2 py-1.5 text-body-md">
+              <li key={r.key} className="flex justify-between gap-2 py-1.5 text-[14px]">
                 <span className="font-semibold">{r.name}</span>
-                <span className="text-on-surface-variant">{r.action === "out" ? "out" : r.action === "in" ? (r.status === "late" ? "late" : "in") : "again"} {t(r.at)}</span>
+                <span className="text-[#6b7280]">{r.action === "out" ? "out" : r.action === "in" ? (r.status === "late" ? "late" : "in") : "again"} {t(r.at)}</span>
               </li>
             ))}
           </ul>

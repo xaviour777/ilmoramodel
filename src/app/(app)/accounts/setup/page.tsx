@@ -33,7 +33,7 @@ export default async function FeeSetupPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Fees and challans</h1>
+          <div className="kick">Money</div><h1 className="h1">Fees and challans</h1>
           <p className="muted text-base">Set each class&apos;s fee once, then make every family&apos;s challan for the month with one button.</p>
         </div>
         <FeesTabs current="setup" salaries={me.role === "accountant"} />

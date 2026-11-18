@@ -28,7 +28,7 @@ export function RegisterSW() {
 }
 
 // Shows "Install app" only when the browser can install Ilmora and it isn't installed yet.
-export function InstallAppButton({ className, iconClass = "msym text-[20px]" }: { className?: string; iconClass?: string }) {
+export function InstallAppButton({ className }: { className?: string }) {
   const [evt, setEvt] = useState<InstallEvent | null>(saved);
   useEffect(() => {
     const sync = () => setEvt(saved);
@@ -43,7 +43,7 @@ export function InstallAppButton({ className, iconClass = "msym text-[20px]" }: 
       saved = null;
       setEvt(null);
     }}>
-      <span className={iconClass} aria-hidden="true">install_mobile</span>Install app
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM12 7v7M9 11l3 3 3-3M11 18h2" /></svg>Install app
     </button>
   );
 }

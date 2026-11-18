@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { PageHead, Stats, Stat } from "@/components/ilm";
+import { UnderTabs } from "@/components/classes-tabs";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, todayPK } from "@/lib/format";
@@ -110,45 +112,41 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
 
   const Contact = ({ r }: { r: Row }) => (
     <div className="flex gap-2">
-      <a href={`tel:${digits(r.phone)}`} aria-label={`Call ${r.guardian_name}`} className="grid h-10 w-10 place-items-center rounded-full bg-surface-container-low text-primary"><span className="msym text-[20px]">call</span></a>
-      <a href={waLink(r.phone)} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${r.guardian_name}`} className="grid h-10 w-10 place-items-center rounded-full bg-surface-container-low text-primary"><span className="msym text-[20px]">forum</span></a>
+      <a href={`tel:${digits(r.phone)}`} aria-label={`Call ${r.guardian_name}`} className="grid h-10 w-10 place-items-center rounded-full bg-[#f1f5f9] text-[#1f2937]"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg></a>
+      <a href={waLink(r.phone)} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${r.guardian_name}`} className="grid h-10 w-10 place-items-center rounded-full bg-[#f1f5f9] text-[#1f2937]"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z" /></svg></a>
     </div>
   );
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="h1">Admissions</h1>
-          <p className="muted text-base">From the first call to the first day. Admitting a child makes the family, the student and the first challan.</p>
-        </div>
-        <a href="#new" className="btn inline-flex items-center gap-1"><span className="msym text-[20px]">person_add</span>New inquiry</a>
-      </div>
+      <PageHead kick="People" title="Admissions" sub="From the first call to the first day. Admitting a child makes the family, the student and the first challan.">
+        <a href="#new" className="btn">New inquiry</a>
+      </PageHead>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">{sp.saved === "inquiry" ? "Inquiry added. It will show in Call today when the call-back date comes." : "Saved."}</div>}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Kpi icon="person_add" label="New inquiries this month" value={newThisMonth} />
-        <Kpi icon="edit_note" label="Entry tests this week" value={testsThisWeek} />
-        <Kpi icon="hourglass_top" label="Seats offered, waiting" value={count("offered")} />
-        <Kpi icon="task_alt" label="Admitted this month" value={admittedThisMonth} note={conversion !== null ? `${conversion}% of decided families joined (6 months)` : undefined} dark />
-      </div>
+      <Stats>
+        <Stat label="New inquiries this month" value={newThisMonth.toLocaleString("en-PK")} />
+        <Stat label="Entry tests this week" value={testsThisWeek.toLocaleString("en-PK")} />
+        <Stat label="Seats offered, waiting" value={count("offered").toLocaleString("en-PK")} />
+        <Stat label="Admitted this month" value={admittedThisMonth.toLocaleString("en-PK")} tone="#15803d" sub={conversion !== null ? `${conversion}% of decided families joined (6 months)` : undefined} />
+      </Stats>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="flex min-w-0 flex-col gap-4">
           {/* who to call today */}
           <section className="card flex flex-col gap-3">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="h2 flex items-center gap-2"><span className="msym text-[22px] text-secondary">call</span>Call today</h2>
+              <h2 className="h2 flex items-center gap-2"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg>Call today</h2>
               <span className="pill pill-gray">{callToday.length}</span>
             </div>
             {callToday.length === 0 ? <p className="muted">No call-backs due. New inquiries get a call-back date two days ahead.</p> : (
-              <ul className="divide-y divide-surface-variant">
+              <ul className="divide-y divide-[#e5e7eb]">
                 {callToday.slice(0, 8).map((r) => (
                   <li key={r.id} className="flex items-center gap-3 py-2">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate font-bold text-primary">{r.child_name} <span className="font-normal text-on-surface-variant">· {r.classes?.name ?? "class not set"}</span></div>
-                      <div className="truncate text-body-sm text-on-surface-variant">
+                      <div className="truncate font-bold text-[#1f2937]">{r.child_name} <span className="font-normal text-[#6b7280]">· {r.classes?.name ?? "class not set"}</span></div>
+                      <div className="truncate text-[13px] text-[#6b7280]">
                         {r.guardian_name} · {r.status === "test" && r.test_on === today ? "Entry test today" : r.status === "offered" ? "Seat offered: ask about fee" : r.follow_up_on && r.follow_up_on < today ? `Call-back was ${shortDate(r.follow_up_on)}` : "Call-back today"}
                       </div>
                     </div>
@@ -162,13 +160,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
 
           {/* steps */}
           <section className="flex flex-col gap-3">
-            <div className="tabs" role="tablist" aria-label="Steps">
-              {STAGES.map((s) => (
-                <Link key={s.id} href={`/principal/admissions?stage=${s.id}`} role="tab" aria-selected={s.id === stage} className="tab">
-                  {s.label} <span className="ml-1 text-on-surface-variant">{count(s.id)}</span>
-                </Link>
-              ))}
-            </div>
+            <UnderTabs current={stage} tabs={STAGES.map((s) => ({ id: s.id, label: `${s.label} · ${count(s.id)}`, href: `/principal/admissions?stage=${s.id}` }))} />
             <p className="muted text-sm">{info.hint}</p>
             {list.length === 0 && <div className="card muted">Nobody in this step.</div>}
             <div className="grid gap-3 lg:grid-cols-2">
@@ -181,23 +173,23 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                     <div className="flex items-start gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-title-md font-bold text-primary">{r.child_name}</span>
-                          <span className="rounded-full bg-surface-container-low px-2 py-0.5 text-label-sm text-primary">{r.classes?.name ?? "Class not set"}</span>
+                          <span className="text-[16px] font-bold text-[#1f2937]">{r.child_name}</span>
+                          <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[12px] text-[#1f2937]">{r.classes?.name ?? "Class not set"}</span>
                         </div>
-                        <div className="text-body-sm text-on-surface-variant">{r.guardian_name} · {r.phone}</div>
+                        <div className="text-[13px] text-[#6b7280]">{r.guardian_name} · {r.phone}</div>
                       </div>
                       {r.status !== "admitted" && <Contact r={r} />}
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 text-label-sm">
-                      {sib && <Link href={`/principal/families/${sib.id}`} className="rounded-full bg-secondary-fixed/50 px-2 py-0.5 text-secondary">Sibling here: {sib.name}</Link>}
-                      {r.referred_by_family_id && <span className="rounded-full bg-secondary-fixed/50 px-2 py-0.5 text-secondary">Referred by {refName.get(r.referred_by_family_id) ?? "a family"}</span>}
-                      {r.source && r.source !== "referral" && <span className="rounded-full bg-surface-variant px-2 py-0.5 text-on-surface-variant">{SOURCE[r.source]}</span>}
-                      {r.status === "test" && r.test_on && <span className={`rounded-full px-2 py-0.5 ${r.test_on < today ? "bg-error-container text-error" : r.test_on === today ? "bg-tertiary-fixed text-primary" : "bg-surface-variant text-on-surface-variant"}`}>Test {r.test_on === today ? "today" : shortDate(r.test_on)}{r.test_on < today ? ": result missing" : ""}</span>}
-                      {["inquiry", "offered"].includes(r.status) && waitDays >= 3 && <span className="rounded-full bg-error-container px-2 py-0.5 text-error">Waiting {waitDays} days</span>}
-                      {r.follow_up_on && ["inquiry", "test", "offered"].includes(r.status) && r.status !== "test" && <span className="rounded-full bg-surface-variant px-2 py-0.5 text-on-surface-variant">Call {r.follow_up_on <= today ? "today" : shortDate(r.follow_up_on)}</span>}
+                    <div className="flex flex-wrap gap-1.5 text-[12px]">
+                      {sib && <Link href={`/principal/families/${sib.id}`} className="rounded-full bg-[#dcfce7] px-2 py-0.5 text-[#15803d]">Sibling here: {sib.name}</Link>}
+                      {r.referred_by_family_id && <span className="rounded-full bg-[#dcfce7] px-2 py-0.5 text-[#15803d]">Referred by {refName.get(r.referred_by_family_id) ?? "a family"}</span>}
+                      {r.source && r.source !== "referral" && <span className="rounded-full bg-[#e5e7eb] px-2 py-0.5 text-[#6b7280]">{SOURCE[r.source]}</span>}
+                      {r.status === "test" && r.test_on && <span className={`rounded-full px-2 py-0.5 ${r.test_on < today ? "bg-[#fee2e2] text-[#dc2626]" : r.test_on === today ? "bg-[#fef3c7] text-[#1f2937]" : "bg-[#e5e7eb] text-[#6b7280]"}`}>Test {r.test_on === today ? "today" : shortDate(r.test_on)}{r.test_on < today ? ": result missing" : ""}</span>}
+                      {["inquiry", "offered"].includes(r.status) && waitDays >= 3 && <span className="rounded-full bg-[#fee2e2] px-2 py-0.5 text-[#dc2626]">Waiting {waitDays} days</span>}
+                      {r.follow_up_on && ["inquiry", "test", "offered"].includes(r.status) && r.status !== "test" && <span className="rounded-full bg-[#e5e7eb] px-2 py-0.5 text-[#6b7280]">Call {r.follow_up_on <= today ? "today" : shortDate(r.follow_up_on)}</span>}
                     </div>
-                    {r.notes && <p className="text-body-sm">{r.notes}</p>}
+                    {r.notes && <p className="text-[13px]">{r.notes}</p>}
 
                     {/* the one next step for this child */}
                     {r.status === "inquiry" && (
@@ -215,8 +207,8 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                       </form>
                     )}
                     {(r.status === "offered" || r.status === "inquiry" || r.status === "test") && (
-                      <details className="rounded-lg bg-surface-container-low px-3 py-2" open={r.status === "offered"}>
-                        <summary className="cursor-pointer text-label-md font-bold text-primary">{r.status === "offered" ? "Admit (when the fee is paid)" : "Admit straight away"}</summary>
+                      <details className="rounded-lg bg-[#f1f5f9] px-3 py-2" open={r.status === "offered"}>
+                        <summary className="cursor-pointer text-[13px] font-bold text-[#1f2937]">{r.status === "offered" ? "Admit (when the fee is paid)" : "Admit straight away"}</summary>
                         <form action={admitStudent} className="mt-2 flex flex-col gap-2">
                           <input type="hidden" name="admission_id" value={r.id} />
                           <div className="flex gap-2">
@@ -226,21 +218,21 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                             <input className="input w-20" name="roll_no" placeholder="Roll" aria-label="Roll number" />
                           </div>
                           <input className="input" name="admission_no" placeholder="Admission no" aria-label="Admission number" />
-                          <label className="flex items-center gap-2 text-label-md"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
+                          <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
                           <button className="btn" type="submit">Admit</button>
                         </form>
                       </details>
                     )}
                     {r.status === "admitted" && (
-                      <div className="flex items-center justify-between text-body-sm">
-                        <span className="text-secondary">Admitted{r.students?.admitted_on ? ` ${shortDate(r.students.admitted_on)}` : ""}</span>
-                        {r.student_id && <Link className="font-semibold text-primary underline" href={`/principal/students/${r.student_id}`}>Open student</Link>}
+                      <div className="flex items-center justify-between text-[13px]">
+                        <span className="text-[#15803d]">Admitted{r.students?.admitted_on ? ` ${shortDate(r.students.admitted_on)}` : ""}</span>
+                        {r.student_id && <Link className="font-semibold text-[#1f2937] underline" href={`/principal/students/${r.student_id}`}>Open student</Link>}
                       </div>
                     )}
 
                     {["inquiry", "test", "offered"].includes(r.status) && (
                       <details>
-                        <summary className="cursor-pointer text-label-md text-on-surface-variant">Call back later or decline</summary>
+                        <summary className="cursor-pointer text-[13px] text-[#6b7280]">Call back later or decline</summary>
                         <form action={setFollowUp} className="mt-2 flex flex-wrap items-end gap-2">
                           <input type="hidden" name="admission_id" value={r.id} /><input type="hidden" name="back" value={here} />
                           <label className="field basis-36">Call back on<input className="input" type="date" name="follow_up_on" min={today} defaultValue={r.follow_up_on ?? ""} /></label>
@@ -250,7 +242,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                         <form action={moveAdmission} className="mt-2 flex flex-wrap items-end gap-2">
                           <input type="hidden" name="admission_id" value={r.id} /><input type="hidden" name="status" value="declined" /><input type="hidden" name="back" value={here} />
                           <label className="field min-w-0 flex-1 basis-40">Why not joining<input className="input" name="note" placeholder="Fee too high, too far, chose another school" /></label>
-                          <button className="btn-ghost text-error" type="submit">Decline</button>
+                          <button className="btn-ghost text-[#dc2626]" type="submit">Decline</button>
                         </form>
                       </details>
                     )}
@@ -277,9 +269,9 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                 const pctUsed = Math.min(100, Math.round((c.used / c.cap) * 100));
                 return (
                   <li key={c.id}>
-                    <div className="flex justify-between text-body-sm"><span className="font-semibold">{c.name}</span>
-                      <span className={c.left === 0 ? "font-bold text-error" : c.left <= 3 ? "font-bold text-tertiary" : "text-on-surface-variant"}>{c.left === 0 ? "Full" : `${c.left} left`}{c.waiting ? ` · ${c.waiting} in test/offer` : ""}</span></div>
-                    <div className="mt-1 h-2 rounded-full bg-surface-variant"><div className={`h-2 rounded-full ${pctUsed >= 100 ? "bg-error" : pctUsed >= 90 ? "bg-tertiary" : "bg-secondary"}`} style={{ width: `${pctUsed}%` }} /></div>
+                    <div className="flex justify-between text-[13px]"><span className="font-semibold">{c.name}</span>
+                      <span className={c.left === 0 ? "font-bold text-[#dc2626]" : c.left <= 3 ? "font-bold text-[#b45309]" : "text-[#6b7280]"}>{c.left === 0 ? "Full" : `${c.left} left`}{c.waiting ? ` · ${c.waiting} in test/offer` : ""}</span></div>
+                    <div className="mt-1 h-2 rounded-full bg-[#e5e7eb]"><div className={`h-2 rounded-full ${pctUsed >= 100 ? "bg-[#dc2626]" : pctUsed >= 90 ? "bg-[#f59e0b]" : "bg-[#16a34a]"}`} style={{ width: `${pctUsed}%` }} /></div>
                   </li>
                 );
               })}
@@ -292,16 +284,16 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
               {trend.map((t) => (
                 <div key={t.m} className="flex flex-1 flex-col items-center gap-1">
                   <div className="flex h-28 w-full items-end justify-center gap-0.5">
-                    <div className="w-1/2 rounded-t bg-primary-fixed-dim" style={{ height: `${(t.inq / trendMax) * 100}%` }} title={`${t.inq} inquiries`} />
-                    <div className="w-1/2 rounded-t bg-secondary" style={{ height: `${(t.adm / trendMax) * 100}%` }} title={`${t.adm} admitted`} />
+                    <div className="w-1/2 rounded-t bg-[#0ea5e9]-fixed-dim" style={{ height: `${(t.inq / trendMax) * 100}%` }} title={`${t.inq} inquiries`} />
+                    <div className="w-1/2 rounded-t bg-[#16a34a]" style={{ height: `${(t.adm / trendMax) * 100}%` }} title={`${t.adm} admitted`} />
                   </div>
-                  <span className="text-[11px] text-on-surface-variant">{t.label}</span>
+                  <span className="text-[11px] text-[#6b7280]">{t.label}</span>
                 </div>
               ))}
             </div>
-            <div className="flex gap-4 text-label-sm text-on-surface-variant">
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-primary-fixed-dim" />Inquiries</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-secondary" />Admitted</span>
+            <div className="flex gap-4 text-[12px] text-[#6b7280]">
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-[#0ea5e9]-fixed-dim" />Inquiries</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-sm bg-[#16a34a]" />Admitted</span>
             </div>
           </section>
 
@@ -310,8 +302,8 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
             <ul className="flex flex-col gap-2">
               {sources.map(([k, n]) => (
                 <li key={k}>
-                  <div className="flex justify-between text-body-sm"><span>{SOURCE[k] ?? "Not recorded"}</span><span className="font-semibold">{n}</span></div>
-                  <div className="mt-1 h-2 rounded-full bg-surface-variant"><div className="h-2 rounded-full bg-primary" style={{ width: `${(n / sourceMax) * 100}%` }} /></div>
+                  <div className="flex justify-between text-[13px]"><span>{SOURCE[k] ?? "Not recorded"}</span><span className="font-semibold">{n}</span></div>
+                  <div className="mt-1 h-2 rounded-full bg-[#e5e7eb]"><div className="h-2 rounded-full bg-[#0ea5e9]" style={{ width: `${(n / sourceMax) * 100}%` }} /></div>
                 </li>
               ))}
             </ul>
@@ -358,18 +350,5 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
         <button className="btn self-start" type="submit">Add inquiry</button>
       </form>
     </>
-  );
-}
-
-function Kpi({ icon, label, value, note, dark }: { icon: string; label: string; value: number; note?: string; dark?: boolean }) {
-  return (
-    <div className={`card !p-4 ${dark ? "!bg-primary-container !text-on-primary" : ""}`}>
-      <div className="flex items-start justify-between gap-2">
-        <span className={`text-label-md ${dark ? "text-primary-fixed-dim" : "text-on-surface-variant"}`}>{label}</span>
-        <span className={`msym text-[20px] ${dark ? "text-secondary-fixed" : "text-secondary"}`} aria-hidden="true">{icon}</span>
-      </div>
-      <div className={`mt-1 text-headline-md font-extrabold ${dark ? "text-on-primary" : "text-primary"}`}>{value.toLocaleString("en-PK")}</div>
-      {note && <div className={`text-body-sm ${dark ? "text-primary-fixed-dim" : "text-on-surface-variant"}`}>{note}</div>}
-    </div>
   );
 }

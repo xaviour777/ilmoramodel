@@ -43,6 +43,7 @@ The rules live in `supabase/migrations/`.
    12. `supabase/migrations/20261104000001_question_bank_papers.sql` (question bank by chapter and board-style papers made from it)
    13. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
    14. optional: `supabase/seed_journey.sql` (adds Class 5 to 7 and a full Class 9 of 200 for board registration, and Ali Raza's story from admission into Class 9 to Class 10; runs once)
+   15. optional: `supabase/seed_model_school.sql` (renames the school to Model School and the principal to Dr Saim, gives Play group and Class 1 to 4 a class teacher, subjects and 25 students each, tops Class 8 and 10 up to 25; runs once)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { FeesTabs } from "@/components/fees-tabs";
+import { PageHead } from "@/components/ilm";
+import { FeesOverview } from "./overview";
 import { randomUUID } from "crypto";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -16,9 +18,21 @@ import { loadMessagingConfig, readyChannels } from "@/lib/deliver";
 const MODES = [["cash", "Cash"], ["jazzcash", "JazzCash"], ["easypaisa", "Easypaisa"]];
 const MODE_LABEL: Record<string, string> = { cash: "Cash", jazzcash: "JazzCash", easypaisa: "Easypaisa", cheque: "Cheque", bank_deposit: "Bank deposit", onebill: "1Bill", raast: "Raast", card: "Card" };
 
-export default async function FeeDesk({ searchParams }: { searchParams: Promise<{ q?: string; family?: string; saved?: string; error?: string; receipt?: string }> }) {
+export default async function FeeDesk({ searchParams }: { searchParams: Promise<{ view?: string; q?: string; family?: string; saved?: string; error?: string; receipt?: string }> }) {
   const me = await requireRole("accountant", "principal", "owner");
   const sp = await searchParams;
+  // principals open on the overview; the accounts office opens on the desk
+  const overview = sp.view === "overview" || (me.role !== "accountant" && sp.view !== "desk" && !sp.q && !sp.family && !sp.saved && !sp.error);
+  if (overview) return (
+    <>
+      <PageHead kick="Money" title="Fees" sub="Make challans, take payments by cash, JazzCash or Easypaisa, and follow up on defaulters.">
+        <Link href="/accounts?view=desk" className="btn-ghost">Collect at desk</Link>
+        <Link href="/accounts/setup" className="btn">Make challans</Link>
+      </PageHead>
+      <FeesTabs current="overview" salaries={me.role === "accountant"} />
+      <FeesOverview />
+    </>
+  );
   const supabase = await createClient();
   const today = todayPK();
   const dayStart = new Date(today + "T00:00:00+05:00").toISOString();
@@ -67,7 +81,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
+        <div><div className="kick">Money</div><h1 className="h1">Fee desk</h1><p className="muted text-base">{shortDate(today)}</p></div>
         <div className="flex items-center gap-3">
           <FeesTabs current="desk" salaries={me.role === "accountant"} />
           <LiveRefresh tables={["payments"]} />
@@ -83,11 +97,12 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         <section className="card flex-[2]">
           <form className="flex items-end gap-2">
+            <input type="hidden" name="view" value="desk" />
             <label className="field flex-1">Find a family<input className="input" name="q" defaultValue={sp.q} placeholder="Name or phone number" /></label>
             <button className="btn-ghost" type="submit">Search</button>
           </form>
           {(results.data ?? []).map((r) => (
-            <Link key={r.id} href={`/accounts?family=${r.id}`} className="row-box hover:border-[var(--blue-ring)]"><b className="flex-1">{r.name}</b><span className="muted">{r.phone}</span></Link>
+            <Link key={r.id} href={`/accounts?view=desk&family=${r.id}`} className="row-box hover:border-[var(--blue-ring)]"><b className="flex-1">{r.name}</b><span className="muted">{r.phone}</span></Link>
           ))}
           {sp.saved === "contact" && <div className="notice-ok">Reminder number saved.</div>}
           {sp.saved && sp.saved !== "contact" && (
@@ -180,7 +195,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
         <section className="card flex-1">
           <h2 className="h2">Largest balances</h2>
           {(owing ?? []).map((o) => (
-            <Link key={o.family_id} href={`/accounts?family=${o.family_id}`} className="flex justify-between gap-2 font-extrabold hover:underline">
+            <Link key={o.family_id} href={`/accounts?view=desk&family=${o.family_id}`} className="flex justify-between gap-2 font-extrabold hover:underline">
               <span>{o.name}</span><span className="tabular-nums">{rupees(Number(o.balance_paisa))}</span>
             </Link>
           ))}

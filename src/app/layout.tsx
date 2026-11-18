@@ -1,37 +1,42 @@
 import type { Metadata, Viewport } from "next";
 import { RegisterSW } from "@/components/pwa";
+import { Nunito } from "next/font/google";
 import "./globals.css";
+import { getBranding, shade } from "@/lib/branding";
 
-export const metadata: Metadata = {
-  title: "Ilmora",
-  description: "School management for Pakistani schools",
-  applicationName: "Ilmora",
-  appleWebApp: { capable: true, title: "Ilmora", statusBarStyle: "default" },
-  icons: { apple: "/icons/apple-touch-icon.png" },
-};
+const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
 
-export const viewport: Viewport = { themeColor: "#103d37" };
+// The tab title and icon follow the school whose domain was opened.
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBranding();
+  return {
+    title: brand?.name ?? "Ilmora",
+    description: brand ? `${brand.name} · school app` : "School management for Pakistani schools",
+    applicationName: brand?.name ?? "Ilmora",
+    appleWebApp: { capable: true, title: brand?.name ?? "Ilmora", statusBarStyle: "default" },
+    icons: { apple: "/icons/apple-touch-icon.png", ...(brand?.logo_url ? { icon: brand.logo_url } : {}) },
+  };
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export const viewport: Viewport = { themeColor: "#16a34a" };
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const brand = await getBranding();
+  const c = brand?.primary_color;
+  // the school's colour replaces Ilmora green on buttons, logo tiles and links
+  const theme = c ? { ["--brand" as string]: c, ["--brand-lip" as string]: shade(c) } : undefined;
   return (
-    <html lang="en">
+    <html lang="en" className={nunito.variable} style={theme}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap"
-        />
-        {/* only the icons the principal screens use, so the font stays small;
-            display=block so an icon never shows as its name while loading */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0&icon_names=account_balance,arrow_right_alt,assignment,auto_awesome,badge,calendar_month,call,campaign,cast_for_education,chevron_right,close,co_present,currency_exchange,dashboard,edit_note,event,fact_check,family_restroom,forum,history,hourglass_top,how_to_reg,install_mobile,logout,menu,notification_important,notifications,payments,person,person_add,point_of_sale,qr_code_2,qr_code_scanner,receipt_long,school,search,settings,task_alt,trending_down,trending_up&display=block"
+          href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@500&display=swap"
         />
       </head>
-      <body className="antialiased">
+      <body className={`${nunito.className} antialiased`}>
         <RegisterSW />
         {children}
       </body>

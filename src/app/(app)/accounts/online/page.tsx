@@ -30,7 +30,7 @@ export default async function OnlinePayments({ searchParams }: { searchParams: P
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Online payments</h1>
+          <div className="kick">Money</div><h1 className="h1">Online payments</h1>
           <p className="muted text-base">Parents pay the school&apos;s JazzCash or Easypaisa and send the transaction ID. Check it in the wallet app, then confirm.</p>
         </div>
         <FeesTabs current="online" salaries={me.role === "accountant"} />

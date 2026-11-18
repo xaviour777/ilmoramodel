@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School — Home</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.qa2{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:112px;min-height:84px;padding:8px 12px;border-radius:16px;border:2px solid transparent;font-weight:800;font-size:13px;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.kp{border-radius:18px;padding:16px;display:flex;gap:12px;align-items:flex-start;border:2px solid transparent}
+.kp .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#fff;flex:none}
+.up{display:inline-block;font-weight:900;font-size:11px;padding:2px 8px;border-radius:99px;background:#dcfce7;color:#15803d}
+.dn{display:inline-block;font-weight:900;font-size:11px;padding:2px 8px;border-radius:99px;background:#fee2e2;color:#b91c1c}
+.seg{display:inline-flex;background:#f1f5f9;border-radius:12px;padding:3px;gap:2px}
+.seg button{min-height:34px;padding:0 14px;border:0;border-radius:10px;background:none;font-weight:800;font-size:13px;color:#4b5563;cursor:pointer}
+.seg button.on{background:#15803d;color:#fff}
+.ring{width:44px;height:44px;border-radius:99px;display:flex;align-items:center;justify-content:center;flex:none}
+.ring b{width:34px;height:34px;border-radius:99px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.cl{display:flex;align-items:center;gap:10px;padding:10px;border:2px solid #eef2f7;border-radius:14px;background:#fff}
+.sch{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px}
+.sch.now{background:#fff7ed;border:2px solid #fed7aa}
+.ai-chip{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-weight:800;font-size:13px;color:#1f2937;cursor:pointer;text-align:left}
+.ai-chip.on{border-color:#c4b5fd;background:#f5f3ff}
+</style>
+</helmet>
+<div class="shell">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
+    <div class="grp">Daily</div>
+    <a class="it on" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance</a>
+    <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
+    <div class="grp">Academics</div>
+    <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
+    <a class="it" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
+    <div class="grp">People</div>
+    <a class="it" href="Students.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students</a>
+    <a class="it" href="Staff.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"></path></svg></span>Staff &amp; pay<span class="badge">2</span></a>
+    <a class="it" href="Admissions.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg></span>Admissions<span class="badge">4</span></a>
+    <div class="grp">Money</div>
+    <a class="it" href="Fees.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01"></path></svg></span>Fees</a>
+    <a class="it" href="Reports.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span>Reports</a>
+    <a class="it" href="Settings.dc.html"><span class="tile t-n"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4"></path></svg></span>Settings</a>
+    <div class="me"><div class="av" style="background:#dcfce7;color:#15803d">DS</div><div><div style="font-weight:900;font-size:14px">Dr Saim</div><div class="muted" style="font-size:12px">Principal</div></div></div>
+  </nav>
+
+  <main class="content" style="padding-top:16px">
+    <div class="wrap" style="gap:18px">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <label style="flex:1 1 300px;display:flex;align-items:center;gap:10px;border:2px solid #e5e7eb;border-radius:14px;padding:0 12px;min-height:46px;background:#fff">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input aria-label="Search" placeholder="Search students, classes, staff, payments, notices…" style="border:0;outline:0;flex:1;font-weight:700;font-size:15px;background:transparent">
+          <span class="tag">Ctrl + K</span>
+        </label>
+        <button type="button" onClick="{{openAi}}" style="display:flex;align-items:center;gap:8px;min-height:46px;padding:0 16px;border-radius:14px;border:2px solid #c4b5fd;background:#f5f3ff;color:#6d28d9;font-weight:900;font-size:14px;cursor:pointer"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg>AI Assistant</button>
+        <button type="button" aria-label="Notifications, 3 new" style="position:relative;width:46px;height:46px;border-radius:14px;border:2px solid #e5e7eb;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.4" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:99px;background:#ef4444;color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span></button>
+        <button type="button" class="chip" style="min-height:46px">EN · اردو</button>
+      </div>
+
+      <section style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+        <div>
+          <div class="muted" style="display:flex;align-items:center;gap:6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Sunday, 15 November 2026</div>
+          <h1 class="title" style="font-size:32px">Assalamu Alaikum, Dr Saim</h1>
+          <p class="sub" style="margin-top:2px">Here's what's happening at Model School today.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <a class="qa2" href="Students.dc.html" style="background:#dcfce7;color:#15803d"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"></path></svg>Add student</a>
+          <a class="qa2" href="Classes.dc.html" style="background:#ede9fe;color:#6d28d9"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"></path></svg>Create class</a>
+          <a class="qa2" href="Exams.dc.html" style="background:#e0f2fe;color:#0369a1"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg>Add exam</a>
+          <a class="qa2" href="Notices.dc.html" style="background:#ffedd5;color:#c2410c"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg>Send notice</a>
+          <a class="qa2" href="Fees.dc.html" style="background:#dcfce7;color:#15803d"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 7h20v12H2zM2 11h20"></path></svg>Collect fee</a>
+          <a class="qa2" href="Reports.dc.html" style="background:#fff;border-color:#e5e7eb;color:#374151"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"></path></svg>More</a>
+        </div>
+      </section>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+        <div class="kp" style="background:#f0fdf4;border-color:#bbf7d0"><span class="ic" style="color:#16a34a"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9"></path></svg></span><div><div class="muted" style="font-weight:800">Total students</div><div style="font-weight:900;font-size:28px">2,947 <span class="up">▲ 6%</span></div><div class="muted" style="font-size:12px">vs. last month</div></div></div>
+        <div class="kp" style="background:#f5f3ff;border-color:#ddd6fe"><span class="ic" style="color:#7c3aed"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"></path></svg></span><div><div class="muted" style="font-weight:800">Classes</div><div style="font-weight:900;font-size:28px">10</div><div class="muted" style="font-size:12px">38 sections · no change</div></div></div>
+        <div class="kp" style="background:#eff6ff;border-color:#bfdbfe"><span class="ic" style="color:#0284c7"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span><div><div class="muted" style="font-weight:800">Teachers &amp; staff</div><div style="font-weight:900;font-size:28px">68 <span class="up">▲ 4%</span></div><div class="muted" style="font-size:12px">64 present today</div></div></div>
+        <div class="kp" style="background:#fff7ed;border-color:#fed7aa"><span class="ic" style="color:#ea580c"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span><div><div class="muted" style="font-weight:800">Today's attendance</div><div style="font-weight:900;font-size:28px">96.2% <span class="up">▲ 1.3%</span></div><div class="muted" style="font-size:12px">2 sections not marked</div></div></div>
+        <div class="kp" style="background:#fdf2f8;border-color:#fbcfe8"><span class="ic" style="color:#db2777"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 7h20v12H2zM2 11h20"></path></svg></span><div><div class="muted" style="font-weight:800">Pending fees</div><div style="font-weight:900;font-size:28px">Rs 287,500 <span class="dn">▼ 12%</span></div><div class="muted" style="font-size:12px">64 families</div></div></div>
+      </section>
+
+      <section style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
+        <div class="card" style="flex:5 1 480px;min-width:0">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+            <h2 class="h2">School trend</h2>
+            <div class="seg" role="group" aria-label="Measure"><sc-for list="{{metrics}}" as="m" hint-placeholder-count="4"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.label}}</button></sc-for></div>
+            <select class="inp" aria-label="Range" style="min-height:36px"><option>Last 6 months</option><option>This session</option></select>
+          </div>
+          <div role="img" aria-label="{{tr.aria}}" style="display:flex;align-items:flex-end;gap:14px;height:200px;margin-top:18px;border-bottom:2px solid #e5e7eb">
+            <sc-for list="{{tr.bars}}" as="b" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px"><span style="font-weight:900;font-size:12px;color:{{b.tc}}">{{b.v}}</span><div style="width:100%;max-width:60px;height:{{b.h}};background:{{b.c}};border-radius:10px 10px 4px 4px"></div></div></sc-for>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:6px"><sc-for list="{{tr.bars}}" as="b" hint-placeholder-count="6"><span style="flex:1;text-align:center;font-weight:800;font-size:12px;color:#6b7280">{{b.l}}</span></sc-for></div>
+          <p class="muted" style="margin:10px 0 0">{{tr.note}}</p>
+        </div>
+        <div class="card" style="flex:3 1 280px;min-width:0">
+          <h2 class="h2">Students by section</h2>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:14px">
+            <div style="width:150px;height:150px;border-radius:99px;background:conic-gradient(#16a34a 0 34%,#0ea5e9 34% 60%,#8b5cf6 60% 80%,#f59e0b 80% 100%);display:flex;align-items:center;justify-content:center" role="img" aria-label="Primary 34%, Middle 26%, Secondary 20%, College 20%"><div style="width:100px;height:100px;border-radius:99px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-weight:900;font-size:22px">2,947</span><span class="muted" style="font-size:12px">students</span></div></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:8px;font-weight:800;font-size:14px;min-width:150px">
+              <div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:99px;background:#16a34a"></span><span style="flex:1">Primary (1–5)</span>34%</div>
+              <div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:99px;background:#0ea5e9"></span><span style="flex:1">Middle (6–8)</span>26%</div>
+              <div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:99px;background:#8b5cf6"></span><span style="flex:1">Secondary (9–10)</span>20%</div>
+              <div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:99px;background:#f59e0b"></span><span style="flex:1">College (11–12)</span>20%</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="flex:3 1 280px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Today's schedule</h2><a href="Classes.dc.html" style="font-weight:800;font-size:13px">Timetable</a></div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-top:10px;font-weight:800;font-size:14px">
+            <div class="sch"><span class="muted" style="width:96px">08:30–09:10</span><span style="flex:1">Assembly</span><span class="tag g">Done</span></div>
+            <div class="sch"><span class="muted" style="width:96px">09:10–09:50</span><span style="flex:1">Period 1</span><span class="tag g">Done</span></div>
+            <div class="sch"><span class="muted" style="width:96px">09:50–10:30</span><span style="flex:1">Period 2</span></div>
+            <div class="sch now"><span class="muted" style="width:96px">10:30–10:50</span><span style="flex:1">Break</span><span class="tag y">Now</span></div>
+            <div class="sch"><span class="muted" style="width:96px">10:50–11:30</span><span style="flex:1">Period 3</span><span class="tag r">2 to cover</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
+        <div class="card" style="flex:5 1 560px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Classes overview · attendance today</h2><a href="Classes.dc.html" style="font-weight:800;font-size:13px">All sections</a></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px">
+            <sc-for list="{{classes}}" as="c" hint-placeholder-count="10">
+              <div class="cl"><span class="tile" style="background:{{c.bg}};color:{{c.fg}};font-weight:900">{{c.n}}</span><div style="flex:1;min-width:0"><div style="font-weight:900;font-size:14px">Class {{c.n}}</div><div class="muted" style="font-size:12px">{{c.s}} students</div></div><span class="ring" style="background:conic-gradient({{c.rc}} 0 {{c.p}},#e5e7eb {{c.p}} 100%)"><b>{{c.p}}</b></span></div>
+            </sc-for>
+          </div>
+        </div>
+        <div class="card" style="flex:3 1 300px;min-width:0">
+          <h2 class="h2">Quick insights · this term</h2>
+          <div class="row" style="margin-top:8px"><span class="tile t-y" style="width:30px;height:30px">★</span><span style="flex:1;font-weight:800">Top class</span><span style="font-weight:900">Class 9 · 92%</span></div>
+          <div class="row"><span class="tile t-o" style="width:30px;height:30px">!</span><span style="flex:1;font-weight:800">Lowest attendance</span><span style="font-weight:900">Class 6 · 91.2%</span></div>
+          <div class="row"><span class="tile t-g" style="width:30px;height:30px">Rs</span><span style="flex:1;font-weight:800">Fee collection</span><span style="font-weight:900">88% · 2.31M / 2.62M</span></div>
+          <div class="row"><span class="tile t-v" style="width:30px;height:30px">✓</span><span style="flex:1;font-weight:800">Next exam</span><span style="font-weight:900">Mid-term · 16 Nov</span></div>
+          <div class="row"><span class="tile t-b" style="width:30px;height:30px">B</span><span style="flex:1;font-weight:800">BISE predicted · Class 10</span><span style="font-weight:900">74% → 80%</span></div>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
+        <div class="card" style="flex:1 1 320px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 class="h2">Do these first</h2><span class="tag y">{{left}} left</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{todos}}" as="t" hint-placeholder-count="4">
+              <button type="button" onClick="{{t.toggle}}" aria-pressed="{{t.done}}" style="display:flex;align-items:center;gap:10px;min-height:50px;padding:6px 10px;border:2px solid {{t.bd}};border-radius:14px;background:{{t.bg}};cursor:pointer;text-align:left;font-weight:800;font-size:14px;color:#1f2937">
+                <span style="width:24px;height:24px;border-radius:8px;border:2.5px solid {{t.bx}};background:{{t.bxbg}};display:flex;align-items:center;justify-content:center;flex:none"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+                <span style="flex:1">{{t.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div class="card" style="flex:1 1 320px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Recent admissions</h2><a href="Admissions.dc.html" style="font-weight:800;font-size:13px">View all</a></div>
+          <div class="tbl" style="margin-top:6px"><table>
+            <thead><tr><th>Student</th><th>Class</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Abdul Rehman</td><td>3</td><td><span class="tag g">Admitted</span></td></tr>
+              <tr><td>Hafsa Noor</td><td>6</td><td><span class="tag g">Admitted</span></td></tr>
+              <tr><td>Anees Khalid</td><td>1</td><td><span class="tag y">Pending</span></td></tr>
+              <tr><td>Fatima Ali</td><td>9</td><td><span class="tag g">Admitted</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="card" style="flex:1 1 320px;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Recent notices</h2><a href="Notices.dc.html" style="font-weight:800;font-size:13px">View all</a></div>
+          <div class="row" style="margin-top:8px"><span class="tile t-p" style="width:32px;height:32px;font-weight:900">!</span><div style="flex:1"><div style="font-weight:900">Mid-term exams from 16 Nov</div><div class="muted" style="font-size:12px">Be in school by 8:15 am</div></div><span class="muted" style="font-size:12px">Today</span></div>
+          <div class="row"><span class="tile t-b" style="width:32px;height:32px;font-weight:900">W</span><div style="flex:1"><div style="font-weight:900">Winter timing</div><div class="muted" style="font-size:12px">School starts at 9:00 am</div></div><span class="muted" style="font-size:12px">13 Nov</span></div>
+          <div class="row"><span class="tile t-g" style="width:32px;height:32px;font-weight:900">H</span><div style="flex:1"><div style="font-weight:900">Iqbal Day holiday</div><div class="muted" style="font-size:12px">Closed on 9 November</div></div><span class="muted" style="font-size:12px">10 Nov</span></div>
+        </div>
+      </section>
+
+      <section class="card" id="ai" style="border-color:#c4b5fd;box-shadow:0 4px 0 #c4b5fd !important;background:#fcfbff">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2" style="display:flex;align-items:center;gap:8px"><span class="tile t-v" style="width:32px;height:32px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>Model School AI assistant</h2><span class="tag v">Beta</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:12px">
+          <div style="flex:1 1 300px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start">
+            <sc-for list="{{asks}}" as="a" hint-placeholder-count="6"><button type="button" class="{{a.cls}}" onClick="{{a.pick}}">{{a.q}}</button></sc-for>
+          </div>
+          <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:10px">
+            <div style="background:#fff;border:2px solid #e5e7eb;border-radius:16px 16px 16px 4px;padding:12px 14px;font-weight:700;line-height:22px;min-height:88px">{{answer}}</div>
+            <div style="display:flex;gap:8px"><input class="inp" aria-label="Ask the assistant" placeholder="Ask anything about your school, in English or Urdu…" style="flex:1"><button type="button" class="chunk" aria-label="Send">Ask</button></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { m:'enr', ask:0, done:{ att:true } }; }
+  renderVals() {
+    const { m, ask, done } = this.state;
+    const L = ['Jun','Jul','Aug','Sep','Oct','Nov'];
+    const D = {
+      enr:{ v:[2580,2650,2720,2790,2860,2947], f:(x)=>x.toLocaleString(), min:2400, max:3000, note:'Enrolment is up 367 students since June, mostly in Primary.', aria:'Enrolment rose from 2,580 in June to 2,947 in November' },
+      att:{ v:[94.1,93.2,95.0,95.6,94.8,96.2], f:(x)=>x+'%', min:85, max:100, note:'Attendance is above the 95% goal for the second month running.', aria:'Attendance between 93% and 96% over six months' },
+      res:{ v:[68,70,69,72,74,76], f:(x)=>x+'%', min:50, max:90, note:'Average result climbed 8 points; Class 9 leads at 92%.', aria:'Average results rose from 68% to 76%' },
+      fee:{ v:[91,89,86,92,90,88], f:(x)=>x+'%', min:60, max:100, note:'Fee collection dipped to 88% in November. 64 families have a balance.', aria:'Fee collection between 86% and 92%' }
+    }[m];
+    const bars = D.v.map((x,i) => { const last = i===D.v.length-1; return { l:L[i], v:D.f(x), h: Math.round((x-D.min)/(D.max-D.min)*170+10)+'px', c: last ? '#15803d' : '#86efac', tc: last ? '#15803d' : '#6b7280' }; });
+    const M = [['enr','Enrolment'],['att','Attendance'],['res','Results'],['fee','Fees']];
+    const C = [['1',40,98],['2',40,96],['3',40,95],['4',40,97],['5',40,96],['6',40,91],['7',40,96],['8',40,97],['9',50,96],['10',40,95]];
+    const pal = [['#dcfce7','#15803d'],['#ede9fe','#6d28d9'],['#ffedd5','#c2410c'],['#e0f2fe','#0369a1'],['#fce7f3','#9d174d']];
+    const classes = C.map(([n,s,p],i) => ({ n, s, p: p+'%', bg: pal[i%5][0], fg: pal[i%5][1], rc: p>=95 ? '#16a34a' : '#f59e0b' }));
+    const TD = [['att','Approve 2 leave requests'],['chal','Send fee reminders to 64 families'],['exam','Publish mid-term date sheet'],['cover','Assign 2 substitute periods']];
+    const todos = TD.map(([k,l]) => { const d = !!done[k]; return { label:l, done:d, bd: d ? '#86efac' : '#e5e7eb', bg: d ? '#f0fdf4' : '#fff', bx: d ? '#16a34a' : '#d1d5db', bxbg: d ? '#16a34a' : '#fff', toggle:()=>this.setState({ done:{ ...done, [k]: !d } }) }; });
+    const A = [
+      ['Create a timetable','Draft ready for all 38 sections. No teacher is double-booked; 3 free periods remain in Class 6. Open Classes › Timetable to review.'],
+      ['Generate exam paper','Class 9 Physics, 75 marks, BISE Lahore pattern: 12 MCQs, 8 short and 3 long questions, weighted to weak chapters.'],
+      ['Write a notice','"Dear parents, mid-term exams start on Monday 16 November. Students must reach school by 8:15 am." Ready in English and Urdu.'],
+      ['Analyze class results','Class 9 leads at 92%. Class 6 is lowest at 71%, mainly Maths. 18 students across the school are below 40% in one subject.'],
+      ['Who has unpaid fees?','64 families owe Rs 287,500. 12 owe more than two months. Sending WhatsApp reminders usually brings in about 40% within a week.'],
+      ['Which teachers need support?','Two Maths teachers have results 6 points below last term and the most leave days. Consider a peer-observation week.']
+    ];
+    return {
+      metrics: M.map(([k,l]) => ({ label:l, cls: m===k ? 'on' : '', pick:()=>this.setState({ m:k }) })),
+      tr: { bars, note: D.note, aria: D.aria },
+      classes, todos, left: todos.filter(t => !t.done).length,
+      asks: A.map(([q],i) => ({ q, cls: ask===i ? 'ai-chip on' : 'ai-chip', pick:()=>this.setState({ ask:i }) })),
+      answer: A[ask][1],
+      openAi: () => this.setState({ ask: 3 })
+    };
+  }
+}
+</script>
+</body>
+</html>

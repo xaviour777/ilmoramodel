@@ -2,10 +2,11 @@ import { Tabs } from "./tabs";
 
 // The fee desk, fee setup with monthly challans, and reminders share the Fees menu entry;
 // the accounts office also reaches staff salaries from here.
-export function FeesTabs({ current, salaries }: { current: "desk" | "setup" | "online" | "messages" | "calls" | "close" | "expenses" | "salaries"; salaries?: boolean }) {
+export function FeesTabs({ current, salaries }: { current: "overview" | "desk" | "setup" | "online" | "messages" | "calls" | "close" | "expenses" | "salaries"; salaries?: boolean }) {
   return (
     <Tabs current={current} tabs={[
-      { id: "desk", label: "Fee desk", href: "/accounts" },
+      ...(salaries ? [] : [{ id: "overview", label: "Overview", href: "/accounts?view=overview" }]),
+      { id: "desk", label: salaries ? "Fee desk" : "Collect at desk", href: salaries ? "/accounts" : "/accounts?view=desk" },
       { id: "setup", label: "Fees and challans", href: "/accounts/setup" },
       { id: "online", label: "Online payments", href: "/accounts/online" },
       { id: "messages", label: "Fee reminders", href: "/accounts/messages" },

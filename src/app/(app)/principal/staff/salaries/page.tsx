@@ -38,7 +38,7 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="h1">Salaries</h1>
+          <div className="kick">People</div><h1 className="h1">Salaries</h1>
           <p className="muted text-base">{monthName}: make the sheet, check it, pay, and send each person their payslip.</p>
         </div>
         {me.role !== "accountant" ? <StaffTabs current="salaries" /> : <FeesTabs current="salaries" salaries />}
