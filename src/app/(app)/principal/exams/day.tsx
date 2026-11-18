@@ -240,3 +240,49 @@ export async function BoardTarget({ back }: { back: string }) {
   );
 }
 
+
+// ================= Marks log =================
+export async function MarksLogTab({ q }: { q?: string }) {
+  const supabase = await createClient();
+  const { data } = await supabase.from("marks_log").select("id, at, action, old_obtained, new_obtained, old_absent, new_absent, changed_by, exam_id, subject_id, student_id").order("at", { ascending: false }).limit(300);
+  const rows = data ?? [];
+  const ids = (k: "changed_by" | "exam_id" | "subject_id" | "student_id") => [...new Set(rows.map((r) => r[k]).filter(Boolean))] as string[];
+  const [{ data: who }, { data: ex }, { data: sub }, { data: stu }] = await Promise.all([
+    ids("changed_by").length ? supabase.from("profiles").select("id, full_name").in("id", ids("changed_by")) : Promise.resolve({ data: [] }),
+    ids("exam_id").length ? supabase.from("exams").select("id, name, status").in("id", ids("exam_id")) : Promise.resolve({ data: [] }),
+    ids("subject_id").length ? supabase.from("subjects").select("id, name").in("id", ids("subject_id")) : Promise.resolve({ data: [] }),
+    ids("student_id").length ? supabase.from("students").select("id, full_name, admission_no").in("id", ids("student_id")) : Promise.resolve({ data: [] }),
+  ]);
+  const N = (list: { id: string; full_name?: string; name?: string }[] | null) => new Map((list ?? []).map((x) => [x.id, x.full_name ?? x.name ?? ""]));
+  const W = N(who), E = N(ex), S = N(sub), T = N(stu);
+  const published = new Set((ex ?? []).filter((e) => e.status === "results").map((e) => e.id));
+  const term = (q ?? "").toLowerCase().trim();
+  const shown = rows.filter((r) => !term || [W.get(r.changed_by ?? ""), E.get(r.exam_id ?? ""), S.get(r.subject_id ?? ""), T.get(r.student_id ?? "")].some((v) => v?.toLowerCase().includes(term)));
+  const val = (o: number | null, a: boolean | null) => (a ? "Absent" : o == null ? "—" : String(Number(o)));
+  // changes after results were published are the ones to look at
+  const after = shown.filter((r) => r.action !== "insert" && r.exam_id && published.has(r.exam_id)).length;
+  return (
+    <section className="card">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div><h2 className="h2">Marks log</h2><p className="muted text-[13px]">Every mark entered, changed or removed: who, when, and from what to what. Nobody can edit this list.</p></div>
+        <form className="flex gap-2"><input type="hidden" name="tab" value="log" /><input className="input" name="q" defaultValue={q} placeholder="Teacher, student, exam or subject" aria-label="Search the log" /><button className="btn-ghost" type="submit">Search</button></form>
+      </div>
+      {after > 0 && <p className="notice-warn mt-2 text-[14px]">{after} change{after === 1 ? "" : "s"} to exams whose results are already published. Check them.</p>}
+      {shown.length === 0 ? <div className="mt-2"><Empty>No changes recorded yet. The log starts from today; earlier marks have no history.</Empty></div> : (
+        <div className="tbl mt-2 overflow-x-auto"><table className="w-full min-w-[760px]">
+          <thead><tr>{["When", "By", "Student", "Exam · subject", "Change", ""].map((h) => <th key={h} className="text-left">{h}</th>)}</tr></thead>
+          <tbody>{shown.map((r) => (
+            <tr key={r.id}>
+              <td className="text-[13px]">{new Date(r.at).toLocaleString("en-GB", { timeZone: "Asia/Karachi", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</td>
+              <td className="font-bold">{W.get(r.changed_by ?? "") ?? "System"}</td>
+              <td>{T.get(r.student_id ?? "") ?? "—"}</td>
+              <td className="text-[13px]">{E.get(r.exam_id ?? "") ?? "—"} · {S.get(r.subject_id ?? "") ?? "—"}</td>
+              <td className="font-black tabular-nums">{r.action === "insert" ? `entered ${val(r.new_obtained, r.new_absent)}` : r.action === "delete" ? `removed ${val(r.old_obtained, r.old_absent)}` : `${val(r.old_obtained, r.old_absent)} → ${val(r.new_obtained, r.new_absent)}`}</td>
+              <td>{r.action !== "insert" && r.exam_id && published.has(r.exam_id) ? <span className="tagx r">after results</span> : r.action === "update" ? <span className="tagx y">changed</span> : null}</td>
+            </tr>
+          ))}</tbody>
+        </table></div>
+      )}
+    </section>
+  );
+}

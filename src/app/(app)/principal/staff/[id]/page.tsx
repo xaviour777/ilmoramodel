@@ -40,7 +40,7 @@ export default async function StaffRecord({ params, searchParams }: { params: Pr
         <div>
           <Link href={admin ? "/principal/staff" : "/principal/staff/salaries"} className="eyebrow">‹ {admin ? "All staff" : "Salaries"}</Link>
           <h1 className="h1">{p.full_name}</h1>
-          <p className="muted text-base">{p.employee_code ? `${p.employee_code} · ` : ""}{d?.designation || ROLE[p.role]}{classOf ? ` · class teacher of ${classOf}` : ""}{p.is_active ? "" : " · not working here now"}</p>
+          <p className="muted text-base">{p.employee_code ? `${p.employee_code} · ` : ""}{d?.designation || ROLE[p.role]}{classOf ? ` · class teacher of ${classOf}` : ""}{p.is_active ? "" : " · not working here now"} · <Link href={`/print/staff-card/${p.id}`} target="_blank" className="underline">ID card</Link></p>
         </div>
         {admin && <StaffTabs current="staff" />}
       </div>

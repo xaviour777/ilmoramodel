@@ -9,14 +9,17 @@ const PRINT_CSS = `@page { size: A4; margin: 0; } @media print { .no-print { dis
 
 // One student's report card (the position is worked out against the whole section).
 export default async function ReportCardPage({ params }: { params: Promise<{ id: string }> }) {
-  const me = await requireRole("principal", "owner", "teacher");
+  const me = await requireRole("principal", "owner", "teacher", "parent", "student");
+  const family = me.role === "parent" || me.role === "student";
   const { id } = await params;
   const supabase = await createClient();
   const { data: st } = await supabase.from("students").select("section_id, campuses(name, schools(name))").eq("id", id).maybeSingle();
   if (!st?.section_id) notFound();
   const r = await sectionReportCards(supabase, st.section_id);
-  const card = r.cards.find((c) => c.student.id === id);
-  if (!card) notFound();
+  const found = r.cards.find((c) => c.student.id === id);
+  if (!found) notFound();
+  // a family only sees its own child's marks, so the class position can't be worked out for them
+  const card = family ? { ...found, position: 0, outOf: 0 } : found;
   const campus = st.campuses as unknown as { name: string; schools: { name: string } };
   return (
     <div style={{ background: "#e5e5e5", minHeight: "100vh", padding: "24px 0" }} className="print-root">
