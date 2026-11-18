@@ -13,12 +13,18 @@ export function ReportCardSheet({ c, school, campus, session, section, classTeac
         <div>{campus}</div>
         <div style={{ fontSize: "13pt", fontWeight: 800, marginTop: "2mm" }}>Progress Report · {session}</div>
       </div>
-      <table style={{ width: "100%", margin: "4mm 0", borderCollapse: "collapse" }}>
-        <tbody>
-          <tr><td>Name: <b>{c.student.full_name}</b></td><td>Class: <b>{section}</b></td></tr>
-          <tr><td>Roll no: <b>{c.student.roll_no ?? ""}</b></td><td>Student ID: <b>{c.student.admission_no ?? ""}</b></td></tr>
-        </tbody>
-      </table>
+      <div style={{ display: "flex", gap: "4mm", alignItems: "center", margin: "4mm 0" }}>
+        <table style={{ flex: 1, borderCollapse: "collapse" }}>
+          <tbody>
+            <tr><td>Name: <b>{c.student.full_name}</b></td><td>Class: <b>{section}</b></td></tr>
+            <tr><td>Roll no: <b>{c.student.roll_no ?? ""}</b></td><td>Student ID: <b>{c.student.admission_no ?? ""}</b></td></tr>
+          </tbody>
+        </table>
+        {c.student.photo_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={c.student.photo_url} alt="" style={{ width: "24mm", height: "32mm", objectFit: "cover", border: "1px solid #000" }} />
+        )}
+      </div>
       {c.exams.length === 0 ? <p>No published results yet this session.</p> : (
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
           <thead>
