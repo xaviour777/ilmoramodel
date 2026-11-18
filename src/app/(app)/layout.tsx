@@ -31,6 +31,7 @@ const NAV: Record<Role, NavItem[]> = {
   ],
   teacher: [
     { href: "/teacher", label: "Attendance", icon: "check" },
+    { href: "/teacher/scan", label: "Scan cards", icon: "check" },
     { href: "/teacher/homework", label: "Homework", icon: "book" },
     { href: "/teacher/marks", label: "Marks", icon: "star" },
     { href: "/teacher/class", label: "My class", icon: "people" },

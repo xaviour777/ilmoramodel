@@ -39,6 +39,11 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
   ]);
 
   const ask = await myTimetableAsk(supabase, me.id);
+  const { data: subFor } = await supabase.from("substitutions")
+    .select("id, absent_teacher_id, timetable_slots(periods(name, starts_at, sort), subjects(name), sections(name, classes(name)))")
+    .eq("substitute_id", me.id).eq("date", date);
+  type Sub = { id: string; timetable_slots: { periods: { name: string; starts_at: string; sort: number }; subjects: { name: string } | null; sections: { name: string; classes: { name: string } } | null } | null };
+  const subs = ((subFor ?? []) as unknown as Sub[]).filter((x) => x.timetable_slots).sort((a, b) => a.timetable_slots!.periods.sort - b.timetable_slots!.periods.sort);
   const mark = new Map((marks ?? []).map((m) => [m.student_id, m.status as string]));
   const already = (marks ?? []).length > 0;
   const counts = { present: 0, absent: 0, late: 0, leave: 0 } as Record<string, number>;
@@ -62,6 +67,14 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
       </div>
 
       {ask?.status === "pending" && <TimetableAsk ack={ask} compact />}
+      {subs.length > 0 && (
+        <section className="card" style={{ borderColor: "var(--orange)", background: "var(--orange-soft)" }}>
+          <h2 className="h2">Extra periods {date === todayPK() ? "today" : `on ${shortDate(date)}`} · substitution</h2>
+          {subs.map((x) => { const t = x.timetable_slots!; return (
+            <div key={x.id} className="flex justify-between gap-2 font-extrabold"><span>{t.periods.name} · {time(t.periods.starts_at)}</span><span>{t.sections ? `${t.sections.classes.name} ${t.sections.name}` : ""} · {t.subjects?.name ?? ""}</span></div>
+          ); })}
+        </section>
+      )}
       {sections.length === 0 ? (
         <div className="card"><p className="muted">You aren&apos;t assigned to any section yet. Ask the principal to add you as a class or subject teacher.</p></div>
       ) : (
