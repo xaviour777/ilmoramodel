@@ -5,7 +5,7 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 type Band = { grade: string; min: number };
 
 export type ReportCard = {
-  student: { id: string; full_name: string; roll_no: string | null; admission_no: string | null };
+  student: { id: string; full_name: string; roll_no: string | null; admission_no: string | null; photo_url?: string | null };
   exams: { id: string; name: string; total: number }[];
   subjects: { name: string; marks: (number | "A" | null)[]; got: number; out: number }[];
   got: number; out: number; percent: number; grade: string; position: number; outOf: number;
@@ -25,7 +25,7 @@ export const DEFAULT_BANDS: Band[] = [
 export async function sectionReportCards(supabase: Supabase, sectionId: string) {
   const [{ data: section }, { data: students }, { data: exams }] = await Promise.all([
     supabase.from("sections").select("name, classes(name), class_teacher:profiles!sections_class_teacher_id_fkey(full_name)").eq("id", sectionId).maybeSingle(),
-    supabase.from("students").select("id, full_name, roll_no, admission_no").eq("section_id", sectionId).eq("status", "enrolled").order("roll_no").order("full_name"),
+    supabase.from("students").select("id, full_name, roll_no, admission_no, photo_url").eq("section_id", sectionId).eq("status", "enrolled").order("roll_no").order("full_name"),
     supabase.from("exams").select("id, name, total_marks, starts_on, grading_scales(bands), terms!inner(academic_sessions!inner(name, is_current, starts_on, ends_on)), exam_sections!inner(section_id)")
       .eq("status", "results").eq("terms.academic_sessions.is_current", true).eq("exam_sections.section_id", sectionId).order("starts_on"),
   ]);

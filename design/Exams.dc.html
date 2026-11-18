@@ -73,6 +73,8 @@ td{padding:11px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
         <button type="button" role="tab" class="{{tPlan}}" onClick="{{goPlan}}">Plan &amp; marks entry</button>
         <button type="button" role="tab" class="{{tRep}}" onClick="{{goRep}}">Results &amp; reports</button>
         <button type="button" role="tab" class="{{tBoard}}" onClick="{{goBoard}}">BISE board prep · 9–12</button>
+        <button type="button" role="tab" class="{{tDay}}" onClick="{{goDay}}">Exam day</button>
+        <button type="button" role="tab" class="{{tGap}}" onClick="{{goGap}}">Gaps and checks</button>
       </div>
 
       <sc-if value="{{showPlan}}" hint-placeholder-val="{{ false }}">
@@ -227,6 +229,84 @@ td{padding:11px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
           </section>
         </div>
       </sc-if>
+
+      <sc-if value="{{showDay}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <section class="grid">
+            <div class="card"><div class="lbl">Papers today</div><div class="big">6</div><div class="muted">Mid-term · Mon 16 Nov</div></div>
+            <div class="card"><div class="lbl">Students sitting</div><div class="big">542</div><div class="muted">33 absent so far</div></div>
+            <div class="card"><div class="lbl">Halls in use</div><div class="big">9</div><div class="muted">of 11 rooms</div></div>
+            <div class="card warm"><div class="lbl">Blocked admit cards</div><div class="big warn">12</div><div class="muted">fees unpaid · you can allow</div></div>
+          </section>
+          <section class="cols">
+            <div class="c3">
+              <div class="card">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Seating plan · Hall B</h2><div style="display:flex;gap:8px"><button type="button" class="chunk w sm">Mix classes</button><button type="button" class="chunk sm">Print door list</button></div></div>
+                <p class="muted" style="margin:6px 0 10px">Class 9 and Class 6 sit alternately so no two neighbours have the same paper.</p>
+                <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px">
+                  <sc-for list="{{seats}}" as="s" hint-placeholder-count="32"><div style="height:42px;border-radius:8px;background:{{s.bg}};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:{{s.fg}}">{{s.t}}</div></sc-for>
+                </div>
+                <div style="display:flex;gap:14px;margin-top:10px;font-weight:800;font-size:12px;color:#4b5563"><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#e0f2fe"></span> Class 9</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#fce7f3"></span> Class 6</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#fee2e2"></span> Absent</span></div>
+              </div>
+              <div class="card">
+                <h2 class="h2">Invigilators</h2>
+                <div class="row" style="margin-top:6px"><span style="width:90px;font-weight:900">Hall A</span><span style="flex:1">Rabia Noor, Tahir Mahmood</span><span class="tag g">Present</span></div>
+                <div class="row"><span style="width:90px;font-weight:900">Hall B</span><span style="flex:1">Usman Ghani, Asma Rafiq</span><span class="tag g">Present</span></div>
+                <div class="row"><span style="width:90px;font-weight:900">Room 12</span><span style="flex:1">Farhan Akhtar</span><span class="tag r">Teaches this paper</span><button type="button" class="chunk w sm">Swap</button></div>
+                <div class="row"><span style="width:90px;font-weight:900">Room 14</span><span style="flex:1">Sadia Malik</span><span class="tag y">On leave · needs cover</span><button type="button" class="chunk w sm">Find cover</button></div>
+              </div>
+            </div>
+            <div class="c2">
+              <div class="card">
+                <h2 class="h2">Print and send</h2>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px">
+                  <button type="button" class="chunk w sm">Admit cards</button><button type="button" class="chunk w sm">Roll number slips</button>
+                  <button type="button" class="chunk w sm">Attendance sheets</button><button type="button" class="chunk w sm">Question paper packets</button>
+                  <button type="button" class="chunk w sm">Answer sheet labels</button><button type="button" class="chunk w sm">Date sheet to parents</button>
+                </div>
+              </div>
+              <div class="card">
+                <h2 class="h2">Live today</h2>
+                <div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">Papers started on time</span><span class="tag g">5 of 6</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Absent students</span><span style="font-weight:900">33 · parents told</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Unfair means reported</span><span class="tag r">1</span></div>
+                <div class="row"><span style="flex:1;font-weight:800">Answer sheets collected</span><span style="font-weight:900">4 of 6 halls</span></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showGap}}" hint-placeholder-val="{{ false }}">
+        <section class="cols">
+          <div class="c3">
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">What is missing in exams and board prep</h2><span class="muted">checked tonight</span></div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+                <sc-for list="{{egaps}}" as="g" hint-placeholder-count="10">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px;border:2px solid #e5e7eb;border-radius:14px;background:#fff"><span style="width:10px;align-self:stretch;border-radius:99px;background:{{g.c}}"></span><div style="flex:1 1 260px"><div style="font-weight:900">{{g.t}}</div><div class="muted" style="font-size:13px">{{g.d}}</div></div><span class="{{g.tc}}">{{g.sev}}</span><button type="button" class="chunk w sm">{{g.fix}}</button></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div class="c2">
+            <div class="card">
+              <h2 class="h2">BISE results, last 5 years</h2>
+              <div style="margin-top:10px"><sc-for list="{{hist}}" as="h" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-weight:800;font-size:13px"><span style="width:44px">{{h.y}}</span><div class="bar" style="flex:1"><span style="width:{{h.w}};background:{{h.c}}"></span></div><span style="width:110px;text-align:right">{{h.v}}</span></div></sc-for></div>
+              <p class="muted" style="margin:8px 0 0;font-size:12px">Pass rate · A+ count. 2027 is Ilmora's prediction.</p>
+            </div>
+            <div class="card">
+              <h2 class="h2">Board readiness · Class 10</h2>
+              <div class="row" style="margin-top:6px"><span style="flex:1;font-weight:800">Registration and fees sent</span><span class="tag y">47 of 50</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Roll number slips received</span><span class="tag">Not yet</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Practicals booked (Phy, Chem, Bio, CS)</span><span class="tag r">0 of 4</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Mock exams done</span><span class="tag y">1 of 3</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Past papers solved, average</span><span class="tag y">3 of 10 years</span></div>
+              <div class="row"><span style="flex:1;font-weight:800">Target set for every student</span><span class="tag g">Yes</span></div>
+            </div>
+          </div>
+        </section>
+      </sc-if>
     </div>
   </main>
 </div>
@@ -267,7 +347,24 @@ class Component extends DCLogic {
     const v = (k) => view===k ? 'pill on' : 'pill';
     const grades = ['9','10','11','12'].map(k => ({ label:'Class '+k, cls: g===k ? 'pill on':'pill', pick: () => this.setState({ g:k }) }));
     return {
-      tPlan:t('plan'), tRep:t('rep'), tBoard:t('board'),
+      tPlan:t('plan'), tRep:t('rep'), tBoard:t('board'), tDay:t('day'), tGap:t('gap'),
+      goDay:()=>this.setState({tab:'day'}), goGap:()=>this.setState({tab:'gap'}),
+      showDay:tab==='day', showGap:tab==='gap',
+      seats: Array.from({ length:32 }, (_, i) => { const absent = [5,18,27].indexOf(i) >= 0; const nine = (i + Math.floor(i/8)) % 2 === 0;
+        return { t: absent ? 'Absent' : (nine ? '9‑' : '6‑') + (10 + i), bg: absent ? '#fee2e2' : nine ? '#e0f2fe' : '#fce7f3', fg: absent ? '#b91c1c' : '#1f2937' }; }),
+      egaps: [
+        ['Practical exams not scheduled','Class 9 and 10 Physics, Chemistry, Biology and Computer practicals are worth 15–25 marks each. None are booked.','High','#ef4444','tag r','Book practicals'],
+        ['No mock exam in board pattern since September','Only 1 of 3 planned mocks done. Students do best after 3 timed mocks.','High','#ef4444','tag r','Plan mocks'],
+        ['3 students not registered with BISE','Fee or B-form missing. Late fee doubles after 30 Nov.','High','#ef4444','tag r','Open list'],
+        ['Marks entry late for 2 teachers','Mid-term results due Friday; Maths and Chemistry not entered.','Medium','#f59e0b','tag y','Remind'],
+        ['No moderation of marks','Two Physics sections marked by different teachers differ by 14 points on the same paper.','Medium','#f59e0b','tag y','Moderate'],
+        ['No retake for failed students','18 students failed one subject in mid-term with no supplementary test planned.','Medium','#f59e0b','tag y','Schedule retake'],
+        ['Question papers not reviewed','4 of 12 mid-term papers were not checked by the head of department.','Medium','#f59e0b','tag y','Assign reviewer'],
+        ['Students have no personal target','Class 9 students do not see their target grade or weak chapters in the app.','Low','#0ea5e9','tag b','Send targets'],
+        ['Results not shared with parents in Urdu','62% of parents chose Urdu but result messages go in English.','Low','#0ea5e9','tag b','Turn on Urdu'],
+        ['No analysis of past board papers','Chapters that come every year are not marked in the question bank.','Low','#0ea5e9','tag b','Run AI analysis']
+      ].map(([t,d,sev,c,tc,fix]) => ({ t, d, sev, c, tc, fix })),
+      hist: [['2022',78,'78% · 6 A+'],['2023',81,'81% · 9 A+'],['2024',79,'79% · 7 A+'],['2025',84,'84% · 12 A+'],['2027',88,'88% · 18 A+ (target)']].map(([y,v,txt]) => ({ y, v:txt, w: v+'%', c: y==='2027' ? '#7c3aed' : '#16a34a' })),
       goPlan:()=>this.setState({tab:'plan'}), goRep:()=>this.setState({tab:'rep'}), goBoard:()=>this.setState({tab:'board'}),
       showPlan:tab==='plan', showRep:tab==='rep', showBoard:tab==='board',
       vClass:v('class'), vStu:v('stu'), vTch:v('tch'), vSub:v('sub'),

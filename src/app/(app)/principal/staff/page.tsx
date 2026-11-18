@@ -33,7 +33,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
   const [{ data: pending }, { data: away }, { data: staff }, { data: slots }, { data: subs }, { data: marked }, { data: dayAway }, { data: rangeAtt }, { count: covered }, { data: pay }, { data: leaveUsed }] = await Promise.all([
     supabase.from("leave_requests").select("id, profile_id, from_on, to_on, reason, profiles!leave_requests_profile_id_fkey(full_name, role)").eq("status", "pending").order("from_on"),
     supabase.from("leave_requests").select("profile_id, profiles!leave_requests_profile_id_fkey(full_name)").eq("status", "approved").lte("from_on", today).gte("to_on", today),
-    supabase.from("profiles").select("id, full_name, role, phone, user_id").in("role", ["principal", "teacher", "accountant"]).eq("is_active", true).order("role").order("full_name"),
+    supabase.from("profiles").select("id, full_name, role, phone, user_id, employee_code").in("role", ["principal", "teacher", "accountant"]).eq("is_active", true).order("role").order("full_name"),
     weekday <= 6
       ? supabase.from("timetable_slots").select("id, teacher_id, period_id, periods!inner(name, starts_at, sort, timing_profiles!inner(is_active)), subjects(name), sections(name, classes(name))").eq("weekday", weekday).eq("periods.timing_profiles.is_active", true)
       : Promise.resolve({ data: [] }),
@@ -213,7 +213,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
               {(staff ?? []).map((s) => (
                 <Row key={s.id}>
                   <span className={`tagx ${s.role === "teacher" ? "b" : s.role === "principal" ? "v" : "y"}`}>{ROLE[s.role] ?? s.role}</span>
-                  <Link href={`/principal/staff/${s.id}`} className="flex-1 font-black hover:underline">{s.full_name}</Link>
+                  <Link href={`/principal/staff/${s.id}`} className="flex-1 font-black hover:underline">{s.full_name}{s.employee_code && <span className="muted ml-2 text-[12px] font-bold">{s.employee_code}</span>}</Link>
                   <span className="muted text-[12px]">{s.user_id ? "can log in" : "no login yet"}</span>
                   <Link href={`/print/staff-cards?id=${s.id}`} target="_blank" className="text-[12px] font-extrabold text-[#0369a1] underline">Card</Link>
                 </Row>

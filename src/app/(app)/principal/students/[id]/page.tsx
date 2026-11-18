@@ -46,7 +46,7 @@ export default async function StudentProfile({ params, searchParams }: { params:
         <div>
           <Link href="/principal/students" className="eyebrow">‹ All students</Link>
           <h1 className="h1">{s.full_name}</h1>
-          <p className="muted text-base">{s.sections ? `${s.sections.classes.name}-${s.sections.name}` : "No class"} · {STATUS[s.status]}{s.roll_no ? ` · Roll ${s.roll_no}` : ""}</p>
+          <p className="muted text-base">{s.admission_no ? `${s.admission_no} · ` : ""}{s.sections ? `${s.sections.classes.name}-${s.sections.name}` : "No class"} · {STATUS[s.status]}{s.roll_no ? ` · Roll ${s.roll_no}` : ""}</p>
         </div>
         <ClassesTabs current="" />
       </div>
@@ -79,7 +79,7 @@ export default async function StudentProfile({ params, searchParams }: { params:
               </select>
             </label>
             <label className="field">Roll no<input className="input" name="roll_no" defaultValue={s.roll_no ?? ""} /></label>
-            <label className="field">Admission no<input className="input" name="admission_no" defaultValue={s.admission_no ?? ""} /></label>
+            <div className="field">Student ID<div className="input flex items-center bg-[#f8fafc] font-black">{s.admission_no ?? "—"}</div></div>
             <label className="field">Gender
               <select className="input" name="gender" defaultValue={s.gender ?? ""}><option value="">Not set</option><option value="male">Boy</option><option value="female">Girl</option></select>
             </label>

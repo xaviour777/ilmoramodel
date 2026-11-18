@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHead, Stats, Stat } from "@/components/ilm";
 import { UnderTabs } from "@/components/classes-tabs";
 import { requireRole } from "@/lib/me";
+import { PhotoField } from "@/components/photo-field";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, todayPK } from "@/lib/format";
 import { CHOICE_LABEL } from "@/lib/messages";
@@ -24,7 +25,7 @@ const SOURCE: Record<string, string> = {
 type Row = {
   id: string; child_name: string; guardian_name: string; phone: string; status: Stage; test_on: string | null; notes: string | null;
   applying_class_id: string | null; created_at: string; follow_up_on: string | null; stage_since: string | null; source: string | null;
-  referred_by_family_id: string | null; student_id: string | null; classes: { name: string } | null; students: { admitted_on: string } | null;
+  referred_by_family_id: string | null; student_id: string | null; photo_url: string | null; classes: { name: string } | null; students: { admitted_on: string } | null;
 };
 type Sec = { id: string; name: string; class_id: string; capacity: number; classes: { name: string; sort: number } };
 
@@ -35,7 +36,7 @@ const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.p
 // The admissions desk: who to call today, every child by step with one clear next action,
 // seats left per class, and where new families come from.
 export default async function AdmissionsPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string; stage?: string; new?: string }> }) {
-  await requireRole("principal", "owner", "accountant");
+  const me = await requireRole("principal", "owner", "accountant");
   const sp = await searchParams;
   const stage: Stage = (STAGES.find((s) => s.id === sp.stage)?.id) ?? "inquiry";
   const supabase = await createClient();
@@ -50,6 +51,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
     allRows<{ section_id: string | null }>((a, b) => supabase.from("students").select("section_id").eq("status", "enrolled").order("id").range(a, b) as never),
   ]);
   const rows = [...((active ?? []) as Row[]), ...((closed ?? []) as Row[])];
+  const { data: nextId } = await supabase.rpc("peek_student_code");
   const secs = ((sections ?? []) as unknown as Sec[]).sort((a, b) => a.classes.sort - b.classes.sort || a.name.localeCompare(b.name));
 
   // seats: capacity minus children studying, per section and per class
@@ -173,6 +175,9 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                     <div className="flex items-start gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {r.photo_url && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={r.photo_url} alt="" className="h-10 w-[30px] rounded-md object-cover" />)}
                           <span className="text-[16px] font-bold text-[#1f2937]">{r.child_name}</span>
                           <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[12px] text-[#1f2937]">{r.classes?.name ?? "Class not set"}</span>
                         </div>
@@ -217,7 +222,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                             </select>
                             <input className="input w-20" name="roll_no" placeholder="Roll" aria-label="Roll number" />
                           </div>
-                          <input className="input" name="admission_no" placeholder="Admission no" aria-label="Admission number" />
+                          <p className="muted text-xs">Student ID will be <b>{nextId ?? "given automatically"}</b>.</p>
                           <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
                           <button className="btn" type="submit">Admit</button>
                         </form>
@@ -314,6 +319,8 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
       <form id="new" action={addInquiry} className="card flex max-w-3xl scroll-mt-24 flex-col gap-3">
         <input type="hidden" name="back" value={here} />
         <h2 className="h2">New inquiry</h2>
+        <PhotoField campusId={me.campus_id} />
+        <div className="rounded-[12px] bg-[#f0fdf4] px-3 py-2 text-[14px] font-extrabold text-[#15803d]">Student ID will be <span className="font-black">{nextId ?? "given automatically"}</span> · given when admitted</div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="field">Child&apos;s name<input className="input" name="child_name" required /></label>
           <label className="field">Parent or guardian<input className="input" name="guardian_name" required /></label>

@@ -52,6 +52,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   const absentIds = [...absentN.entries()].filter(([, n]) => n >= 3).map(([id]) => id);
   const lowIds = en.filter((s) => (avg(s.id) ?? 1) < 0.5).map((s) => s.id);
   const atRisk = new Set([...absentIds, ...lowIds]);
+  const { data: nextId } = await supabase.rpc("peek_student_code");
   const { count: leftThisSession } = await supabase.from("students").select("id", { count: "exact", head: true }).neq("status", "enrolled").gte("created_at", sessionStart);
 
   // a phone number finds the family's children too
@@ -68,7 +69,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   if (filter === "absent") query = query.in("id", absentIds.length ? absentIds.slice(0, 300) : NONE);
   if (filter === "low") query = query.in("id", lowIds.length ? lowIds.slice(0, 300) : NONE);
   if (q) {
-    const ors = [`full_name.ilike.%${q}%`, `roll_no.ilike.%${q}%`, `admission_no.ilike.%${q}%`, `b_form.ilike.%${q}%`];
+    const ors = [`full_name.ilike.%${q}%`, `roll_no.ilike.%${q}%`, `admission_no.ilike.%${q}%`, `legacy_admission_no.ilike.%${q}%`, `b_form.ilike.%${q}%`];
     if (familyIds.length) ors.push(`family_id.in.(${familyIds.join(",")})`);
     query = query.or(ors.join(","));
   }
@@ -141,7 +142,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
                 <span className="flex min-w-0 items-center gap-2.5">
                   <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#ede9fe] text-[13px] font-black text-[#6d28d9]">{ini(r.full_name)}</span>
                   <span className="min-w-0"><span className="block truncate font-black">{r.full_name}</span>
-                    <span className="muted block truncate text-[12px]">{r.sections ? `${r.sections.classes.name}-${r.sections.name}` : "No class"}{r.roll_no ? ` · Roll ${r.roll_no}` : ""}</span></span>
+                    <span className="muted block truncate text-[12px]">{r.admission_no ? `${r.admission_no} · ` : ""}{r.sections ? `${r.sections.classes.name}-${r.sections.name}` : "No class"}{r.roll_no ? ` · Roll ${r.roll_no}` : ""}</span></span>
                 </span>
                 <span className="hidden text-right font-black tabular-nums sm:block">{a == null ? "—" : pct(a)}</span>
                 <span className="hidden text-right font-black tabular-nums sm:block">{t == null ? "—" : pct(t)}</span>
@@ -165,7 +166,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
             <div className="flex items-center gap-3">
               <span className="flex h-14 w-14 flex-none items-center justify-center rounded-full bg-[#ede9fe] text-[18px] font-black text-[#6d28d9]">{ini(sel.full_name)}</span>
               <div className="min-w-0"><h2 className="h2 truncate">{sel.full_name}</h2>
-                <div className="muted text-[13px]">{sel.sections ? `${sel.sections.classes.name}-${sel.sections.name}` : "No class"}{sel.roll_no ? ` · Roll ${sel.roll_no}` : ""}{sel.families?.name ? ` · ${sel.families.name}` : ""}</div></div>
+                <div className="muted text-[13px]">{sel.admission_no ? `${sel.admission_no} · ` : ""}{sel.sections ? `${sel.sections.classes.name}-${sel.sections.name}` : "No class"}{sel.roll_no ? ` · Roll ${sel.roll_no}` : ""}{sel.families?.name ? ` · ${sel.families.name}` : ""}</div></div>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[["Average", avg(sel.id) == null ? "—" : pct(avg(sel.id)!)], ["Attend.", attRate(sel.id) == null ? "—" : pct(attRate(sel.id)!)], ["Fee due", selDue ? rupees(selDue) : "Nil"]].map(([l, v]) => (
@@ -197,14 +198,13 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
       <form id="add" action={addStudent} className="card flex scroll-mt-6 flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="h2">Add a student</h2>
           <Link href="/principal/admissions" className="text-[13px] font-black text-[#0369a1]">New family? Use Admissions →</Link></div>
-        <p className="muted text-[13px]">For a child already admitted.</p>
+        <p className="muted text-[13px]">For a child already admitted. Student ID will be <b>{nextId ?? "given automatically"}</b>.</p>
         <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
           <label className="field">Student&apos;s name<input className="input" name="full_name" required /></label>
           <label className="field">Class
             <select className="input" name="section_id" required>{secs.map((s) => <option key={s.id} value={s.id}>{s.classes.name}-{s.name}</option>)}</select>
           </label>
           <label className="field">Roll no<input className="input" name="roll_no" /></label>
-          <label className="field">Admission no<input className="input" name="admission_no" /></label>
           <label className="field">Gender
             <select className="input" name="gender" defaultValue=""><option value="">Not set</option><option value="male">Boy</option><option value="female">Girl</option></select>
           </label>

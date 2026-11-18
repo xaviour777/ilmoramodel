@@ -29,7 +29,7 @@ export async function addStudent(f: FormData) {
   }
   const { data: stu, error } = await supabase.from("students").insert({
     campus_id: me.campus_id, family_id: fam!.id, section_id: str(f, "section_id") || null, full_name: str(f, "full_name"),
-    roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null, gender: str(f, "gender") || null,
+    roll_no: str(f, "roll_no") || null, gender: str(f, "gender") || null,
     date_of_birth: str(f, "date_of_birth") || null,
   }).select("id").single();
   if (error) redirect(`/principal/students?error=${encodeURIComponent(error.message)}`);
@@ -44,7 +44,7 @@ export async function saveStudent(f: FormData) {
   const back = `/principal/students/${id}`;
   const status = STATUSES.includes(str(f, "status")) ? str(f, "status") : "enrolled";
   const { error } = await supabase.from("students").update({
-    full_name: str(f, "full_name"), roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null,
+    full_name: str(f, "full_name"), roll_no: str(f, "roll_no") || null,
     gender: str(f, "gender") || null, date_of_birth: str(f, "date_of_birth") || null,
     section_id: str(f, "section_id") || null, status,
   }).eq("id", id);
