@@ -5,10 +5,10 @@ import { requireRole } from "@/lib/me";
 
 export type PracticeQ = { id: string; question: string; options: string[] };
 
-export async function startPractice(studentId: string, subjectId: string, chapter: string) {
+export async function startPractice(studentId: string, subjectId: string, chapter: string, n = 10) {
   await requireRole("parent", "student");
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("practice_set", { p_student: studentId, p_subject: subjectId, p_chapter: chapter, p_n: 10 });
+  const { data, error } = await supabase.rpc("practice_set", { p_student: studentId, p_subject: subjectId, p_chapter: chapter, p_n: Math.min(30, Math.max(5, n)) });
   return { questions: (data ?? []) as PracticeQ[], error: error?.message ?? null };
 }
 
