@@ -93,6 +93,10 @@ export type AiAnswer =
 
 /** One AI call through the edge function, as the signed-in person. */
 export async function callAi(supabase: SupabaseClient, req: AiRequest): Promise<AiAnswer> {
+  // the principal can switch each AI feature off in AI tools
+  const SWITCH: Record<AiRequest["feature"], string> = { tutor: "homework", marks: "paper", notice: "notice", quiz: "qpaper" };
+  const { data: on } = await supabase.rpc("ai_feature_enabled", { p_feature: SWITCH[req.feature] });
+  if (on === false) return { ok: false, reason: "off", message: "This AI feature is switched off in AI tools." };
   const { data, error } = await supabase.functions.invoke("ai", { body: req });
   if (error) return { ok: false, reason: "error", message: error.message };
   return data as AiAnswer;
