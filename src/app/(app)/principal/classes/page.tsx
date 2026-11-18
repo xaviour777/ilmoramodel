@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ClassesTabs } from "@/components/classes-tabs";
 import { PageHead, Chips, Empty, Row as Line } from "@/components/ilm";
 import { ClassesOverview, GapsTab, MoveTab, PerformanceTab, PromotionTab, TimetableStatus } from "./views";
+import { BellsMode, RoomsMode, SectionsMode } from "./v2";
 import { shortDate, time, todayPK } from "@/lib/format";
 import {
   activateTiming, addPeriod, assignSubjectTeacher,
@@ -12,25 +13,28 @@ import {
 import { WeekGrid } from "@/components/week-grid";
 import { liveWeek, weekdayOf } from "@/lib/timetable";
 
-type Search = { class?: string; f?: string; lv?: string; batch?: string; all?: string; q?: string; from?: string; sort?: string; tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
+type Search = { sec?: string; lvm?: string; ws?: string; sf?: string; kind?: string; class?: string; f?: string; lv?: string; batch?: string; all?: string; q?: string; from?: string; sort?: string; tab?: string; profile?: string; section?: string; view?: string; teacher?: string; day?: string; saved?: string; error?: string };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default async function ClassesPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
-  const tab = sp.tab ?? "classes";
+  const tab = sp.tab ?? "sections";
   const supabase = await createClient();
   const { data: year } = await supabase.from("academic_sessions").select("name").eq("is_current", true).maybeSingle();
   return (
     <>
       <PageHead kick={`Academics${year?.name ? ` · Session ${year.name}` : ""}`} title="Classes and sections"
-        sub="From Play group to BS. Set up classes, promote students, and watch how every class is doing.">
+        sub="Pick a section. Everything about it, and what to do next, is on one screen.">
         <Link href="/principal/classes?tab=promote" className="btn-ghost">Promote students</Link>
-        <Link href="/principal/classes#add-class" className="btn">Add class or program</Link>
+        <Link href="/principal/classes?tab=classes#add-class" className="btn">Add class or program</Link>
       </PageHead>
       <ClassesTabs current={tab} />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">{savedText(sp.saved)}</div>}
+      {tab === "sections" && <SectionsMode secId={sp.sec} lvm={sp.lvm} wsTab={sp.ws} sf={sp.sf} />}
+      {tab === "rooms" && <RoomsMode sort={sp.sort} />}
+      {tab === "bells" && <BellsMode kind={sp.kind} />}
       {tab === "classes" && <ClassesOverview classId={sp.class} level={sp.lv} />}
       {tab === "promote" && <PromotionTab sectionId={sp.section} batch={sp.batch} all={sp.all === "1"} />}
       {tab === "move" && <MoveTab q={sp.q} fromSection={sp.from} />}
@@ -126,6 +130,9 @@ function savedText(v: string) {
   if (v.startsWith("moved-")) return `${v.slice(6)} student${v.slice(6) === "1" ? "" : "s"} moved. Undo is under Recent moves.`;
   if (v.startsWith("undone-")) return `Undone for ${v.slice(7)} student${v.slice(7) === "1" ? "" : "s"}.`;
   if (v === "rules") return "Rules saved.";
+  if (v === "bells") return "Saved. The day's times are worked out below.";
+  if (v === "room") return "Rooms updated.";
+  if (v === "syllabus") return "Syllabus plan saved.";
   if (v === "program") return "Added. It shows as Not started until it has a section.";
   if (v.startsWith("filled-")) return `Filled ${v.slice(7)} free periods. Check them, then change any period below.`;
   return ({ full: "No free periods left to fill.", sent: "Sent. Each teacher sees it on their dashboard and can accept it or report a problem.",

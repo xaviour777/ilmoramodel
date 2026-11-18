@@ -271,6 +271,7 @@ export async function addInquiry(f: FormData) {
     campus_id: me.campus_id, child_name: str(f, "child_name"), guardian_name: str(f, "guardian_name"),
     phone: str(f, "phone"), applying_class_id: str(f, "class_id") || null, notes: str(f, "notes") || null,
     reminder_phone: reminder || null, reminder_channel: channelChoice(f), ...childDetails(f),
+    photo_url: str(f, "photo_url").startsWith("http") ? str(f, "photo_url") : null,
   });
   back("/principal/admissions", error?.message, "inquiry");
 }
@@ -308,9 +309,9 @@ export async function admitStudent(f: FormData) {
   if (a.address) await supabase.from("families").update({ address: a.address }).eq("id", fam.id).is("address", null);
   const { data: stu, error: e2 } = await supabase.from("students").insert({
     campus_id: me.campus_id, family_id: fam.id, section_id: str(f, "section_id"), full_name: a.child_name,
-    roll_no: str(f, "roll_no") || null, admission_no: str(f, "admission_no") || null,
+    roll_no: str(f, "roll_no") || null,
     father_name: a.guardian_name, father_cnic: a.father_cnic, b_form: a.b_form, gender: a.gender, date_of_birth: a.date_of_birth,
-    address: a.address, previous_school: a.previous_school, last_class_passed: a.last_class_passed,
+    address: a.address, previous_school: a.previous_school, last_class_passed: a.last_class_passed, photo_url: a.photo_url ?? null,
   }).select("id").single();
   if (e2) return back("/principal/admissions", e2.message);
   const { error: e3 } = await supabase.from("admissions").update({ status: "admitted", student_id: stu.id }).eq("id", a.id);

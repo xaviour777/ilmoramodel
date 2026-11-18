@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model School —AI tools</title>
+<title>Model School — AI for your school</title>
 <script src="./support.js"></script>
 <link rel="stylesheet" href="ilmora.css">
 </head>
@@ -10,17 +10,23 @@
 <x-dc>
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
-<style>body{margin:0;background:#f7f9fc}</style>
+<style>
+body{margin:0;background:#f7f9fc}
+.fc{display:flex;flex-direction:column;gap:8px;text-align:left;padding:16px;border:2px solid #e5e7eb;border-radius:18px;background:#fff;box-shadow:0 4px 0 #e5e7eb;cursor:pointer;color:#1f2937;min-height:150px}
+.fc:hover{border-color:#c4b5fd}
+.fc.on{border-color:#a78bfa;background:#f5f3ff;box-shadow:0 4px 0 #c4b5fd}
+.st{font-weight:900;font-size:11px;padding:3px 10px;border-radius:99px;align-self:flex-start}
+</style>
 </helmet>
 <div class="shell">
   <nav aria-label="Main" class="side">
     <div class="brand"><div class="logo">M</div><div><div style="font-weight:900;font-size:18px;color:#15803d">Model School</div><div class="muted" style="font-size:12px">Main Campus · 2026–27</div></div></div>
     <div class="grp">Daily</div>
     <a class="it" href="HomeV2.dc.html"><span class="tile t-g"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></span>Home</a>
-    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">19</span></a>
+    <a class="it" href="Attendance.dc.html"><span class="tile t-o"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg></span>Attendance<span class="badge">3</span></a>
     <a class="it" href="Notices.dc.html"><span class="tile t-p"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"></path></svg></span>Notices &amp; holidays</a>
     <div class="grp">Academics</div>
-    <a class="it" href="Classes.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
+    <a class="it" href="ClassesV2.dc.html"><span class="tile t-b"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></span>Classes</a>
     <a class="it" href="Exams.dc.html"><span class="tile t-v"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"></path></svg></span>Exams</a>
     <a class="it on" href="AITools.dc.html"><span class="tile t-y"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>AI tools</a>
     <div class="grp">People</div>
@@ -35,104 +41,90 @@
   </nav>
   <main class="content">
     <div class="wrap">
-      <header><div class="lbl">Academics</div><h1 class="title">AI tools</h1><p class="sub">Let Ilmora do the slow work. Teachers always approve before anything reaches parents.</p></header>
-
-      <section class="grid">
-        <div class="card"><div class="lbl">Papers checked</div><div class="big">312</div><div class="muted">this term</div></div>
-        <div class="card"><div class="lbl">Teacher hours saved</div><div class="big ok">41</div><div class="muted">about 8 min per paper</div></div>
-        <div class="card"><div class="lbl">Teacher changes</div><div class="big">6%</div><div class="muted">of AI marks edited</div></div>
-        <div class="card"><div class="lbl">Tutor reports sent</div><div class="big">188</div><div class="muted">to parents</div></div>
+      <section class="card" style="background:#5b21b6 !important;border-color:#4c1d95;box-shadow:0 5px 0 #4c1d95 !important;color:#fff;display:flex;flex-wrap:wrap;gap:20px;align-items:center">
+        <div style="flex:1 1 420px">
+          <div class="lbl" style="color:#ddd6fe">AI for your school</div>
+          <h1 class="title" style="color:#fff">What AI can do for Model School</h1>
+          <p style="margin:8px 0 0;font-weight:700;font-size:15px;line-height:23px;color:#ede9fe">{{total}} jobs AI can do for you, sorted by who it helps. Pick one to see what it does, then turn it on. AI only suggests; a person always approves before anything reaches parents.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:10px">
+          <div style="background:#6d28d9;border-radius:14px;padding:12px"><div style="font-weight:900;font-size:24px">41 hrs</div><div style="font-weight:700;font-size:12px;color:#ddd6fe">teacher time saved this month</div></div>
+          <div style="background:#6d28d9;border-radius:14px;padding:12px"><div style="font-weight:900;font-size:24px">{{onCount}} on</div><div style="font-weight:700;font-size:12px;color:#ddd6fe">of {{total}} features</div></div>
+          <div style="background:#6d28d9;border-radius:14px;padding:12px"><div style="font-weight:900;font-size:24px">Rs 1,840</div><div style="font-weight:700;font-size:12px;color:#ddd6fe">AI cost this month</div></div>
+          <div style="background:#6d28d9;border-radius:14px;padding:12px"><div style="font-weight:900;font-size:24px">Rs 3,000</div><div style="font-weight:700;font-size:12px;color:#ddd6fe">monthly limit</div></div>
+        </div>
       </section>
 
-      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:8px">
-        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="7"><button type="button" class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
       </div>
 
-      <sc-if value="{{s.paper}}" hint-placeholder-val="{{ true }}">
-        <section class="cols">
-          <div class="c3">
-            <div class="card" style="border-style:dashed;text-align:center;padding:32px">
-              <span class="tile lg t-y" style="margin:0 auto"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"></path></svg></span>
-              <h2 class="h2" style="margin-top:12px">Upload scanned answer sheets</h2>
-              <p class="muted">Photos or PDF. Ilmora reads handwriting in English and Urdu and matches each page to a student.</p>
-              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px">
-                <label class="field" style="min-width:180px">Exam<select><option>Mid-term · Physics 9‑C</option></select></label>
-                <label class="field" style="min-width:160px">Marking key<select><option>Uploaded key (75 marks)</option><option>Make one with AI</option></select></label>
-              </div>
-              <button type="button" class="chunk" style="margin-top:14px">Choose files</button>
-            </div>
-            <div class="card">
-              <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Waiting for teacher approval</h2><span class="tag y">3 batches</span></div>
-              <div class="row" style="margin-top:6px"><div style="flex:1"><div style="font-weight:900">Physics 9‑C · 50 papers</div><div class="muted">Avg 58% · 4 flagged for unclear handwriting</div></div><span class="tag y">Farhan</span><button type="button" class="chunk w sm">Review</button></div>
-              <div class="row"><div style="flex:1"><div style="font-weight:900">Biology 9‑A · 50 papers</div><div class="muted">Avg 74% · 1 flagged</div></div><span class="tag y">Ayesha</span><button type="button" class="chunk w sm">Review</button></div>
-              <div class="row"><div style="flex:1"><div style="font-weight:900">English 8 · 15 papers</div><div class="muted">Essay marks with written feedback</div></div><span class="tag g">Approved</span><button type="button" class="chunk w sm">Open</button></div>
-            </div>
-          </div>
-          <div class="c2">
-            <div class="card dark">
-              <div class="lbl" style="color:#fcd34d">What AI found · Physics 9‑C</div>
-              <ul style="margin:10px 0 0;padding-left:18px;line-height:24px;font-weight:700">
-                <li>31 of 50 lost marks on units in numericals.</li>
-                <li>Q4 (turning effect) was the hardest: 38% average.</li>
-                <li>3 answers look copied word for word. Flagged to the teacher.</li>
-              </ul>
-              <button type="button" class="chunk" style="margin-top:14px;width:100%">Make a revision worksheet</button>
-            </div>
-          </div>
-        </section>
-      </sc-if>
+      <section class="cols">
+        <div class="c3" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
+          <sc-for list="{{feats}}" as="f" hint-placeholder-count="9">
+            <button type="button" class="{{f.cls}}" onClick="{{f.pick}}">
+              <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><span class="tile {{f.tile}}" style="font-weight:900">{{f.ini}}</span><span class="st" style="background:{{f.sbg}};color:{{f.sfg}}">{{f.status}}</span></div>
+              <span style="font-weight:900;font-size:16px">{{f.n}}</span>
+              <span class="muted" style="font-size:13px">{{f.d}}</span>
+              <span style="font-weight:800;font-size:12px;color:#6d28d9;margin-top:auto">{{f.win}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <aside class="card c2" style="border-color:#c4b5fd;box-shadow:0 4px 0 #c4b5fd !important;gap:12px;position:sticky;top:16px">
+          <div style="display:flex;gap:12px;align-items:center"><span class="tile lg {{sel.tile}}" style="font-weight:900;font-size:18px">{{sel.ini}}</span><div><div class="lbl">{{sel.cat}} · lives in {{sel.where}}</div><h2 class="h2" style="font-size:22px">{{sel.n}}</h2></div></div>
+          <p style="margin:0;font-weight:700;line-height:22px">{{sel.long}}</p>
+          <div style="background:#f5f3ff;border:2px solid #ddd6fe;border-radius:14px;padding:12px"><div class="lbl" style="color:#6d28d9">Example from your school</div><p style="margin:6px 0 0;font-weight:700;line-height:22px">{{sel.ex}}</p></div>
+          <div class="row"><span style="flex:1;font-weight:800">Saves</span><span style="font-weight:900">{{sel.save}}</span></div>
+          <div class="row"><span style="flex:1;font-weight:800">Who approves</span><span style="font-weight:900">{{sel.who}}</span></div>
+          <div class="row"><span style="flex:1;font-weight:800">Status</span><span class="st" style="background:{{sel.sbg}};color:{{sel.sfg}}">{{sel.status}}</span></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk" onClick="{{toggle}}">{{btn}}</button><a class="chunk w" href="{{sel.href}}">Open {{sel.where}}</a></div>
+        </aside>
+      </section>
 
-      <sc-if value="{{s.tutor}}" hint-placeholder-val="{{ false }}">
-        <section class="cols">
-          <div class="c3">
-            <div class="card">
-              <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 class="h2">Tutor report · Hamza Ali, 9‑C</h2><span class="tag r">Needs help</span></div>
-              <p style="font-weight:700;line-height:24px;margin:12px 0 0">Hamza's average fell from 49% to 38% this term. He is strongest in Biology (61%) and weakest in Physics (28%), mainly numericals on forces. He missed 4 days in 3 weeks, all Mondays. A 20‑minute daily practice of 5 numericals and regular Monday attendance should lift him above 50% before the send-up.</p>
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px">
-                <div><div class="lbl">Physics</div><div class="bar" style="margin-top:6px"><span style="width:28%;background:#ef4444"></span></div></div>
-                <div><div class="lbl">Maths</div><div class="bar" style="margin-top:6px"><span style="width:35%;background:#ef4444"></span></div></div>
-                <div><div class="lbl">English</div><div class="bar" style="margin-top:6px"><span style="width:44%;background:#f59e0b"></span></div></div>
-                <div><div class="lbl">Biology</div><div class="bar" style="margin-top:6px"><span style="width:61%"></span></div></div>
-              </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;justify-content:flex-end"><button type="button" class="chunk w">Translate to Urdu</button><button type="button" class="chunk w">Edit</button><button type="button" class="chunk">Send to parent on WhatsApp</button></div>
-            </div>
-          </div>
-          <div class="c2">
-            <form class="card" style="display:flex;flex-direction:column;gap:12px">
-              <h2 class="h2">Make reports for a class</h2>
-              <label class="field">Section<select><option>Class 9‑C (50)</option></select></label>
-              <label class="field">Based on<select><option>All tests this term</option></select></label>
-              <label class="field">Language<select><option>English and Urdu</option></select></label>
-              <button type="button" class="chunk">Make 50 reports</button>
-            </form>
-          </div>
-        </section>
-      </sc-if>
-
-      <sc-if value="{{s.ask}}" hint-placeholder-val="{{ false }}">
-        <section class="card" style="display:flex;flex-direction:column;gap:14px">
-          <h2 class="h2">Ask Ilmora about your school</h2>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="align-self:flex-end;max-width:70%;background:#e0f2fe;border:2px solid #7dd3fc;border-radius:16px 16px 4px 16px;padding:10px 14px;font-weight:800">Which teachers improved results the most this term?</div>
-            <div style="align-self:flex-start;max-width:80%;background:#fff;border:2px solid #e5e7eb;border-radius:16px 16px 16px 4px;padding:12px 14px;font-weight:700;line-height:22px">Ayesha Siddiqui (Biology) is up 7 points since first term, then Maryam's Chemistry group up 5. Sadia Malik's Maths classes dropped 3 points; she has had 9 leave days this term. <a href="Exams.dc.html">See the teacher report</a></div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="chip">Who might fail the board exam?</button><button type="button" class="chip">Which families pay late every month?</button><button type="button" class="chip">Compare 9‑A and 9‑C</button></div>
-          <div style="display:flex;gap:10px"><input class="inp" aria-label="Your question" placeholder="Type a question in English or Urdu" style="flex:1"><button type="button" class="chunk">Ask</button></div>
-        </section>
-      </sc-if>
+      <section class="card dark" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <div style="flex:1 1 300px"><div class="lbl" style="color:#fcd34d">Ask anything</div><div style="font-weight:700;margin-top:4px">The AI Assistant button at the top of every page answers questions about your school in English or Urdu.</div></div>
+        <input class="inp" aria-label="Ask the assistant" placeholder="Which class needs my attention this week?" style="flex:2 1 320px;color:#1f2937">
+        <button type="button" class="chunk">Ask</button>
+      </section>
     </div>
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
 class Component extends DCLogic {
-  constructor(p){ super(p); this.state = { tab:'paper' }; }
+  constructor(p){ super(p); this.state = { cat:'all', sel:'brief', on:{ brief:1, paper:1, notice:1, tutor:1, risk:1, remind:1 } }; }
   renderVals() {
-    const { tab } = this.state;
-    const T = [['paper','Paper checking'],['tutor','Tutor reports'],['ask','Ask Ilmora']];
+    const { cat, sel, on } = this.state;
+    // id, cat, name, short, win, where, href, tile, long, example, saves, approver
+    const F = [
+      ['brief','Principal','Daily brief','Every morning: what changed, what needs you.','Read in 1 minute','Home','HomeV2.dc.html','t-g','Reads attendance, fees, exams, leave and admissions overnight and writes 3–5 lines on what needs you today.','"9‑C fell to 84% this week, mostly Mondays. 117 families have a balance. Sadia Malik asked for leave; Farhan can cover."','30 min a day','Nobody, read-only'],
+      ['ask','Principal','Ask anything','Questions in English or Urdu.','Answers in seconds','every page','HomeV2.dc.html','t-v','Ask about your own data: who is slipping, which class earns least, which teacher improved most.','"Which teachers improved results the most?" → Ayesha Siddiqui +7, Usman Ghani +2; Sadia Malik −3 with 9 leave days.','Hours of report reading','Nobody, read-only'],
+      ['risk','Principal','Early warning','Spots students about to fail or leave.','Catch problems early','Students','Students.dc.html','t-o','Combines attendance, marks, fees and homework to flag students at risk of failing, dropping out or not paying.','26 students flagged this term. Hamza Ali: marks −11, 4 Monday absences, fee 2 months late.','Lost students and fees','Class teacher'],
+      ['plan','Principal','Action plans','Turns a problem into steps.','Clear next steps','Classes','ClassesV2.dc.html','t-b','For any weak class or subject, writes a week-by-week plan with owners and checks.','9‑C Physics: 2 extra periods till 20 Dec, daily 5 numericals, retest 4 Dec, call 7 parents.','Planning time','Principal'],
+      ['paper','Teaching','Paper checking','Marks scanned answer sheets.','8 min saved per paper','Exams','Exams.dc.html','t-y','Reads handwriting in English and Urdu, drafts marks against your key and flags unclear answers for the teacher.','Physics 9‑C, 50 papers: average 58%, 4 flagged, 3 answers look copied.','41 teacher hours a month','Subject teacher'],
+      ['qpaper','Teaching','Question papers','Board-pattern papers from the question bank.','Paper in 2 minutes','Exams','Exams.dc.html','t-y','Makes MCQ, short and long questions in BISE pattern, weighted to chapters your students are weak in.','Class 9 Physics, 75 marks: 12 MCQs, 8 short, 3 long; 40% from weak chapters.','2–3 hours per paper','Head of department'],
+      ['tt','Teaching','Timetable maker','Fills the week without clashes.','No double bookings','Classes','ClassesV2.dc.html','t-b','Builds every section’s timetable from subject hours and teacher free time, and fixes clashes.','38 sections, 0 clashes, hard subjects in the morning.','2 days each term','Principal'],
+      ['sub','Teaching','Substitute finder','Covers absent teachers.','Every period covered','Staff','Staff.dc.html','t-b','When a teacher is on leave, picks free teachers of the same subject and spreads the load fairly.','Sadia away Monday: Farhan P2, P5; Rabia P3, P6.','20 min each morning','Principal'],
+      ['tutor','Students and parents','Tutor reports','A plain report for each child.','Parents understand','Students','Students.dc.html','t-g','Writes each child’s progress, strengths and one thing to practise, in English and Urdu, ready for WhatsApp.','Hamza: strongest in Biology (61%), practise 5 Physics numericals daily.','5 min per child','Class teacher'],
+      ['homework','Students and parents','Homework helper','Explains homework step by step.','Students learn, not copy','Student app','Students.dc.html','t-g','Students ask "Samjhao" and get hints, not answers. Teachers see what was asked.','188 questions this week; most about algebraic fractions.','Tuition costs for parents','Teacher sees log'],
+      ['notice','Communication','Notice writer','From 5 words to a full notice.','Ready in English and Urdu','Notices','Notices.dc.html','t-p','Turns a short note into a polite notice for parents in English, Urdu or both.','"closed Monday smog" → a full closure notice with online class times.','10 min per notice','Principal'],
+      ['remind','Communication','Smart reminders','Right message, right channel.','More fees on time','Fees','Fees.dc.html','t-p','Chooses WhatsApp or SMS for each family and the best day to remind, from past payments.','64 families reminded; 40% usually pay within a week.','Calls to defaulters','Accountant'],
+      ['fee','Money','Cash-flow forecast','Money in vs salaries due.','No surprises on the 1st','Fees','Fees.dc.html','t-o','Predicts collections for the month from payment history and warns when salaries may be short.','Rs 980k expected by 10 Dec; payroll needs Rs 1.25M on 1 Dec.','Owner’s worry','Owner'],
+      ['seat','Money','Seats and rooms','Where you lose money.','More profit per room','Classes','ClassesV2.dc.html','t-o','Finds empty seats, crowded rooms and sections to merge or open, with the money each change makes.','Merge 8‑A and 8‑B: saves Rs 58k a month. Open ICS in Rooms 15–16: +Rs 290k.','Rs per month','Director'],
+      ['adm','Money','Admission follow-up','Turns inquiries into joins.','More families join','Admissions','Admissions.dc.html','t-p','Reminds you which families to call and writes the follow-up message.','4 families not called in 7 days; referrals join 3× more.','Lost admissions','Admissions officer'],
+      ['board','Exams','Board predictor','Predicts BISE results.','Push the right students','Exams','Exams.dc.html','t-v','Predicts each Class 9–10 student’s board marks from school tests and shows who can reach A+.','Class 9: 66% now, 75% target; 18 students close to A+.','Guesswork','Principal']
+    ];
+    const C = [['all','All'],['Principal','For the principal'],['Teaching','For teachers'],['Students and parents','For students and parents'],['Communication','Messages'],['Money','Money'],['Exams','Exams']];
+    const status = (id) => on[id] ? ['On','#dcfce7','#15803d'] : ['Try it','#ede9fe','#6d28d9'];
+    const feats = F.filter(f => cat==='all' || f[1]===cat).map(f => { const [s,bg,fg] = status(f[0]); return { n:f[2], d:f[3], win:f[4], tile:f[7], ini:f[2][0], status:s, sbg:bg, sfg:fg, cls: f[0]===sel ? 'fc on':'fc', pick:()=>this.setState({ sel:f[0] }) }; });
+    const s = F.find(f => f[0]===sel); const [st,sbg,sfg] = status(s[0]);
     return {
-      tabs: T.map(([k,l]) => ({ label:l, cls: tab===k ? 'chip on':'chip', pick:()=>this.setState({ tab:k }) })),
-      s: { paper: tab==='paper', tutor: tab==='tutor', ask: tab==='ask' }
+      total: F.length, onCount: Object.values(on).filter(Boolean).length,
+      cats: C.map(([k,l]) => ({ label:l, cls: cat===k ? 'chip on':'chip', pick:()=>this.setState({ cat:k }) })),
+      feats,
+      sel: { n:s[2], cat:s[1], where:s[5], href:s[6], tile:s[7], ini:s[2][0], long:s[8], ex:s[9], save:s[10], who:s[11], status:st, sbg, sfg },
+      btn: on[sel] ? 'Turn off' : 'Turn on',
+      toggle: () => this.setState({ on:{ ...on, [sel]: !on[sel] } })
     };
   }
 }

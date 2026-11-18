@@ -17,8 +17,8 @@ export async function computeGaps(s: School) {
   const out: { sev: "High" | "Medium" | "Low"; title: string; detail: string; fix: string; href: string; check: string }[] = [];
   const add = (check: string, sev: "High" | "Medium" | "Low", title: string, detail: string, fix: string, href: string) => out.push({ check, sev, title, detail, fix, href });
   const live = s.sections;
-  for (const x of live.filter((x) => !x.class_teacher_id)) add("teacher", "Medium", `${classTitle(x.cls)}-${x.name} has no class teacher`, "Nobody is responsible for its attendance and parents.", "Assign teacher", `/principal/classes?class=${x.cls.id}`);
-  for (const x of live.filter((x) => x.capacity && x.students > x.capacity)) add("capacity", "High", `${classTitle(x.cls)}-${x.name} is over capacity`, `${x.students} students for ${x.capacity} seats.`, "Open a section", `/principal/classes?class=${x.cls.id}`);
+  for (const x of live.filter((x) => !x.class_teacher_id)) add("teacher", "Medium", `${classTitle(x.cls)}-${x.name} has no class teacher`, "Nobody is responsible for its attendance and parents.", "Assign teacher", `/principal/classes?sec=${x.id}&ws=over`);
+  for (const x of live.filter((x) => x.capacity && x.students > x.capacity)) add("capacity", "High", `${classTitle(x.cls)}-${x.name} is over capacity`, `${x.students} students for ${x.capacity} seats.`, "Open a section", `/principal/classes?tab=classes&class=${x.cls.id}`);
   // subjects taught in a section with no teacher on record
   for (const ss of s.secSubjects.filter((q) => !q.teacher_id)) {
     const sec = live.find((x) => x.id === ss.section_id); const sub = s.subjects.find((q) => q.id === ss.subject_id);
@@ -36,7 +36,7 @@ export async function computeGaps(s: School) {
   }
   const hasTen = s.classes.some((c) => c.lvl === "matric" && c.sort === 10 && live.some((x) => x.class_id === c.id && x.students > 0));
   const hasEleven = s.classes.some((c) => c.lvl === "intermediate" && live.some((x) => x.class_id === c.id));
-  if (hasTen && !hasEleven) add("path", "High", "No Class 11 after matric", "Class 10 students have nowhere to go in this school next year. Add FSc, ICS or FA.", "Add Class 11", "/principal/classes?lv=intermediate#programs");
+  if (hasTen && !hasEleven) add("path", "High", "No Class 11 after matric", "Class 10 students have nowhere to go in this school next year. Add FSc, ICS or FA.", "Add Class 11", "/principal/classes?tab=classes&lv=intermediate#programs");
   const order = { High: 0, Medium: 1, Low: 2 };
   return out.sort((a, b) => order[a.sev] - order[b.sev]);
 }
@@ -61,7 +61,7 @@ export async function ClassesOverview({ classId, level }: { classId?: string; le
   const notStarted = groups.filter((g) => !g.started).length;
   const offered = new Set(s.classes.map((c) => c.program).filter(Boolean));
   const ideas = PROGRAMS.filter((x) => !offered.has(x.program));
-  const href = (o: { lv?: string; class?: string }) => "/principal/classes?" + new URLSearchParams(Object.entries({ lv: lv === "all" ? undefined : lv, ...o }).filter(([, v]) => v) as [string, string][]);
+  const href = (o: { lv?: string; class?: string }) => "/principal/classes?" + new URLSearchParams(Object.entries({ tab: "classes", lv: lv === "all" ? undefined : lv, ...o }).filter(([, v]) => v) as [string, string][]);
   const insight = sel && [
     sel.started ? `${sel.students} of ${sel.seats || "—"} seats taken in ${sel.secs.length} section${sel.secs.length === 1 ? "" : "s"}.` : "Not started yet: add a section to open admissions.",
     sel.att != null ? `Attendance ${pct(sel.att)} this session.` : "",
@@ -500,7 +500,7 @@ export async function PerformanceTab({ sort }: { sort?: string }) {
             <thead><tr>{["Section", "Class teacher", "Seats", "Attendance", "Avg result", "Pass", "Fees", "Homework", "Per teacher", "Overall"].map((h) => <th key={h} className="text-left">{h}</th>)}</tr></thead>
             <tbody>{rows.map((r) => (
               <tr key={r.id}>
-                <td><Link href={`/principal/classes?class=${r.cls.id}`} className="font-black text-[#0369a1]">{classTitle(r.cls)}-{r.name}</Link></td>
+                <td><Link href={`/principal/classes?sec=${r.id}`} className="font-black text-[#0369a1]">{classTitle(r.cls)}-{r.name}</Link></td>
                 <td className="text-[13px]">{r.class_teacher_id ? s.teacherName.get(r.class_teacher_id) ?? "—" : <span className="text-[#b91c1c]">none</span>}</td>
                 <td className="tabular-nums">{r.students}/{r.capacity ?? "—"}</td>
                 <td className="tabular-nums">{p(r.att)}</td><td className="tabular-nums">{p(r.result)}</td><td className="tabular-nums">{p(r.pass)}</td>

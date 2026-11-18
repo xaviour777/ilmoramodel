@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { pct, shortDate } from "@/lib/format";
 import Link from "next/link";
+import { PhotoField } from "@/components/photo-field";
 import { PageHead, Stats, Stat, Insight, Empty, Bar, Row } from "@/components/ilm";
 import { CHANNEL_LABEL, CHOICE_LABEL } from "@/lib/messages";
 import { addInquiry, admitStudent, moveAdmission } from "../actions";
@@ -14,7 +15,7 @@ const COLS = [
 ] as const;
 
 export default async function AdmissionsPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
-  await requireRole("principal", "owner", "accountant");
+  const me = await requireRole("principal", "owner", "accountant");
   const sp = await searchParams;
   const supabase = await createClient();
   const [{ data: rows }, { data: classes }, { data: sections }, { data: year }, { data: enrolled }, { count: declined }] = await Promise.all([
@@ -25,6 +26,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
     supabase.from("students").select("section_id").eq("status", "enrolled"),
     supabase.from("admissions").select("id", { count: "exact", head: true }).eq("status", "declined"),
   ]);
+  const { data: nextId } = await supabase.rpc("peek_student_code");
   const since = year?.starts_on ?? "1900-01-01";
   const thisSession = (rows ?? []).filter((r) => r.created_at.slice(0, 10) >= since);
   const joined = thisSession.filter((r) => r.status === "admitted").length;
@@ -65,7 +67,9 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
               {list.length === 0 && <p className="muted text-[13px]">Nobody here.</p>}
               {list.map((a) => (
                 <div key={a.id} className="flex flex-col gap-2 rounded-[14px] border-2 border-[#e5e7eb] bg-white p-3 shadow-[0_3px_0_#e5e7eb]">
-                  <div className="font-black">{a.child_name}</div>
+                  <div className="flex items-center gap-2">{a.photo_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={a.photo_url} alt="" className="h-10 w-[30px] rounded-md object-cover" />)}<div className="font-black">{a.child_name}</div></div>
                   <div className="muted text-xs">{a.classes?.name ?? "Class not set"} · {a.guardian_name} · {a.phone}</div>
                   {(a.reminder_phone || a.reminder_channel !== "auto") && (
                     <div className="muted text-xs">Reminders: {a.reminder_phone ?? a.phone}{a.reminder_channel !== "auto" ? ` on ${CHANNEL_LABEL[a.reminder_channel as "whatsapp" | "sms"]}` : ""}</div>
@@ -91,7 +95,7 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
                         </select>
                         <input className="input min-h-10 w-20 py-1 text-sm" name="roll_no" placeholder="Roll" aria-label="Roll number" />
                       </div>
-                      <input className="input min-h-10 py-1 text-sm" name="admission_no" placeholder="Admission no" aria-label="Admission number" />
+                      <p className="muted text-xs">Student ID will be <b>{nextId ?? "given automatically"}</b>.</p>
                       <label className="flex items-center gap-2 text-xs font-extrabold"><input type="checkbox" name="first_challan" defaultChecked className="h-4 w-4" /> Make the first challan (admission + this month)</label>
                       <button className="btn min-h-10 text-sm" type="submit">Admit</button>
                       </form>
@@ -125,6 +129,8 @@ export default async function AdmissionsPage({ searchParams }: { searchParams: P
       </div>
       <form id="inquiry" action={addInquiry} className="card flex min-w-0 flex-[3_1_480px] scroll-mt-6 flex-col gap-3">
         <h2 className="h2">New inquiry</h2>
+        <PhotoField campusId={me.campus_id} />
+        <div className="rounded-[12px] bg-[#f0fdf4] px-3 py-2 text-[14px] font-extrabold text-[#15803d]">Student ID will be <span className="font-black">{nextId ?? "given automatically"}</span> · given when admitted</div>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="field">Child&apos;s name<input className="input" name="child_name" required /></label>
           <label className="field">Parent or guardian<input className="input" name="guardian_name" required /></label>
