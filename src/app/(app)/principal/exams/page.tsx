@@ -4,9 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { pct, shortDate, time, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Chips, Insight, Empty, Bar, Bars, Row } from "@/components/ilm";
 import { UnderTabs } from "@/components/classes-tabs";
+import { fetchAll } from "@/lib/fetch-all";
+import { BoardTarget, ExamDayTab, ExamGapsTab } from "./day";
+import { PrintButton } from "@/app/print/paper-check/[id]/print-button";
 import { addPaper, addStandardClasses, createExam, setExamStatus } from "../actions";
 
-type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string };
+type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string };
 const KIND: Record<string, string> = { class_test: "Class test", monthly: "Monthly test", term: "Term exam", sendup: "Send-up", final: "Final", other: "Other" };
 // Ideas for the name box; the principal can type any name instead.
 const NAME_IDEAS = ["Weekly test", "Monthly test · November", "December test", "Mid-term exam", "Pre-board test", "Send-up exam", "Final exam", "Surprise quiz", "Chapter 3 test", "Summer homework test"];
@@ -25,7 +28,7 @@ const NEXT: Record<string, [string, string] | undefined> = {
 export default async function ExamsPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
-  const tab = sp.tab === "results" || sp.tab === "board" ? sp.tab : "plan";
+  const tab = ["results", "board", "day", "gaps"].includes(sp.tab ?? "") ? sp.tab! : "plan";
   const q = (o: Record<string, string | undefined>) => "/principal/exams?" + new URLSearchParams(Object.entries({ ...o }).filter(([, v]) => v) as [string, string][]);
   return (
     <>
@@ -36,13 +39,17 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
       <UnderTabs current={tab} tabs={[
         { id: "plan", label: "Plan & marks entry", href: q({ tab: "plan" }) },
         { id: "results", label: "Results & reports", href: q({ tab: "results" }) },
-        { id: "board", label: "Board prep · 9–12", href: q({ tab: "board" }) },
+        { id: "board", label: "BISE board prep · 9–12", href: q({ tab: "board" }) },
+        { id: "day", label: "Exam day", href: q({ tab: "day" }) },
+        { id: "gaps", label: "Gaps and checks", href: q({ tab: "gaps" }) },
       ]} />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}
       {tab === "plan" && <PlanTab sp={sp} />}
       {tab === "results" && <ResultsTab sp={sp} />}
       {tab === "board" && <BoardTab sp={sp} />}
+      {tab === "day" && <ExamDayTab date={sp.date} roomId={sp.room} />}
+      {tab === "gaps" && <ExamGapsTab />}
     </>
   );
 }
@@ -247,19 +254,19 @@ async function PlanTab({ sp }: { sp: Search }) {
 // ---------- results: every mark of published exams this session ----------
 type Mark = { exam_id: string; obtained: number; subject_id: string; subjects: { name: string }; students: { id: string; full_name: string; section_id: string; sections: { name: string; class_id: string; classes: { name: string } } } };
 
-async function sessionResults(classIds?: string[]) {
+// Every mark of published exams in a session (the current one unless asked), read in full.
+async function sessionResults(classIds?: string[], sessionId?: string) {
   const supabase = await createClient();
-  const { data: exams } = await supabase.from("exams").select("id, name, starts_on, total_marks, terms!inner(academic_sessions!inner(is_current))")
-    .eq("status", "results").eq("terms.academic_sessions.is_current", true).order("starts_on", { ascending: true, nullsFirst: true });
+  let eq = supabase.from("exams").select("id, name, starts_on, total_marks, terms!inner(session_id, academic_sessions!inner(is_current))").eq("status", "results");
+  eq = sessionId ? eq.eq("terms.session_id", sessionId) : eq.eq("terms.academic_sessions.is_current", true);
+  const { data: exams } = await eq.order("starts_on", { ascending: true, nullsFirst: true });
   const ids = (exams ?? []).map((e) => e.id);
-  let marks: Mark[] = [];
-  if (ids.length) {
+  const marks = ids.length ? await fetchAll<Mark>((f, t) => {
     let qy = supabase.from("marks").select("exam_id, obtained, subject_id, subjects(name), students!inner(id, full_name, section_id, sections!inner(name, class_id, classes(name)))")
-      .in("exam_id", ids).eq("is_absent", false).not("obtained", "is", null).limit(20000);
+      .in("exam_id", ids).eq("is_absent", false).not("obtained", "is", null);
     if (classIds?.length) qy = qy.in("students.sections.class_id", classIds);
-    const { data } = await qy;
-    marks = (data ?? []) as unknown as Mark[];
-  }
+    return qy.order("id").range(f, t) as unknown as PromiseLike<{ data: Mark[] | null; error: unknown }>;
+  }) : [];
   const total = new Map((exams ?? []).map((e) => [e.id, e.total_marks || 100]));
   return { exams: exams ?? [], marks: marks.map((m) => ({ ...m, r: Number(m.obtained) / (total.get(m.exam_id) ?? 100) })) };
 }
@@ -271,71 +278,94 @@ const grade = (r: number) => GRADES.find(([, min]) => r >= min)![0];
 
 async function ResultsTab({ sp }: { sp: Search }) {
   const supabase = await createClient();
-  const { data: classes } = await supabase.from("classes").select("id, name").order("sort");
+  const [{ data: classes }, { data: sessions }, { data: sections }, { data: subjectList }, { data: teach }] = await Promise.all([
+    supabase.from("classes").select("id, name").order("sort"),
+    supabase.from("academic_sessions").select("id, name, is_current").order("starts_on", { ascending: false }),
+    supabase.from("sections").select("id, name, class_id"),
+    supabase.from("subjects").select("id, name").order("name"),
+    supabase.from("section_subjects").select("section_id, subject_id, teacher_id, profiles(full_name)"),
+  ]);
   const cls = (classes ?? []).find((c) => c.id === sp.cls);
-  const { exams, marks: all } = await sessionResults(cls ? [cls.id] : undefined);
-  const exam = exams.find((e) => e.id === sp.exam) ?? exams.at(-1);
-  const marks = all.filter((m) => m.exam_id === exam?.id);
-  const view = ["class", "student", "subject"].includes(sp.view ?? "") ? sp.view! : "class";
+  const { exams, marks: all } = await sessionResults(cls ? [cls.id] : undefined, sp.session || undefined);
+  const exam = sp.exam === "all" ? undefined : exams.find((e) => e.id === sp.exam) ?? exams.at(-1);
+  const teacherOf = new Map(((teach ?? []) as unknown as { section_id: string; subject_id: string; teacher_id: string | null; profiles: { full_name: string } | null }[])
+    .map((t) => [`${t.section_id}|${t.subject_id}`, { id: t.teacher_id, name: t.profiles?.full_name ?? "No teacher" }]));
+  const teachers = [...new Map([...teacherOf.values()].filter((t) => t.id).map((t) => [t.id!, t.name])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  const inScope = (m: (typeof all)[number]) => (!sp.sec || m.students.section_id === sp.sec) && (!sp.subj || m.subject_id === sp.subj)
+    && (!sp.teacher || teacherOf.get(`${m.students.section_id}|${m.subject_id}`)?.id === sp.teacher);
+  const scoped = all.filter(inScope);
+  const marks = scoped.filter((m) => !exam || m.exam_id === exam.id);
+  const view = ["class", "student", "teacher", "subject"].includes(sp.view ?? "") ? sp.view! : "class";
   const show = sp.show ?? "all";
-  // one result per student: their average across subjects in this exam
   const perStudent = [...group(marks, (m) => m.students.id).values()].map((ms) => ({
     id: ms[0].students.id, name: ms[0].students.full_name, cls: `${ms[0].students.sections.classes.name}-${ms[0].students.sections.name}`,
-    r: avg(ms.map((m) => m.r))!, low: ms.filter((m) => m.r < 0.4).map((m) => m.subjects.name),
+    r: avg(ms.map((m) => m.r))!, low: [...new Set(ms.filter((m) => m.r < 0.4).map((m) => m.subjects.name))],
   }));
   const prev = exam ? exams[exams.findIndex((e) => e.id === exam.id) - 1] : undefined;
-  const prevAvg = prev ? avg(all.filter((m) => m.exam_id === prev.id).map((m) => m.r)) : null;
+  const prevBy = new Map(prev ? [...group(scoped.filter((m) => m.exam_id === prev.id), (m) => m.students.id).entries()].map(([k, v]) => [k, avg(v.map((m) => m.r))!]) : []);
+  const prevAvg = prev ? avg([...prevBy.values()]) : null;
   const average = avg(perStudent.map((s) => s.r));
   const pass = perStudent.filter((s) => s.r >= 0.4).length;
   const atRisk = perStudent.filter((s) => s.low.length > 0);
-  const trend = exams.map((e) => ({ label: e.name.length > 12 ? e.name.slice(0, 11) + "…" : e.name, r: avg(all.filter((m) => m.exam_id === e.id).map((m) => m.r)) })).filter((t) => t.r != null);
+  const trend = exams.map((e) => ({ label: e.name.length > 12 ? e.name.slice(0, 11) + "…" : e.name, r: avg(scoped.filter((m) => m.exam_id === e.id).map((m) => m.r)) })).filter((t) => t.r != null);
   const spread = GRADES.map(([g]) => ({ g, n: perStudent.filter((s) => grade(s.r) === g).length }));
-  const href = (o: Partial<Search>) => "/principal/exams?" + new URLSearchParams(Object.entries({ tab: "results", exam: exam?.id, cls: sp.cls, view, show, ...o }).filter(([, v]) => v) as [string, string][]);
+  const q = (o: Partial<Search>) => "/principal/exams?" + new URLSearchParams(Object.entries({ tab: "results", session: sp.session, exam: sp.exam, cls: sp.cls, sec: sp.sec, subj: sp.subj, teacher: sp.teacher, view, show, ...o }).filter(([, v]) => v) as [string, string][]);
+  const status = (a: number) => (a >= 0.7 ? ["Strong", "g"] : a >= 0.5 ? ["OK", "b"] : ["Weak", "r"]);
 
   let rows: { a: string; b: string; c: string; d: string; e: string; ec: string; href?: string }[] = [];
   let head = ["", "", "", "", ""];
   if (view === "class") {
     head = ["Section", "Students", "Average", "Pass rate", "Status"];
-    rows = [...group(perStudent, (s) => s.cls).entries()].sort().map(([k, v]) => {
-      const a = avg(v.map((s) => s.r))!; const pr = v.filter((s) => s.r >= 0.4).length / v.length;
-      return { a: k, b: String(v.length), c: pct(a), d: pct(pr), e: a >= 0.7 ? "Strong" : a >= 0.5 ? "OK" : "Weak", ec: a >= 0.7 ? "g" : a >= 0.5 ? "b" : "r" };
-    });
+    rows = [...group(perStudent, (s) => s.cls).entries()].sort().map(([k, v]) => { const a = avg(v.map((s) => s.r))!; const st = status(a);
+      return { a: k, b: String(v.length), c: pct(a), d: pct(v.filter((s) => s.r >= 0.4).length / v.length), e: st[0], ec: st[1] }; });
   } else if (view === "student") {
-    head = ["Student", "Class", "Average", "Grade", "Weak subjects"];
+    head = ["Student", "Class", "Average", prev ? `Change vs ${prev.name}` : "Grade", "Weak subjects"];
     let list = [...perStudent].sort((a, b) => b.r - a.r);
     if (show === "low") list = list.filter((s) => s.r < 0.5);
     if (show === "top") list = list.slice(0, 10);
-    rows = list.slice(0, 200).map((s) => ({ a: s.name, b: s.cls, c: pct(s.r), d: grade(s.r), e: s.low.join(", ") || "—", ec: s.low.length ? "r" : "g", href: `/principal/students/${s.id}` }));
+    if (show === "drop") list = list.filter((s) => prevBy.has(s.id) && s.r - prevBy.get(s.id)! <= -0.1);
+    rows = list.slice(0, 300).map((s) => ({ a: s.name, b: s.cls, c: pct(s.r), d: prevBy.has(s.id) ? `${s.r >= prevBy.get(s.id)! ? "+" : ""}${Math.round((s.r - prevBy.get(s.id)!) * 100)} pts` : grade(s.r), e: s.low.join(", ") || "—", ec: s.low.length ? "r" : "g", href: `/principal/students/${s.id}` }));
+  } else if (view === "teacher") {
+    head = ["Teacher", "Subjects · sections", "Average", "Pass rate", "Status"];
+    rows = [...group(marks, (m) => teacherOf.get(`${m.students.section_id}|${m.subject_id}`)?.name ?? "No teacher").entries()].map(([k, v]) => {
+      const a = avg(v.map((m) => m.r))!; const st = status(a);
+      const what = [...new Set(v.map((m) => `${m.subjects.name} ${m.students.sections.classes.name.replace("Class ", "")}-${m.students.sections.name}`))];
+      return { a: k, b: what.slice(0, 4).join(", ") + (what.length > 4 ? ` +${what.length - 4}` : ""), c: pct(a), d: pct(v.filter((m) => m.r >= 0.4).length / v.length), e: st[0], ec: st[1] };
+    }).sort((x, y) => parseFloat(x.c) - parseFloat(y.c));
   } else {
     head = ["Subject", "Marks", "Average", "Below 40%", "Status"];
     rows = [...group(marks, (m) => m.subjects.name).entries()].map(([k, v]) => ({ k, v, a: avg(v.map((m) => m.r))! })).sort((x, y) => x.a - y.a)
-      .map(({ k, v, a }) => ({ a: k, b: String(v.length), c: pct(a), d: String(v.filter((m) => m.r < 0.4).length), e: a >= 0.7 ? "Strong" : a >= 0.5 ? "OK" : "Weak", ec: a >= 0.7 ? "g" : a >= 0.5 ? "b" : "r" }));
+      .map(({ k, v, a }) => { const st = status(a); return { a: k, b: String(v.length), c: pct(a), d: String(v.filter((m) => m.r < 0.4).length), e: st[0], ec: st[1] }; });
   }
 
   return (
     <>
-      <form className="card grid items-end gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
+      <form className="card grid items-end gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
         <input type="hidden" name="tab" value="results" /><input type="hidden" name="view" value={view} />
-        <label className="field">Test<select className="input" name="exam" defaultValue={exam?.id}>{exams.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}{!exams.length && <option>No published results</option>}</select></label>
+        <label className="field">Session<select className="input" name="session" defaultValue={sp.session ?? ""}>{(sessions ?? []).map((x) => <option key={x.id} value={x.is_current ? "" : x.id}>{x.name}</option>)}</select></label>
+        <label className="field">Test<select className="input" name="exam" defaultValue={sp.exam ?? exam?.id ?? ""}><option value="all">All tests this session</option>{exams.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}</select></label>
         <label className="field">Class<select className="input" name="cls" defaultValue={sp.cls ?? ""}><option value="">All classes</option>{(classes ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        <label className="field">Show<select className="input" name="show" defaultValue={show}><option value="all">Everyone</option><option value="low">Below 50%</option><option value="top">Top 10</option></select></label>
+        <label className="field">Section<select className="input" name="sec" defaultValue={sp.sec ?? ""}><option value="">All</option>{(sections ?? []).filter((x) => !cls || x.class_id === cls.id).map((x) => <option key={x.id} value={x.id}>{(classes ?? []).find((c) => c.id === x.class_id)?.name}-{x.name}</option>)}</select></label>
+        <label className="field">Subject<select className="input" name="subj" defaultValue={sp.subj ?? ""}><option value="">All subjects</option>{(subjectList ?? []).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
+        <label className="field">Teacher<select className="input" name="teacher" defaultValue={sp.teacher ?? ""}><option value="">All teachers</option>{teachers.map(([id, n]) => <option key={id} value={id}>{n}</option>)}</select></label>
+        <label className="field">Show<select className="input" name="show" defaultValue={show}><option value="all">Everyone</option><option value="low">Below 50%</option><option value="top">Top 10</option><option value="drop">Dropped 10+ pts</option></select></label>
         <button className="btn-ghost" type="submit">Apply</button>
       </form>
       <div className="flex flex-wrap items-center justify-between gap-2.5">
-        <Chips label="Report view" current={view} items={[{ id: "class", label: "By class" }, { id: "student", label: "By student" }, { id: "subject", label: "By subject" }].map((v) => ({ ...v, href: href({ view: v.id }) }))} />
-        <Link href="/principal/exams#report-cards" className="btn-ghost" style={{ minHeight: 36, fontSize: 12 }}>Print report cards</Link>
+        <Chips label="Report view" current={view} items={[{ id: "class", label: "By class" }, { id: "student", label: "By student" }, { id: "teacher", label: "By teacher" }, { id: "subject", label: "By subject" }].map((v) => ({ ...v, href: q({ view: v.id }) }))} />
+        <div className="flex gap-2"><PrintButton /><Link href="/principal/exams#report-cards" className="btn-ghost" style={{ minHeight: 36, fontSize: 12 }}>Report cards</Link></div>
       </div>
-      {!exam ? <Empty>No results published this session yet. Publish an exam&apos;s results on the Plan tab and they show here.</Empty> : (
+      {!exams.length ? <Empty>No results published in this session yet. Publish an exam&apos;s results on the Plan tab and they show here.</Empty> : (
         <>
           <Stats>
-            <Stat label="Average" value={average != null ? pct(average) : "—"} sub={prevAvg != null && average != null ? `${average >= prevAvg ? "▲" : "▼"} ${Math.abs(Math.round((average - prevAvg) * 100))} pts since ${prev!.name}` : exam.name} />
+            <Stat label="Average" value={average != null ? pct(average) : "—"} sub={prevAvg != null && average != null ? `${average >= prevAvg ? "▲" : "▼"} ${Math.abs(Math.round((average - prevAvg) * 100))} pts since ${prev!.name}` : exam?.name ?? "all tests"} />
             <Stat label="Pass rate" value={perStudent.length ? pct(pass / perStudent.length) : "—"} sub={`${pass} of ${perStudent.length} students · 40%+`} />
             <Stat label="A+ and A" value={perStudent.filter((s) => s.r >= 0.7).length} sub="70% and above" tone="#15803d" />
             <Stat label="At risk" value={atRisk.length} sub="below 40% in 1+ subject" tone={atRisk.length ? "#b91c1c" : undefined} />
           </Stats>
           <section className="flex flex-wrap items-start gap-5">
             <div className="card min-w-0 flex-[3_1_480px]">
-              <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="h2">{cls ? cls.name : "School"} average · test by test</h2><span className="muted text-[12px]">Each bar is one published test this session</span></div>
+              <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="h2">{cls ? cls.name : "School"} average · test by test</h2><span className="muted text-[12px]">Each bar is one published test</span></div>
               <div className="mt-4">{trend.length ? <Bars bars={trend.map((t) => ({ label: t.label, value: Math.round(t.r! * 100), note: pct(t.r!), color: t.r! >= 0.5 ? "#16a34a" : "#f59e0b" }))} /> : <Empty>No marks yet.</Empty>}</div>
             </div>
             <div className="card min-w-0 flex-[2_1_300px]">
@@ -346,12 +376,12 @@ async function ResultsTab({ sp }: { sp: Search }) {
             </div>
           </section>
           <section className="card">
-            <h2 className="h2">{view === "class" ? "By class" : view === "student" ? "By student" : "By subject"} · {exam.name}</h2>
-            <p className="muted text-[13px]">{cls ? cls.name : "All classes"}{show !== "all" && view === "student" ? ` · ${show === "low" ? "below 50%" : "top 10"}` : ""}</p>
+            <h2 className="h2">{{ class: "By class", student: "By student", teacher: "By teacher", subject: "By subject" }[view]} · {exam?.name ?? "all tests"}</h2>
+            <p className="muted text-[13px]">{cls ? cls.name : "All classes"}{view === "subject" ? " · chapter detail comes from AI paper checking" : ""}</p>
             <div className="tbl mt-2 overflow-x-auto"><table className="w-full">
               <thead><tr>{head.map((h) => <th key={h} className="text-left">{h}</th>)}</tr></thead>
               <tbody>{rows.map((r) => (
-                <tr key={r.a + r.b}><td>{r.href ? <Link href={r.href} className="font-black text-[#0369a1]">{r.a}</Link> : <b>{r.a}</b>}</td><td>{r.b}</td><td className="tabular-nums">{r.c}</td><td className="tabular-nums">{r.d}</td><td><span className={`tagx ${r.ec}`}>{r.e}</span></td></tr>
+                <tr key={r.a + r.b}><td>{r.href ? <Link href={r.href} className="font-black text-[#0369a1]">{r.a}</Link> : <b>{r.a}</b>}</td><td className="text-[13px]">{r.b}</td><td className="tabular-nums">{r.c}</td><td className="tabular-nums">{r.d}</td><td><span className={`tagx ${r.ec}`}>{r.e}</span></td></tr>
               ))}</tbody>
             </table></div>
             {rows.length === 0 && <Empty>No marks match.</Empty>}
@@ -376,6 +406,11 @@ async function BoardTab({ sp }: { sp: Search }) {
   const risk = perStudent.filter((s) => s.weak.length);
   const subjects = [...group(marks, (m) => m.subjects.name).entries()].map(([n, v]) => ({ n, r: avg(v.map((m) => m.r))!, low: new Set(v.filter((m) => m.r < 0.4).map((m) => m.students.id)).size })).sort((a, b) => a.r - b.r);
   const push = [...perStudent].filter((s) => s.r < 0.5 || s.weak.length).sort((a, b) => a.r - b.r).slice(0, 8);
+  const [{ data: tset }, { count: pastPapers }] = await Promise.all([
+    supabase.from("campus_settings").select("board_target").maybeSingle(),
+    supabase.from("question_papers").select("id", { count: "exact", head: true }).eq("class_id", cls.id),
+  ]);
+  const target = tset?.board_target ?? null;
   const { count: boardReady } = await supabase.from("students").select("id, sections!inner(class_id)", { count: "exact", head: true }).eq("sections.class_id", cls.id).eq("status", "enrolled");
 
   return (
@@ -383,10 +418,13 @@ async function BoardTab({ sp }: { sp: Search }) {
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <Chips label="Board class" current={cls.id} items={(classes ?? []).map((c) => ({ id: c.id, label: c.name, href: `/principal/exams?tab=board&grade=${c.id}` }))} />
         <span className="kick">{cls.board || "Board not set"} · from {exams.length} published test{exams.length === 1 ? "" : "s"} this session</span>
+        <BoardTarget back={`/principal/exams?tab=board&grade=${cls.id}`} />
       </div>
       <Stats>
         <Stat label="Predicted board avg" value={pred != null ? pct(pred) : "—"} sub={`from ${exams.length} school tests`} />
+        <Stat label="Target" value={target ? `${target}%` : "—"} sub={target && pred != null ? `${pred * 100 >= target ? "on track" : `${Math.round(target - pred * 100)} pts to go`}` : "set it below"} />
         <Stat label="Students" value={boardReady ?? 0} sub={<Link href="/principal/students/board" className="text-[#0369a1]">Board registration →</Link>} />
+        <Stat label="Past papers made" value={pastPapers ?? 0} sub="question papers for this class" />
         <Stat label="On track for A+" value={perStudent.filter((s) => s.r >= 0.8).length} sub="80%+ average" tone="#15803d" />
         <Stat label="Might fail a paper" value={risk.length} sub="below 33% in a subject" tone={risk.length ? "#b91c1c" : undefined} />
       </Stats>
