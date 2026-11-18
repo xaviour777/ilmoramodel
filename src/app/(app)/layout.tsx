@@ -1,3 +1,4 @@
+import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
 import { Nav, type NavItem } from "@/components/nav";
 import { signOut } from "@/app/login/actions";
@@ -78,6 +79,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <Nav items={NAV[me.role]} />
+        {(me.role === "parent" || me.role === "student") && <div className="px-3"><UrduSwitch /></div>}
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
           <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
             <Avatar name={me.full_name} url={me.avatar_url} size={40} />
