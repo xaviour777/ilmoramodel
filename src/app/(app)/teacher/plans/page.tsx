@@ -17,10 +17,11 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
   const end = addDays(week, 6);
   const sections = await mySections(me.id);
   const secIds = sections.map((s) => s.id);
-  const [{ data: subs }, { data: plans }, { data: diary }] = await Promise.all([
+  const [{ data: subs }, { data: plans }, { data: diary }, { data: obs }] = await Promise.all([
     secIds.length ? supabase.from("section_subjects").select("section_id, subject_id, teacher_id, subjects(name)").in("section_id", secIds) : Promise.resolve({ data: [] }),
     supabase.from("lesson_plans").select("*").eq("week_start", week).eq("teacher_id", me.id),
     secIds.length ? supabase.from("lesson_diary").select("section_id, subject_id, date, topic").in("section_id", secIds).gte("date", week).lte("date", end) : Promise.resolve({ data: [] }),
+    supabase.from("observations").select("*").eq("teacher_id", me.id).order("observed_on", { ascending: false }).limit(10),
   ]);
   type S = { section_id: string; subject_id: string; teacher_id: string | null; subjects: { name: string } };
   const pairs = ((subs ?? []) as unknown as S[]).filter((s) => s.teacher_id === me.id || me.role !== "teacher");
@@ -58,6 +59,16 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
           );
         })}
       </div>
+      {(obs ?? []).length > 0 && <section className="card">
+        <h2 className="h2">Lesson observations by the principal</h2>
+        {(obs ?? []).map((o) => (
+          <div key={o.id} className="row-box flex-col items-stretch">
+            <div className="flex flex-wrap gap-3 font-extrabold"><span>{shortDate(o.observed_on)}</span>{([["Planning", o.planning], ["Teaching", o.delivery], ["Involvement", o.engagement], ["Discipline", o.discipline]] as [string, number | null][]).filter(([, v]) => v != null).map(([k, v]) => <span key={k} className="tagx">{k} {v}/5</span>)}</div>
+            {o.strengths && <div className="text-sm"><b>Went well:</b> {o.strengths}</div>}
+            {o.improve && <div className="text-sm"><b>To improve:</b> {o.improve}</div>}
+          </div>
+        ))}
+      </section>}
     </>
   );
 }

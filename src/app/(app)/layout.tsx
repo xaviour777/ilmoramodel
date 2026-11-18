@@ -17,6 +17,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
     { href: "/settings", label: "Settings", icon: "gear", also: ["/accounts/messages", "/profile"] },
@@ -38,6 +39,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
     { href: "/teacher/leave", label: "Leave & pay", icon: "clock" },
     { href: "/teacher/requests", label: "Parents' requests", icon: "people" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
   parent: [
     { href: "/parent", label: "My children", icon: "home" },
@@ -45,12 +47,14 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/parent/progress", label: "Progress & practice", icon: "star" },
     { href: "/parent/exams", label: "Exams & report card", icon: "star" },
     { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
+    { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
     { href: "/student", label: "Home", icon: "home" },
     { href: "/student/tutor", label: "Homework tutor", icon: "chat" },
     { href: "/student/progress", label: "My progress", icon: "star" },
     { href: "/student/exams", label: "My exams", icon: "star" },
+    { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
 };
 NAV.owner = NAV.principal;

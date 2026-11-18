@@ -30,6 +30,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
     { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
+    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
   ] },
   { label: "Academics", items: [
     { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },

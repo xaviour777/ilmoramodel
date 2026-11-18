@@ -20,6 +20,7 @@ export default async function ParentRequests({ searchParams }: { searchParams: P
   ]);
   type Kid = { id: string; full_name: string; section_id: string | null; sections: { name: string; class_teacher_id: string | null; classes: { name: string } } | null };
   const list = (kids ?? []) as unknown as Kid[];
+  const vans = (await Promise.all(list.map(async (k) => ({ k, v: ((await supabase.rpc("my_child_van", { p_student: k.id })).data ?? [])[0] as { name: string; plate: string | null; driver_name: string | null; driver_phone: string | null; route: string | null; stop: string | null } | undefined })))).filter((x) => x.v);
   const name = new Map((staff ?? []).map((p) => [p.id, p.full_name]));
   const kidName = new Map(list.map((k) => [k.id, k.full_name.split(" ")[0]]));
   const mine = (slots ?? []).filter((s) => s.student_id);
@@ -30,6 +31,15 @@ export default async function ParentRequests({ searchParams }: { searchParams: P
       <div><h1 className="h1">Leave and meetings</h1><p className="muted text-base">Ask for your child&apos;s leave, and book a time to meet a teacher.</p></div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">{sp.saved === "leave" ? "Sent. The class teacher will approve or refuse it." : sp.saved === "booked" ? "Booked. The teacher sees it in their app." : "Cancelled."}</div>}
+      {vans.length > 0 && <section className="card">
+        <h2 className="h2">School van</h2>
+        {vans.map(({ k, v }) => (
+          <div key={k.id} className="row-box flex-wrap">
+            <div className="flex-1"><div className="font-extrabold">{k.full_name.split(" ")[0]} · {v!.name}{v!.plate ? ` (${v!.plate})` : ""}</div><div className="muted text-xs">{v!.stop ? `Stop: ${v!.stop} · ` : ""}{v!.route ?? ""}</div></div>
+            {v!.driver_phone && <a className="btn-ghost min-h-10 px-3 text-sm" href={`tel:${v!.driver_phone.replace(/[^\d+]/g, "")}`}>Call {v!.driver_name ?? "driver"}</a>}
+          </div>
+        ))}
+      </section>}
       <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
         <form action={askLeave} className="card">
           <h2 className="h2">Ask for leave</h2>
