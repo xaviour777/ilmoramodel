@@ -78,3 +78,12 @@ language sql stable security definer set search_path = public as $$
   select coalesce(p_module = any(s.modules), false) from schools s where s.id = app.my_school()
 $$;
 grant execute on function public.has_module(text) to authenticated;
+
+-- the platform admin switches premium modules on or off per school
+create or replace function public.super_set_module(p_school uuid, p_module text, p_on boolean) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not app.is_super() then raise exception 'Not allowed.'; end if;
+  update schools set modules = case when p_on then array(select distinct unnest(modules || p_module)) else array_remove(modules, p_module) end where id = p_school;
+end $$;
+grant execute on function public.super_set_module(uuid, text, boolean) to authenticated;

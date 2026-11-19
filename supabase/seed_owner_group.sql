@@ -121,3 +121,6 @@ begin
     (v_school, v_mt, 'expense', 'Smart board for Class 8', 'Two quotations attached', 18500000, v_pr);
 
 end $$;
+
+-- the demo school has the WhatsApp premium module switched on
+update public.schools set modules = array(select distinct unnest(modules || 'whatsapp'::text)) where name = 'Model School';

@@ -18,6 +18,7 @@ export const OWNER_GROUPS: PGroup[] = [
     { id: "o-people", href: "/owner/people", label: "Principals and staff", tile: "t-g", icon: "students" },
   ] },
   { label: "Admin", items: [
+    { id: "o-wa", href: "/whatsapp", label: "WhatsApp", tile: "t-g", icon: "notices" },
     { id: "o-reports", href: "/owner/reports", label: "Reports", tile: "t-v", icon: "reports" },
     { id: "o-settings", href: "/owner/settings", label: "Group settings", tile: "t-n", icon: "settings" },
     { id: "o-campus", href: "/principal", label: "Open my campus", tile: "t-y", icon: "classes", also: ["/principal", "/accounts", "/settings"] },

@@ -24,16 +24,18 @@ export type QrNumber = { id: string; instance: string; daily_limit: number; sent
 
 export const SETTINGS_COLS = "whatsapp_enabled, whatsapp_phone_number_id, whatsapp_template, whatsapp_template_lang, sms_enabled, sms_method, sms_url, sms_body, sms_sender";
 
-export async function loadMessagingConfig(supabase: Supabase): Promise<MessagingConfig | null> {
+// `campusId` is given by server jobs that run without a signed-in person (service key).
+export async function loadMessagingConfig(supabase: Supabase, campusId?: string): Promise<MessagingConfig | null> {
+  const one = <T,>(q: T) => (campusId ? (q as unknown as { eq: (c: string, v: string) => T }).eq("campus_id", campusId) : q);
   const [{ data: s }, { data: k }] = await Promise.all([
-    supabase.from("campus_settings").select(SETTINGS_COLS).maybeSingle(),
-    supabase.from("campus_secrets").select("whatsapp_token, sms_api_key").maybeSingle(),
+    one(supabase.from("campus_settings").select(SETTINGS_COLS)).maybeSingle(),
+    one(supabase.from("campus_secrets").select("whatsapp_token, sms_api_key")).maybeSingle(),
   ]);
   let qr: QrNumber[] = [];
   if (evoReady()) {
     const [{ data: on }, { data: nums }] = await Promise.all([
-      supabase.rpc("has_module", { p_module: "whatsapp" }),
-      supabase.from("wa_numbers").select("id, instance, daily_limit, sent_today, sent_on, last_used_at").eq("status", "connected"),
+      campusId ? Promise.resolve({ data: true }) : supabase.rpc("has_module", { p_module: "whatsapp" }),
+      one(supabase.from("wa_numbers").select("id, instance, daily_limit, sent_today, sent_on, last_used_at").eq("status", "connected")),
     ]);
     if (on) qr = (nums ?? []) as QrNumber[];
   }
@@ -102,12 +104,13 @@ export async function sendOne(c: MessagingConfig, channel: Channel, to: string, 
 
 // Sends waiting messages on the connected channels, a few at a time, and records each result.
 // Stops after `limit` so one click never runs past the server's time limit; the rest stay queued.
-export async function deliverQueued(supabase: Supabase, limit = 60) {
-  const config = await loadMessagingConfig(supabase);
+export async function deliverQueued(supabase: Supabase, limit = 60, campusId?: string) {
+  const config = await loadMessagingConfig(supabase, campusId);
   const channels = readyChannels(config);
   if (!channels.length) return { sent: 0, failed: 0, left: 0, channels };
-  const { data: queued, count } = await supabase.from("messages").select("id, channel, to_phone, body", { count: "exact" })
-    .eq("status", "queued").in("channel", channels).order("created_at").limit(limit);
+  let q = supabase.from("messages").select("id, channel, to_phone, body", { count: "exact" }).eq("status", "queued").in("channel", channels);
+  if (campusId) q = q.eq("campus_id", campusId);
+  const { data: queued, count } = await q.order("created_at").limit(limit);
   let sent = 0, failed = 0;
   const list = queued ?? [];
   const qr = config!.qr_numbers ?? [];
@@ -144,7 +147,9 @@ export async function deliverQueued(supabase: Supabase, limit = 60) {
       }
       await new Promise((r) => setTimeout(r, 2500 + Math.random() * 4000));
     }
-    const { count: left } = await supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued").in("channel", channels);
+    let lq = supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued").in("channel", channels);
+    if (campusId) lq = lq.eq("campus_id", campusId);
+    const { count: left } = await lq;
     return { sent, failed, left: left ?? 0, channels };
   }
   for (let i = 0; i < list.length; i += 6) {
