@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model School Group — Owner screens</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.nb{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;padding:5px 10px;border:2px solid transparent;border-radius:14px;background:none;font-weight:800;font-size:15px;color:#4b5563;cursor:pointer;text-align:left}
+.nb:hover{background:#f1f5f9;color:#1f2937}
+.nb.on{background:#e0f2fe;border-color:#7dd3fc;color:#0369a1;box-shadow:0 3px 0 #7dd3fc}
+.kp2{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.hbar{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;padding:5px 0}
+.hbar .t{flex:1;height:14px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.hbar .t i{display:block;height:100%;border-radius:99px}
+.blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+@media (max-width:900px){.blocks{grid-template-columns:minmax(0,1fr)}}
+td.b{font-weight:900}td.g{color:#15803d;font-weight:900}td.r{color:#b91c1c;font-weight:900}td.m{color:#6b7280}
+tr.tot td{border-top:3px solid #1f2937;font-weight:900}
+</style>
+</helmet>
+<div class="shell">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo" style="background:#1f2937;box-shadow:0 4px 0 #111827">M</div><div><div style="font-weight:900;font-size:17px;color:#1f2937">Model School Group</div><div class="muted" style="font-size:12px">4 campuses · Owner</div></div></div>
+    <div class="grp">Group</div>
+    <a class="nb" href="Owner.dc.html" style="text-decoration:none"><span class="tile t-g" style="font-weight:900;font-size:13px">O</span><span style="flex:1">Overview</span></a>
+    <sc-for list="{{nav}}" as="g" hint-placeholder-count="4">
+      <div>
+        <sc-if value="{{g.showLabel}}" hint-placeholder-val="{{ true }}"><div class="grp">{{g.label}}</div></sc-if>
+        <sc-for list="{{g.items}}" as="i" hint-placeholder-count="3">
+          <button type="button" class="{{i.cls}}" onClick="{{i.pick}}"><span class="tile {{i.tile}}" style="font-weight:900;font-size:13px">{{i.ini}}</span><span style="flex:1">{{i.label}}</span><sc-if value="{{i.hasBadge}}" hint-placeholder-val="{{ false }}"><span class="badge">{{i.badge}}</span></sc-if></button>
+        </sc-for>
+      </div>
+    </sc-for>
+    <div class="me"><div class="av" style="background:#1f2937;color:#fff">KA</div><div><div style="font-weight:900;font-size:14px">Khalid Aziz</div><div class="muted" style="font-size:12px">Owner and director</div></div></div>
+  </nav>
+
+  <main class="content">
+    <div class="wrap">
+      <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+        <div><div class="lbl">{{scr.group}}</div><h1 class="title">{{scr.title}}</h1><p class="sub">{{scr.sub}}</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk w">Export</button><button type="button" class="chunk">{{scr.cta}}</button></div>
+      </header>
+
+      <section class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px">
+        <span class="lbl">Campus</span>
+        <sc-for list="{{campusChips}}" as="c" hint-placeholder-count="5"><button type="button" class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+        <span style="width:2px;height:28px;background:#e5e7eb"></span>
+        <sc-for list="{{periods}}" as="p" hint-placeholder-count="4"><button type="button" class="{{p.cls}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for>
+      </section>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+        <sc-for list="{{scr.kpis}}" as="k" hint-placeholder-count="4">
+          <div class="kp2"><span class="lbl" style="font-size:11px">{{k.l}}</span><span style="font-weight:900;font-size:24px;color:{{k.c}}">{{k.v}}</span><span class="muted" style="font-size:12px">{{k.n}}</span></div>
+        </sc-for>
+      </section>
+
+      <div class="blocks">
+        <sc-for list="{{scr.blocks}}" as="b" hint-placeholder-count="4">
+          <section class="{{b.cls}}">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center"><h2 class="h2" style="color:{{b.hc}}">{{b.title}}</h2><span class="muted" style="font-size:12px">{{b.sub}}</span></div>
+
+            <sc-if value="{{b.isTable}}" hint-placeholder-val="{{ true }}">
+              <div class="tbl" style="margin-top:10px"><table style="min-width:{{b.minw}}">
+                <thead><tr><sc-for list="{{b.head}}" as="h" hint-placeholder-count="5"><th>{{h}}</th></sc-for></tr></thead>
+                <tbody><sc-for list="{{b.rows}}" as="r" hint-placeholder-count="4"><tr class="{{r.cls}}"><sc-for list="{{r.cells}}" as="c" hint-placeholder-count="5"><td class="{{c.cls}}"><sc-if value="{{c.isTag}}" hint-placeholder-val="{{ false }}"><span class="{{c.tag}}">{{c.v}}</span></sc-if><sc-if value="{{c.isText}}" hint-placeholder-val="{{ true }}">{{c.v}}</sc-if></td></sc-for></tr></sc-for></tbody>
+              </table></div>
+            </sc-if>
+
+            <sc-if value="{{b.isBars}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="5"><div class="hbar"><span style="width:130px">{{x.n}}</span><div class="t"><i style="width:{{x.w}};background:{{x.c}}"></i></div><span style="width:96px;text-align:right">{{x.v}}</span></div></sc-for></div>
+            </sc-if>
+
+            <sc-if value="{{b.isList}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:6px"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="4">
+                <div class="row"><span class="tile {{x.tile}}" style="font-weight:900;font-size:13px">{{x.ini}}</span><div style="flex:1 1 220px"><div style="font-weight:900">{{x.t}}</div><div class="muted" style="font-size:12px">{{x.d}}</div></div><span style="font-weight:900">{{x.amt}}</span>
+                  <sc-if value="{{x.open}}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><button type="button" class="chunk w sm" onClick="{{x.no}}">Decline</button><button type="button" class="chunk sm" onClick="{{x.yes}}">Approve</button></div></sc-if>
+                  <sc-if value="{{x.hasTag}}" hint-placeholder-val="{{ false }}"><span class="{{x.tc}}">{{x.tag}}</span></sc-if>
+                  <sc-if value="{{x.hasBtn}}" hint-placeholder-val="{{ false }}"><button type="button" class="chunk w sm">{{x.btn}}</button></sc-if>
+                </div>
+              </sc-for></div>
+            </sc-if>
+
+            <sc-if value="{{b.isNote}}" hint-placeholder-val="{{ false }}">
+              <ul style="margin:10px 0 0;padding-left:18px;line-height:24px;font-weight:700"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+            </sc-if>
+          </section>
+        </sc-for>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { page:'campuses', camp:'all', period:'month', ap:{} }; }
+  renderVals() {
+    const S0 = this.state; const set = (o) => this.setState(o);
+    const cell = (v) => { if (v && typeof v === 'object') return { v:v.v, cls:v.cls||'', tag:v.tag||'', isTag:!!v.tag, isText:!v.tag }; return { v, cls:'', tag:'', isTag:false, isText:true }; };
+    const T = (title, sub, head, rows, span, minw) => ({ isTable:true, title, sub, head, minw: minw || '640px', cls: 'card' + (span ? ' span2' : ''), hc:'#1f2937',
+      rows: rows.map(r => Array.isArray(r) ? { cls:'', cells:r.map(cell) } : { cls:r.cls, cells:r.c.map(cell) }) });
+    const B = (title, sub, items, span) => { const mx = Math.max(...items.map(i => i[1])); return { isBars:true, title, sub, cls:'card' + (span ? ' span2' : ''), hc:'#1f2937',
+      items: items.map(([n,val,label,c]) => ({ n, v:label, w: Math.round(Math.abs(val)/mx*100)+'%', c: c || '#0ea5e9' })) }; };
+    const L = (title, sub, items, span) => ({ isList:true, title, sub, cls:'card' + (span ? ' span2' : ''), hc:'#1f2937', items });
+    const N = (title, items, span) => ({ isNote:true, title, sub:'', cls:'card dark' + (span ? ' span2' : ''), hc:'#fcd34d', items });
+    const li = (ini, tile, t, d, amt, tag, tc, btn) => ({ ini, tile, t, d, amt: amt||'', hasTag:!!tag, tag, tc, hasBtn:!!btn, btn, open:false });
+    const tg = (v, tag) => ({ v, tag });
+    const K = (l, v, n, c) => ({ l, v, n, c: c || '#1f2937' });
+
+    // Approvals with live state
+    const AP = [
+      ['pay','B','t-b','Payroll transfer · all campuses','211 staff · requested by accounts · 2 days ago','Rs 3.9M'],
+      ['con','F','t-o','Fee concessions · Johar Town','18 families · Nadia Rehman · today','Rs 64k/mo'],
+      ['lab','L','t-v','Science lab equipment · DHA','Imran Qureshi · quotation from 3 vendors','Rs 1.2M'],
+      ['hire','H','t-g','Hire 8 teachers · Gulberg','Saima Rauf · before April opening','Rs 520k/mo'],
+      ['fee','%','t-p','Fee increase 8% · all campuses','From April 2027 · parents told 60 days before','+Rs 560k/mo'],
+      ['van','V','t-o','Second school van · Main Campus','Dr Saim · 34 children on waiting list','Rs 4.6M']
+    ];
+    const apItems = AP.map(([id,ini,tile,t,d,amt]) => { const s = S0.ap[id]; return { ini, tile, t, d, amt, open:!s, hasTag:!!s, tag: s==='y' ? 'Approved' : 'Declined', tc: s==='y' ? 'tag g' : 'tag', hasBtn:false,
+      yes:()=>set({ ap:{ ...S0.ap, [id]:'y' } }), no:()=>set({ ap:{ ...S0.ap, [id]:'n' } }) }; });
+    const pending = AP.filter(([id]) => !S0.ap[id]).length;
+
+    const P = {
+      campuses: { group:'Group', title:'Campuses', sub:'Every campus, its principal, size and status.', cta:'Add a campus',
+        kpis:[K('Campuses','4','3 running · 1 opening'),K('Students','1,285','of 2,110 seats'),K('Seats used','61%','825 empty seats','#c2410c'),K('Staff','211','58 per campus average')],
+        blocks:[
+          T('All campuses','click a row to open it',['Campus','City','Principal','Opened','Students','Sections','Staff','Fee range','Status'],[
+            [{v:'Main Campus',cls:'b'},'Model Town','Dr Saim','2012','575 / 810','19','74','Rs 4,200–5,500',tg('Strong','tag g')],
+            [{v:'Johar Town',cls:'b'},'Johar Town','Nadia Rehman','2016','462 / 600','16','61','Rs 4,000–5,200',tg('Fees low','tag y')],
+            [{v:'DHA Campus',cls:'b'},'DHA Phase 5','Imran Qureshi','2021','248 / 400','12','52','Rs 7,500–9,000',tg('Losing money','tag r')],
+            [{v:'Gulberg',cls:'b'},'Gulberg III','Saima Rauf','Apr 2027','0 / 300','—','6','Rs 6,000–7,500',tg('Opening','tag v')]],true,'900px'),
+          B('Seats used by campus','students of seats',[['Main Campus',71,'575 / 810'],['Johar Town',77,'462 / 600'],['DHA Campus',62,'248 / 400','#f59e0b'],['Gulberg',0,'opening','#c4b5fd']]),
+          N('AI · campus notes',['Johar Town is fullest but collects the least fees.','DHA has the best results but too few students for its staff.','Main Campus Class 9 is full; send 14 waiting children to Johar Town Class 9.'])
+        ] },
+      approvals: { group:'Group', title:'Approvals', sub:'Anything above a principal’s limit comes here. Approve or decline in one tap.', cta:'Approval limits',
+        kpis:[K('Waiting', String(pending), 'for you', pending ? '#b91c1c' : '#15803d'),K('Approved this month','14','Rs 6.2M'),K('Declined','3','Rs 410k'),K('Average wait','1.4 days','goal: same day')],
+        blocks:[ L('Waiting for you','tap Approve or Decline',apItems,true),
+          T('Recent decisions','last 30 days',['Date','Campus','Request','Amount','By','Decision'],[
+            ['14 Nov','DHA','Generator repair','Rs 85k','Imran Qureshi',tg('Approved','tag g')],
+            ['12 Nov','Johar Town','Annual trip','Rs 340k','Nadia Rehman',tg('Declined','tag')],
+            ['8 Nov','Main','Smart boards × 4','Rs 960k','Dr Saim',tg('Approved','tag g')],
+            ['1 Nov','All','October payroll','Rs 3.86M','Accounts',tg('Approved','tag g')]],true),
+          T('Who can approve what','set in Group settings',['Request','Principal up to','Above that'],[
+            ['Expense','Rs 50,000','Owner'],['Fee concession','10% per family','Owner'],['Hiring','Replacement only','Owner for new posts'],['Payroll','—','Owner always']]),
+          N('AI · before you approve',['The van pays for itself in 26 months if 34 waiting children join at Rs 3,500 transport fee.','Johar Town concessions are 2× other campuses; ask for the hardship list.'])
+        ] },
+      revenue: { group:'Money', title:'Revenue and fees', sub:'What each campus billed, collected and is still owed.', cta:'Send fee reminders',
+        kpis:[K('Billed','Rs 7.15M','November'),K('Collected','Rs 5.83M','82% of billed','#15803d'),K('Outstanding','Rs 1.32M','312 families','#b91c1c'),K('Paid online','46%','JazzCash, Easypaisa, bank')],
+        blocks:[
+          T('By campus','this month',['Campus','Billed','Collected','Outstanding','Rate','Online','Concessions'],[
+            [{v:'Main',cls:'b'},'Rs 2.98M','Rs 2.71M','Rs 270k',{v:'91%',cls:'g'},'52%','Rs 62k'],
+            [{v:'Johar Town',cls:'b'},'Rs 2.41M','Rs 1.78M','Rs 630k',{v:'74%',cls:'r'},'38%','Rs 128k'],
+            [{v:'DHA',cls:'b'},'Rs 1.76M','Rs 1.55M','Rs 210k',{v:'88%',cls:'g'},'61%','Rs 34k'],
+            {cls:'tot',c:['Group','Rs 7.15M','Rs 6.04M','Rs 1.11M','85%','48%','Rs 224k']}],true,'820px'),
+          B('Collection by month','group',[['Jun',88,'88%','#16a34a'],['Jul',62,'62% (holidays)','#f59e0b'],['Aug',90,'90%','#16a34a'],['Sep',92,'92%','#16a34a'],['Oct',89,'89%','#16a34a'],['Nov',82,'82% so far','#0ea5e9']]),
+          T('Outstanding by age','how long it is unpaid',['Age','Families','Amount'],[['Under 30 days','188','Rs 610k'],['30–60 days','84','Rs 420k'],['60–90 days','27','Rs 190k'],[{v:'Over 90 days',cls:'r'},'13',{v:'Rs 100k',cls:'r'}]]),
+          T('Fee structure','monthly tuition',['Level','Main','Johar Town','DHA','Gulberg'],[['Pre-school','Rs 4,200','Rs 4,000','Rs 7,500','Rs 6,000'],['Primary','Rs 4,200','Rs 4,000','Rs 7,500','Rs 6,000'],['Middle','Rs 4,750','Rs 4,500','Rs 8,200','Rs 6,800'],['Matric','Rs 5,500','Rs 5,200','Rs 9,000','Rs 7,500']]),
+          N('AI · more money in',['Johar Town reminders go by SMS only; WhatsApp reminders raised collection 9 points at Main.','13 families owe over 90 days (Rs 100k): hold result cards until a payment plan is agreed.'])
+        ] },
+      expenses: { group:'Money', title:'Expenses and payroll', sub:'Where money goes, by campus and by head.', cta:'Run payroll',
+        kpis:[K('Expenses','Rs 6.51M','November'),K('Payroll','Rs 3.9M','211 staff · due 1 Dec','#c2410c'),K('Payroll / income','65%','healthy is under 60%','#c2410c'),K('Cost per student','Rs 5,070','a month')],
+        blocks:[
+          B('By head','group, this month',[['Salaries',3900,'Rs 3.9M · 60%'],['Rent',720,'Rs 720k · 11%','#7c3aed'],['Utilities',460,'Rs 460k · 7%','#f59e0b'],['Transport',330,'Rs 330k · 5%','#db2777'],['Supplies',260,'Rs 260k · 4%','#16a34a'],['Repairs and other',840,'Rs 840k · 13%','#94a3b8']]),
+          T('By campus','this month',['Campus','Salaries','Rent','Utilities','Other','Total','Per student'],[
+            [{v:'Main',cls:'b'},'Rs 1.42M','Rs 260k','Rs 180k','Rs 300k','Rs 2.16M','Rs 3,760'],
+            [{v:'Johar Town',cls:'b'},'Rs 1.28M','Rs 240k','Rs 150k','Rs 320k','Rs 1.99M','Rs 4,310'],
+            [{v:'DHA',cls:'b'},'Rs 1.06M','Rs 220k','Rs 130k','Rs 530k',{v:'Rs 1.94M',cls:'r'},{v:'Rs 7,820',cls:'r'}],
+            [{v:'Gulberg',cls:'b'},'Rs 140k','Rs 180k','Rs 20k','Rs 80k','Rs 420k','—']],true,'760px'),
+          L('Payroll calendar','next 3 months',[li('D','t-b','1 December','211 staff · Rs 3.9M','', 'Needs approval','tag y'),li('J','t-b','1 January','+8 Gulberg teachers','Rs 4.42M','Planned','tag'),li('F','t-b','1 February','annual increments 7%','Rs 4.73M','Planned','tag')]),
+          N('AI · save money',['DHA spends Rs 7,820 per student, twice Main. 6 teachers have under 18 periods a week.','Electricity is 22% higher at Johar Town; solar on its roof pays back in 3.5 years.'])
+        ] },
+      pl: { group:'Money', title:'Profit and loss', sub:'Income minus every cost, by campus.', cta:'Download P&L',
+        kpis:[K('Income','Rs 6.21M','November','#15803d'),K('Costs','Rs 6.51M','November','#c2410c'),K('Net','− Rs 300k','this month','#b91c1c'),K('Year to date','+ Rs 6.8M','margin 11%','#15803d')],
+        blocks:[
+          T('Statement · November','Rs thousands',['Line','Main','Johar Town','DHA','Gulberg','Group'],[
+            ['Tuition fees','2,710','1,780','1,550','0','6,040'],['Admission and other fees','95','48','27','0','170'],
+            {cls:'tot',c:['Total income','2,805','1,828','1,577','0','6,210']},
+            ['Salaries','1,420','1,280','1,060','140','3,900'],['Rent','260','240','220','180','900'],['Utilities','180','150','130','20','480'],['Transport, supplies, repairs','300','320','530','80','1,230'],
+            {cls:'tot',c:['Total costs','2,160','1,990','1,940','420','6,510']},
+            {cls:'tot',c:[{v:'Net profit',cls:'b'},{v:'+ 645',cls:'g'},{v:'− 162',cls:'r'},{v:'− 363',cls:'r'},{v:'− 420',cls:'r'},{v:'− 300',cls:'r'}]}],true,'760px'),
+          B('Margin by campus','year to date',[['Main Campus',24,'24%','#16a34a'],['Johar Town',6,'6%','#f59e0b'],['DHA Campus',-9,'− 9%','#ef4444'],['Gulberg',-100,'set-up cost','#c4b5fd']]),
+          N('AI · why November is negative',['Gulberg set-up (Rs 420k) and DHA losses outweigh Main’s profit.','Without Gulberg the group made Rs 120k; December fees usually recover 6–8 points.'])
+        ] },
+      academics: { group:'School', title:'Academics', sub:'Results, attendance and board prep across campuses.', cta:'Open board report',
+        kpis:[K('Average result','71%','mid-term, group'),K('Pass rate','86%','▲ 2 vs first term','#15803d'),K('Attendance','90.6%','goal 90%'),K('BISE predicted','76%','Class 10, group')],
+        blocks:[
+          T('By campus','mid-term',['Campus','Attendance','Avg result','Pass','A+ students','BISE predicted','Syllabus on track'],[
+            [{v:'Main',cls:'b'},'89.6%','71%','87%','41','74%','78%'],[{v:'Johar Town',cls:'b'},'91.2%','68%','83%','26','71%','70%'],[{v:'DHA',cls:'b'},'93.1%',{v:'77%',cls:'g'},{v:'94%',cls:'g'},'31',{v:'82%',cls:'g'},'88%']],true,'820px'),
+          B('Subject average','group',[['English',68,'68%'],['Urdu',72,'72%'],['Mathematics',61,'61%','#f59e0b'],['Physics',58,'58%','#ef4444'],['Chemistry',64,'64%'],['Biology',73,'73%','#16a34a']]),
+          L('Weakest sections','act this month',[li('9','t-o','Main · 9‑C','Physics 47%, attendance 84%','', 'Plan sent','tag y'),li('8','t-o','Johar Town · 8‑B','Maths 49%','', 'No plan','tag r'),li('7','t-o','Johar Town · 7‑A','English 52%','', 'No plan','tag r')]),
+          N('AI · share what works',['DHA’s weekly 25-mark tests lifted Physics 11 points; copy them at Main and Johar Town.','Maths is the weakest subject at every campus; a group Maths coordinator would help.'])
+        ] },
+      admissions: { group:'School', title:'Admissions', sub:'Inquiries to joined, for every campus.', cta:'Set targets',
+        kpis:[K('Inquiries','214','this session'),K('Joined','127','59% conversion','#15803d'),K('Target','270','47% reached','#c2410c'),K('Waiting list','22','Main Class 9 and Class 1')],
+        blocks:[
+          T('Funnel by campus','this session',['Campus','Inquiries','Tests','Offers','Joined','Target','Reached'],[
+            [{v:'Main',cls:'b'},'72','61','52','46','60',{v:'77%',cls:'g'}],[{v:'Johar Town',cls:'b'},'58','44','36','31','50','62%'],[{v:'DHA',cls:'b'},'30','18','14',{v:'12',cls:'r'},'40',{v:'30%',cls:'r'}],[{v:'Gulberg',cls:'b'},'54','—','41','38','120','32%']],true,'760px'),
+          B('Where families come from','joined',[['Parent referral',52,'52 · 41%','#db2777'],['Facebook',31,'31 · 24%'],['Walk-in',24,'24 · 19%'],['Banner and flyers',12,'12 · 9%'],['Website',8,'8 · 7%']]),
+          L('Follow-ups overdue','not called in 7 days',[li('R','t-p','Rayan Ahmed · DHA','Class 6 · called once','', '', '', 'Call'),li('S','t-p','Sara Nadeem · Gulberg','Class 3 · visited campus','', '', '', 'Call'),li('H','t-p','Hassan Raza · Johar Town','Class 9 · test passed','', '', '', 'Send offer')]),
+          N('AI · fill seats',['A Rs 1,000 referral discount at DHA could add 8–10 students by April.','Gulberg needs 82 more joins; open-day weekends brought 60% of Main’s families.'])
+        ] },
+      people: { group:'School', title:'Principals and staff', sub:'Who runs each campus and how the teams are doing.', cta:'Add staff',
+        kpis:[K('Staff','211','168 teachers · 43 admin'),K('Students per teacher','7.6 : 1','group average'),K('Vacancies','11','8 at Gulberg','#c2410c'),K('Left this year','9','4% turnover')],
+        blocks:[
+          T('Principals scorecard','this term',['Principal','Campus','Results','Attendance','Fees','Parents','Score'],[
+            [{v:'Dr Saim',cls:'b'},'Main','71%','89.6%','91%','82%',tg('86','tag g')],[{v:'Nadia Rehman',cls:'b'},'Johar Town','68%','91.2%','74%','76%',tg('72','tag y')],
+            [{v:'Imran Qureshi',cls:'b'},'DHA','77%','93.1%','88%','88%',tg('78','tag y')],[{v:'Saima Rauf',cls:'b'},'Gulberg','—','—','—','—',tg('New','tag v')]],true,'760px'),
+          T('Staff by campus','',['Campus','Teachers','Admin','Vacant','Staff attendance','Avg salary'],[
+            ['Main','58','16','1','96%','Rs 61k'],['Johar Town','47','14','2','94%','Rs 58k'],[{v:'DHA',cls:'b'},{v:'42 (6 extra)',cls:'r'},'10','0','97%','Rs 66k'],['Gulberg','6','0','8','—','Rs 60k']]),
+          L('Hiring','open posts',[li('P','t-g','Physics teacher · Gulberg','12 applied · 3 shortlisted','', 'Interviews Mon','tag y'),li('M','t-g','Maths coordinator · group','new post','', 'Needs approval','tag r'),li('A','t-g','Accountant · Johar Town','replacement','', 'Offer sent','tag g')]),
+          N('AI · people',['Move 3 DHA teachers with light loads to Gulberg instead of hiring 3 new ones: saves Rs 180k a month.','Johar Town teachers mark attendance late 3 days a week; a short training would help.'])
+        ] },
+      reports: { group:'Admin', title:'Reports', sub:'Ready-made reports for the board, the bank and the principals.', cta:'Schedule a report',
+        kpis:[K('Reports','12','ready'),K('Scheduled','4','sent by email'),K('Last board pack','1 Nov','next 1 Dec'),K('Downloads','38','this month')],
+        blocks:[ L('Group reports','pick a campus and dates above',[
+          li('B','t-v','Monthly board pack','P&L, fees, results, admissions, approvals · 12 pages','', 'Monthly','tag b','Download'),
+          li('P','t-g','Profit and loss','by campus and group, any period','', '', '', 'Download'),
+          li('F','t-o','Fee aging','who owes what and for how long','', 'Weekly','tag b','Download'),
+          li('S','t-b','Payroll register','every salary, deduction and transfer','', '', '', 'Download'),
+          li('A','t-v','Academic summary','results, attendance, BISE prediction','', 'Termly','tag b','Download'),
+          li('D','t-p','Admissions funnel','by campus and source','', '', '', 'Download'),
+          li('T','t-n','Tax and audit pack','income, expenses, withholding, bank','', 'Yearly','tag b','Download'),
+          li('C','t-o','Campus comparison','all indicators side by side','', '', '', 'Download')],true) ] },
+      settings: { group:'Admin', title:'Group settings', sub:'Rules that apply to every campus.', cta:'Save',
+        kpis:[K('Campuses','4',''),K('Users','236','owners, principals, staff'),K('AI budget','Rs 3,000','a month per campus'),K('Session','2026–27','Apr – Mar')],
+        blocks:[
+          L('Settings','',[li('C','t-b','Campuses','add, rename, set capacity and principal','', '', '', 'Open'),li('A','t-p','Approval limits','what principals can approve alone','', '', '', 'Open'),li('F','t-o','Group fee policy','fee bands, late fee, sibling discount','', '', '', 'Open'),li('L','t-g','Branding','logo, school name, website, result card','', '', '', 'Open'),li('P','t-o','Payments','JazzCash, Easypaisa, 1Link, banks per campus','', '', '', 'Open'),li('I','t-y','AI','which features each campus can use, monthly budget','', '', '', 'Open')]),
+          T('Roles','who sees what',['Role','Sees','Can approve'],[['Owner','All campuses','Everything'],['Director','All campuses','Up to Rs 500k'],['Principal','Own campus','Up to Rs 50k'],['Accountant','Own campus fees','Receipts only']])
+        ] }
+    };
+    const scr = P[S0.page];
+    const NAV = [
+      ['Group',[['campuses','Campuses','C','t-b'],['approvals','Approvals','A','t-p']]],
+      ['Money',[['revenue','Revenue and fees','R','t-o'],['expenses','Expenses and payroll','E','t-o'],['pl','Profit and loss','P','t-v']]],
+      ['School',[['academics','Academics','A','t-v'],['admissions','Admissions','D','t-p'],['people','Principals and staff','S','t-b']]],
+      ['Admin',[['reports','Reports','R','t-v'],['settings','Group settings','G','t-n']]]
+    ];
+    const nav = NAV.map(([label, items]) => ({ label, showLabel: label !== 'Group', items: items.map(([id,l,ini,tile]) => ({ label:l, ini, tile, cls: S0.page===id ? 'nb on':'nb', hasBadge: id==='approvals' && pending>0, badge: pending,
+      pick: () => set({ page:id }) })) }));
+    return {
+      nav, scr,
+      campusChips: [['all','All campuses'],['main','Main'],['jt','Johar Town'],['dha','DHA'],['gb','Gulberg']].map(([id,l]) => ({ label:l, cls: S0.camp===id ? 'chip on':'chip', pick:()=>set({ camp:id }) })),
+      periods: [['month','This month'],['term','This term'],['year','This year'],['custom','Custom']].map(([id,l]) => ({ label:l, cls: S0.period===id ? 'chip on':'chip', pick:()=>set({ period:id }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
