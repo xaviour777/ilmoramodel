@@ -21,6 +21,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
+    { href: "/principal/approvals", label: "Ask the owner", icon: "coin" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
     { href: "/settings", label: "Settings", icon: "gear", also: ["/accounts/messages", "/profile"] },
