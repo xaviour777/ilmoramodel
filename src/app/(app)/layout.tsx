@@ -1,3 +1,4 @@
+import { OWNER_GROUPS, OWNER_TABS } from "@/components/owner-nav";
 import { PushToggle } from "@/components/push-toggle";
 import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
@@ -112,14 +113,16 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   const markedSections = (sectionToday.data ?? []).filter((s) => s.marked > 0).length;
   // only count unmarked sections once the school day has started (someone has marked)
   const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
-  const badges = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
+  const badges: Record<string, number> = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
+  const owner = me.role === "owner";
+  if (owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
   const brand = await getBranding();
   const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
     <div className="ilm min-h-screen">
       <div className="hidden lg:block">
-        <PrincipalSidebar badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
+        <PrincipalSidebar groups={owner ? OWNER_GROUPS : undefined} badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
       </div>
       {/* phone header */}
       <header className="sticky top-0 z-30 flex items-center gap-2.5 border-b-2 border-[#e5e7eb] bg-white px-4 pt-4 pb-2.5 lg:hidden">
@@ -137,7 +140,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
         </div>
         <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12">{children}</main>
       </div>
-      <PrincipalBottomBar badges={badges} />
+      <PrincipalBottomBar badges={badges} groups={owner ? OWNER_GROUPS : undefined} tabs={owner ? OWNER_TABS : undefined} />
     </div>
   );
 }
