@@ -2,7 +2,9 @@ import { signIn, signOut } from "./actions";
 import { getBranding, DEFAULT_COLOR, shade } from "@/lib/branding";
 
 const demo = [
-  ["Principal", "principal@demo.ilmora.pk"],
+  ["Owner (3 campuses)", "owner@demo.ilmora.pk"],
+  ["Principal · Johar Town", "principal@demo.ilmora.pk"],
+  ["Principal · Model Town", "principal.mt@demo.ilmora.pk"],
   ["Teacher", "teacher@demo.ilmora.pk"],
   ["Accountant", "accounts@demo.ilmora.pk"],
   ["Parent", "parent@demo.ilmora.pk"],
@@ -45,10 +47,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         brand.support_email && <p className="muted text-center text-sm">Trouble signing in? Write to <a className="underline" href={`mailto:${brand.support_email}`}>{brand.support_email}</a></p>
       ) : (
         <div className="card">
-          <div className="eyebrow">Demo logins · password Ilmora@2026</div>
+          <div className="eyebrow">Demo logins · tap one to sign in</div>
+          <p className="muted text-sm">Password for all: <code className="rounded bg-[#f1f5f9] px-1.5 py-0.5 font-black text-[#1f2937]">Ilmora@2026</code> (capital I, small lmora)</p>
           <ul className="flex flex-col gap-1.5 text-sm font-bold">
             {demo.map(([role, email]) => (
-              <li key={email} className="flex justify-between gap-3"><span>{role}</span><span className="muted">{email}</span></li>
+              <li key={email}>
+                <form action={signIn}>
+                  <input type="hidden" name="email" value={email} /><input type="hidden" name="password" value="Ilmora@2026" />
+                  <button type="submit" className="flex w-full justify-between gap-3 rounded-xl border-2 px-3 py-2 text-left hover:bg-[#f0f9ff]" style={{ borderColor: "#e5e7eb" }}><span>{role}</span><span className="muted">{email}</span></button>
+                </form>
+              </li>
             ))}
           </ul>
         </div>
