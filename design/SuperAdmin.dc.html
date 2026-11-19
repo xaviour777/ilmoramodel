@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ilmora platform — Super admin</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ilmora.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f9fc}
+.nb{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:4px 10px;border:2px solid transparent;border-radius:14px;background:none;font-weight:800;font-size:14px;color:#4b5563;cursor:pointer;text-align:left}
+.nb:hover{background:#f1f5f9;color:#1f2937}
+.nb.on{background:#e0f2fe;border-color:#7dd3fc;color:#0369a1;box-shadow:0 3px 0 #7dd3fc}
+.kp2{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.hbar{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;padding:5px 0}
+.hbar .t{flex:1;height:14px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.hbar .t i{display:block;height:100%;border-radius:99px}
+.blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.span2{grid-column:1 / -1}
+@media (max-width:900px){.blocks{grid-template-columns:minmax(0,1fr)}}
+td.b{font-weight:900}td.g{color:#15803d;font-weight:900}td.r{color:#b91c1c;font-weight:900}
+tr.tot td{border-top:3px solid #1f2937;font-weight:900}
+</style>
+</helmet>
+<div class="shell">
+  <nav aria-label="Main" class="side">
+    <div class="brand"><div class="logo" style="background:#0f172a;box-shadow:0 4px 0 #000">i</div><div><div style="font-weight:900;font-size:17px">Ilmora platform</div><div class="muted" style="font-size:12px">Super admin</div></div></div>
+    <sc-for list="{{nav}}" as="g" hint-placeholder-count="5">
+      <div>
+        <div class="grp">{{g.label}}</div>
+        <sc-for list="{{g.items}}" as="i" hint-placeholder-count="3">
+          <button type="button" class="{{i.cls}}" onClick="{{i.pick}}"><span class="tile {{i.tile}}" style="width:30px;height:30px;font-weight:900;font-size:12px">{{i.ini}}</span><span style="flex:1">{{i.label}}</span><sc-if value="{{i.hasBadge}}" hint-placeholder-val="{{ false }}"><span class="badge">{{i.badge}}</span></sc-if></button>
+        </sc-for>
+      </div>
+    </sc-for>
+    <div class="me"><div class="av" style="background:#0f172a;color:#fff">SA</div><div><div style="font-weight:900;font-size:14px">admin@ilmora.pk</div><div class="muted" style="font-size:12px">Super admin · 2FA on</div></div></div>
+  </nav>
+
+  <main class="content">
+    <div class="wrap">
+      <header style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+        <div><div class="lbl">{{scr.group}}</div><h1 class="title">{{scr.title}}</h1><p class="sub">{{scr.sub}}</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chunk w">Export</button><button type="button" class="chunk">{{scr.cta}}</button></div>
+      </header>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+        <sc-for list="{{scr.kpis}}" as="k" hint-placeholder-count="4">
+          <div class="kp2"><span class="lbl" style="font-size:11px">{{k.l}}</span><span style="font-weight:900;font-size:24px;color:{{k.c}}">{{k.v}}</span><span class="muted" style="font-size:12px">{{k.n}}</span></div>
+        </sc-for>
+      </section>
+
+      <div class="blocks">
+        <sc-for list="{{scr.blocks}}" as="b" hint-placeholder-count="4">
+          <section class="{{b.cls}}">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center"><h2 class="h2" style="color:{{b.hc}}">{{b.title}}</h2><span class="muted" style="font-size:12px">{{b.sub}}</span></div>
+            <sc-if value="{{b.isTable}}" hint-placeholder-val="{{ true }}">
+              <div class="tbl" style="margin-top:10px"><table style="min-width:{{b.minw}}">
+                <thead><tr><sc-for list="{{b.head}}" as="h" hint-placeholder-count="5"><th>{{h}}</th></sc-for></tr></thead>
+                <tbody><sc-for list="{{b.rows}}" as="r" hint-placeholder-count="4"><tr class="{{r.cls}}"><sc-for list="{{r.cells}}" as="c" hint-placeholder-count="5"><td class="{{c.cls}}"><sc-if value="{{c.isTag}}" hint-placeholder-val="{{ false }}"><span class="{{c.tag}}">{{c.v}}</span></sc-if><sc-if value="{{c.isText}}" hint-placeholder-val="{{ true }}">{{c.v}}</sc-if></td></sc-for></tr></sc-for></tbody>
+              </table></div>
+            </sc-if>
+            <sc-if value="{{b.isBars}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="5"><div class="hbar"><span style="width:130px">{{x.n}}</span><div class="t"><i style="width:{{x.w}};background:{{x.c}}"></i></div><span style="width:110px;text-align:right">{{x.v}}</span></div></sc-for></div>
+            </sc-if>
+            <sc-if value="{{b.isList}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:6px"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="4">
+                <div class="row"><span class="tile {{x.tile}}" style="font-weight:900;font-size:13px">{{x.ini}}</span><div style="flex:1 1 220px"><div style="font-weight:900">{{x.t}}</div><div class="muted" style="font-size:12px">{{x.d}}</div></div><span style="font-weight:900">{{x.amt}}</span>
+                  <sc-if value="{{x.open}}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><button type="button" class="chunk w sm" onClick="{{x.no}}">{{x.nl}}</button><button type="button" class="chunk sm" onClick="{{x.yes}}">{{x.yl}}</button></div></sc-if>
+                  <sc-if value="{{x.hasTag}}" hint-placeholder-val="{{ false }}"><span class="{{x.tc}}">{{x.tag}}</span></sc-if>
+                  <sc-if value="{{x.hasBtn}}" hint-placeholder-val="{{ false }}"><button type="button" class="chunk w sm">{{x.btn}}</button></sc-if>
+                </div>
+              </sc-for></div>
+            </sc-if>
+            <sc-if value="{{b.isNote}}" hint-placeholder-val="{{ false }}">
+              <ul style="margin:10px 0 0;padding-left:18px;line-height:24px;font-weight:700"><sc-for list="{{b.items}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+            </sc-if>
+          </section>
+        </sc-for>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { page:'overview', act:{} }; }
+  renderVals() {
+    const S0 = this.state; const set = (o) => this.setState(o);
+    const cell = (v) => (v && typeof v === 'object') ? { v:v.v, cls:v.cls||'', tag:v.tag||'', isTag:!!v.tag, isText:!v.tag } : { v, cls:'', tag:'', isTag:false, isText:true };
+    const T = (title, sub, head, rows, span, minw) => ({ isTable:true, title, sub, head, minw: minw || '640px', cls:'card' + (span?' span2':''), hc:'#1f2937', rows: rows.map(r => Array.isArray(r) ? { cls:'', cells:r.map(cell) } : { cls:r.cls, cells:r.c.map(cell) }) });
+    const B = (title, sub, items, span) => { const mx = Math.max(...items.map(i => Math.abs(i[1]))); return { isBars:true, title, sub, cls:'card' + (span?' span2':''), hc:'#1f2937', items: items.map(([n,val,label,c]) => ({ n, v:label, w: Math.round(Math.abs(val)/mx*100)+'%', c: c || '#0ea5e9' })) }; };
+    const L = (title, sub, items, span) => ({ isList:true, title, sub, cls:'card' + (span?' span2':''), hc:'#1f2937', items });
+    const N = (title, items, span) => ({ isNote:true, title, sub:'', cls:'card dark' + (span?' span2':''), hc:'#fcd34d', items });
+    const li = (ini, tile, t, d, amt, tag, tc, btn) => ({ ini, tile, t, d, amt: amt||'', hasTag:!!tag, tag, tc, hasBtn:!!btn, btn, open:false });
+    const act = (id, ini, tile, t, d, amt, yl, nl, yTag, nTag) => { const s = S0.act[id]; return { ini, tile, t, d, amt, yl, nl, open:!s, hasTag:!!s, hasBtn:false, tag: s==='y' ? yTag : nTag, tc: s==='y' ? 'tag g' : 'tag', yes:()=>set({ act:{ ...S0.act, [id]:'y' } }), no:()=>set({ act:{ ...S0.act, [id]:'n' } }) }; };
+    const tg = (v, tag) => ({ v, tag });
+    const K = (l, v, n, c) => ({ l, v, n, c: c || '#1f2937' });
+    const openTickets = ['t1','t2','t3','t4'].filter(id => !S0.act[id]).length;
+
+    const P = {
+      overview: { group:'Platform', title:'Platform overview', sub:'Every school on Ilmora: growth, money, usage and health.', cta:'Add a school',
+        kpis:[K('Schools','48','41 paying · 7 on trial'),K('Students','31,420','▲ 2,180 this month','#15803d'),K('Monthly revenue','Rs 1.86M','MRR ▲ 9%','#15803d'),K('Churn','2.1%','1 school left in Oct','#c2410c'),K('Uptime','99.96%','last 30 days','#15803d'),K('Open tickets', String(openTickets), 'avg reply 2 hrs', openTickets ? '#c2410c' : '#15803d')],
+        blocks:[
+          B('New schools by month','paying',[['Jun',3,'3'],['Jul',2,'2'],['Aug',5,'5'],['Sep',6,'6'],['Oct',4,'4'],['Nov',7,'7 so far','#16a34a']]),
+          B('Revenue by plan','monthly',[['Basic',380,'Rs 380k · 19 schools'],['Standard',820,'Rs 820k · 16 schools','#16a34a'],['Pro',520,'Rs 520k · 5 schools','#7c3aed'],['Enterprise',140,'Rs 140k · 1 group','#0f172a']]),
+          L('Needs you today','',[li('T','t-o','5 trials end this week','2 have not added students yet','', 'Call','tag y'),li('P','t-r','3 payments failed','Rs 96k · retry tomorrow','', 'Urgent','tag r'),li('L','t-b','2 schools near student limit','Azenu School 11/12, Al-Huda 480/500','', 'Upsell','tag b'),li('B','t-g','Backup finished','all 48 schools, 03:00','', 'OK','tag g')]),
+          N('AI · growth notes',['Schools that add 50+ students in the first week convert 4× more often.','Lahore has 62% of schools; Faisalabad trials doubled after the September expo.','Fees module is the most used; AI paper checking is used by only 9 schools.'])
+        ] },
+      schools: { group:'Platform', title:'Schools', sub:'Every school, its plan, usage and health. Open one to help or log in as them.', cta:'Add a school',
+        kpis:[K('Active','41','paying'),K('Trials','7','14 days each'),K('Suspended','2','unpaid','#b91c1c'),K('At risk','4','low use or late payment','#c2410c')],
+        blocks:[
+          T('All schools','search, filter by plan, city or health',['School','City','Plan','Students','Campuses','Last active','Health','Bill','Actions'],[
+            [{v:'Model School Group',cls:'b'},'Lahore','Enterprise','1,285 / ∞','4','2 min ago',tg('92','tag g'),tg('Paid','tag g'),'Log in as · Open'],
+            [{v:'Azenu School',cls:'b'},'Lahore','Trial','11 / 12','1','today',tg('64','tag y'),tg('Trial · 6 days left','tag y'),'Log in as · Open'],
+            [{v:'Al-Huda Academy',cls:'b'},'Faisalabad','Standard','480 / 500','1','1 hr ago',tg('81','tag g'),tg('Paid','tag g'),'Log in as · Open'],
+            [{v:'Bright Future School',cls:'b'},'Multan','Basic','212 / 300','1','9 days ago',tg('48','tag r'),tg('Overdue 12 days','tag r'),'Log in as · Open'],
+            [{v:'The City Grammar',cls:'b'},'Islamabad','Pro','1,040 / 1,500','2','5 min ago',tg('88','tag g'),tg('Paid','tag g'),'Log in as · Open']],true,'1000px'),
+          N('Health score',['Logins and daily attendance marking (40%) + fee module use (20%) + paying on time (20%) + support tickets (10%) + features used (10%).','Below 60 = call the school this week.']),
+          L('School actions','for the selected school',[li('L','t-b','Log in as the principal','every visit is written in the audit log','', '', '', 'Log in'),li('S','t-o','Suspend or restore','read-only mode, data is kept','', '', '', 'Suspend'),li('E','t-g','Export all data','Excel and CSV, sent to the owner','', '', '', 'Export'),li('D','t-r','Delete school','after 30 days, with owner confirmation','', '', '', 'Delete')])
+        ] },
+      onboarding: { group:'Platform', title:'Onboarding and trials', sub:'From signup to a school that uses Ilmora every day.', cta:'Send setup guide',
+        kpis:[K('Trials','7','14-day trial'),K('Trial to paid','58%','last 90 days','#15803d'),K('Days to go live','4.2','average'),K('Stuck in setup','3','no students added','#c2410c')],
+        blocks:[
+          T('Setup checklist per school','what each new school has done',['School','Classes','Students','Teachers','Fee setup','Attendance used','Ready'],[
+            [{v:'Azenu School',cls:'b'},tg('Done','tag g'),tg('11','tag y'),tg('2','tag y'),tg('No','tag r'),tg('No','tag r'),'40%'],
+            [{v:'Iqra Model School',cls:'b'},tg('Done','tag g'),tg('320','tag g'),tg('18','tag g'),tg('Done','tag g'),tg('Daily','tag g'),'100%'],
+            [{v:'Sunrise Academy',cls:'b'},tg('Done','tag g'),tg('0','tag r'),tg('0','tag r'),tg('No','tag r'),tg('No','tag r'),'20%']],true,'860px'),
+          L('Import tools','to go live in a day',[li('X','t-g','Import students from Excel','name, father, class, B-form, phone','', '', '', 'Template'),li('S','t-b','Import from other software','Edunation, Schoolpro, Google Sheets','', '', '', 'Start'),li('F','t-o','Import fee balances','opening dues per family','', '', '', 'Template')]),
+          N('AI · convert more trials',['Trials that import students on day 1 convert 81% of the time.','Send a WhatsApp video of fee challans on day 3; it doubled fee setup.'])
+        ] },
+      billing: { group:'Business', title:'Billing and invoices', sub:'Subscriptions, invoices, failed payments and discounts.', cta:'Create invoice',
+        kpis:[K('MRR','Rs 1.86M','monthly recurring','#15803d'),K('Collected this month','Rs 1.62M','87%'),K('Overdue','Rs 238k','6 schools','#b91c1c'),K('Average per school','Rs 45k','a month')],
+        blocks:[
+          T('Invoices','November',['Invoice','School','Plan','Amount','Due','Status'],[
+            ['INV-1124','Model School Group','Enterprise · 4 campuses','Rs 140,000','1 Nov',tg('Paid','tag g')],
+            ['INV-1131','Al-Huda Academy','Standard · 500 students','Rs 45,000','5 Nov',tg('Paid','tag g')],
+            ['INV-1137','Bright Future School','Basic · 300','Rs 18,000','5 Nov',tg('Overdue 12 days','tag r')],
+            ['INV-1142','The City Grammar','Pro · 1,500','Rs 96,000','10 Nov',tg('Card failed · retry','tag y')]],true,'820px'),
+          B('Payment method','this month',[['Bank transfer',58,'58%'],['JazzCash',21,'21%','#ef4444'],['Easypaisa',14,'14%','#16a34a'],['Card',7,'7%','#7c3aed']]),
+          L('Dunning','what happens when a school does not pay',[li('1','t-y','Day 1','reminder email and WhatsApp to owner','', 'Auto','tag g'),li('7','t-o','Day 7','banner inside the app for the principal','', 'Auto','tag g'),li('15','t-r','Day 15','read-only mode, parents still see results','', 'Auto','tag g'),li('45','t-n','Day 45','suspend; data kept 90 days','', 'Needs you','tag y')])
+        ] },
+      plans: { group:'Business', title:'Plans and features', sub:'What each plan includes. Turn features on per plan or per school.', cta:'New plan',
+        kpis:[K('Plans','4','Basic, Standard, Pro, Enterprise'),K('Custom deals','3','schools with special prices'),K('Add-ons sold','12','SMS packs, AI, extra campus'),K('Discount codes','5','2 active')],
+        blocks:[
+          T('Plan matrix','price per month',['Feature','Basic Rs 18k','Standard Rs 45k','Pro Rs 96k','Enterprise'],[
+            ['Students','300','500','1,500','Unlimited'],['Campuses','1','1','2','Unlimited'],['Attendance, fees, exams','✓','✓','✓','✓'],['Parent app','✓','✓','✓','✓'],
+            ['WhatsApp reminders','—','500/mo','3,000/mo','Unlimited'],['AI paper checking','—','—','✓','✓'],['Owner multi-campus','—','—','—','✓'],['Public result page and domain','—','✓','✓','✓'],['Priority support','—','—','✓','✓ + manager']],true,'760px'),
+          L('Feature flags','turn on early for chosen schools',[act('f1','B','t-v','Board predictor (beta)','on for 6 schools','', 'Turn on for all','Keep beta','On for all','Beta'),act('f2','R','t-b','Classrooms and profit per room','on for 2 schools','', 'Turn on for all','Keep beta','On for all','Beta'),act('f3','O','t-g','Owner dashboard','Enterprise only','', 'Add to Pro','Keep','Added to Pro','Enterprise only')]),
+          N('AI · pricing',['5 Standard schools are above 480 students; offer Pro at Standard price for 3 months.','Schools using WhatsApp reminders collect 9 points more fees; bundle it into Basic.'])
+        ] },
+      usage: { group:'Business', title:'Usage and limits', sub:'Students, messages, AI and storage per school. Stop bills from surprising anyone.', cta:'Set limits',
+        kpis:[K('WhatsApp sent','182k','this month · Rs 364k cost'),K('SMS sent','41k','Rs 61k cost'),K('AI spend','Rs 74k','limit Rs 150k'),K('Storage','212 GB','photos and papers')],
+        blocks:[
+          T('Top schools by usage','this month',['School','Students','WhatsApp','SMS','AI spend','Storage','Over limit'],[
+            [{v:'Model School Group',cls:'b'},'1,285','38,400','4,100','Rs 18,400','41 GB',tg('No','tag g')],
+            [{v:'The City Grammar',cls:'b'},'1,040','31,200','9,800','Rs 14,100','33 GB',tg('SMS 98%','tag y')],
+            [{v:'Al-Huda Academy',cls:'b'},'480 / 500','6,100','2,300','Rs 1,200','9 GB',tg('Students 96%','tag y')]],true,'820px'),
+          B('Cost per student','platform cost, monthly',[['WhatsApp',11.6,'Rs 11.6'],['Servers and database',6.4,'Rs 6.4','#7c3aed'],['AI',2.4,'Rs 2.4','#ca8a04'],['SMS',1.9,'Rs 1.9','#db2777'],['Storage',0.9,'Rs 0.9','#16a34a']]),
+          N('AI · margins',['WhatsApp is 50% of your cost per student; template messages cost 60% less than free text.','Average revenue per student is Rs 59; cost Rs 23; margin 61%.'])
+        ] },
+      partners: { group:'Business', title:'Partners and resellers', sub:'Sales agents and partners who bring schools, and their commission.', cta:'Add partner',
+        kpis:[K('Partners','9','4 cities'),K('Schools from partners','17','35% of paying'),K('Commission due','Rs 112k','November','#c2410c'),K('Best partner','EduLink Faisalabad','6 schools')],
+        blocks:[ T('Partners','',['Partner','City','Schools','Revenue brought','Commission','Due'],[
+          [{v:'EduLink',cls:'b'},'Faisalabad','6','Rs 270k/mo','15%','Rs 40,500'],[{v:'Ali Raza (agent)',cls:'b'},'Lahore','5','Rs 190k/mo','15%','Rs 28,500'],[{v:'SchoolPro Multan',cls:'b'},'Multan','4','Rs 120k/mo','20%','Rs 24,000']],true) ] },
+      support: { group:'Care', title:'Support tickets', sub:'Questions and problems from schools.', cta:'New ticket',
+        kpis:[K('Open', String(openTickets), 'tickets', openTickets ? '#c2410c' : '#15803d'),K('First reply','2.1 hrs','goal 4 hrs','#15803d'),K('Solved this week','37',''),K('Happy','94%','after solving','#15803d')],
+        blocks:[ L('Open tickets','reply or solve',[
+          act('t1','F','t-r','Fee challan shows wrong late fee · Bright Future','Urgent · 2 hrs ago','', 'Solved','Reply','Solved','Replied'),
+          act('t2','L','t-o','Teacher cannot log in · Al-Huda','High · 5 hrs ago','', 'Solved','Reply','Solved','Replied'),
+          act('t3','R','t-b','Result card logo too small · Model School','Normal · yesterday','', 'Solved','Reply','Solved','Replied'),
+          act('t4','W','t-g','How to send WhatsApp in Urdu? · Azenu','Question · yesterday','', 'Solved','Reply','Solved','Replied')],true),
+          B('Tickets by topic','this month',[['Fees and challans',34,'34'],['Logins and passwords',22,'22','#f59e0b'],['Results and report cards',15,'15','#7c3aed'],['Attendance',9,'9','#16a34a'],['Other',11,'11','#94a3b8']]),
+          N('AI · fewer tickets',['22 login tickets: add "Forgot password" by WhatsApp OTP.','Fee tickets fall 40% when schools watch the 3-minute fee setup video.'])
+        ] },
+      announce: { group:'Care', title:'Announcements', sub:'Tell every school, a plan, or one city about updates and downtime.', cta:'New announcement',
+        kpis:[K('Sent this month','4',''),K('Read by principals','86%',''),K('Scheduled','1','maintenance Sunday 2 am'),K('Release notes','v2.14','18 Nov')],
+        blocks:[ L('Announcements','',[li('M','t-o','Maintenance · Sunday 2–3 am','all schools · app read-only for 1 hour','', 'Scheduled','tag y'),li('N','t-g','New: public result page','Standard plan and above','', 'Sent','tag g'),li('W','t-b','WhatsApp Urdu templates','all schools','', 'Sent','tag g')],true) ] },
+      data: { group:'Safety', title:'Data and backups', sub:'Backups, restores and data requests for every school.', cta:'Back up now',
+        kpis:[K('Last backup','03:00 today','all schools','#15803d'),K('Kept for','30 days','daily · 12 monthly'),K('Restore tests','Passed','14 Nov','#15803d'),K('Data requests','2','export, delete')],
+        blocks:[ T('Backups','',['Time','Scope','Size','Status'],[['Today 03:00','All 48 schools','28.4 GB',tg('Done','tag g')],['Yesterday 03:00','All 47 schools','28.1 GB',tg('Done','tag g')],['14 Nov 11:20','Restore test · Azenu School','0.2 GB',tg('Passed','tag g')]]),
+          L('Restore one school','go back to any day in the last 30',[li('R','t-b','Restore a school to a date','other schools are not touched','', '', '', 'Choose'),li('U','t-o','Undo one table','e.g. marks deleted by mistake','', '', '', 'Choose')]) ] },
+      security: { group:'Safety', title:'Security and audit log', sub:'Who did what, when. Logins, log-in-as, money changes and settings.', cta:'Download log',
+        kpis:[K('2FA on','100%','platform team'),K('Log-in-as','6','this week, all logged'),K('Failed logins','148','12 blocked IPs','#c2410c'),K('Row-level security','On','every table','#15803d')],
+        blocks:[ T('Audit log','latest',['Time','Who','School','What'],[
+          ['10:42','admin@ilmora.pk','Al-Huda','Logged in as principal (ticket #T-2)'],['10:15','Dr Saim','Model School','Changed fee for Class 9: Rs 5,500 → 5,800'],['09:58','system','all','Daily backup finished'],['09:30','Unknown','—',{v:'5 failed logins, IP blocked',cls:'r'}]],true,'760px') ] },
+      health: { group:'Safety', title:'System health', sub:'Is Ilmora fast and up for every school?', cta:'Status page',
+        kpis:[K('Uptime','99.96%','30 days','#15803d'),K('Page speed','0.8 s','95% of pages','#15803d'),K('Errors','0.04%','of requests'),K('Database','61%','of plan used','#c2410c')],
+        blocks:[ B('Busiest hour','requests a minute, school days',[['7–8 am',1840,'1,840 · attendance','#f59e0b'],['8–9 am',2210,'2,210 · peak','#ef4444'],['12–1 pm',960,'960'],['6–9 pm',1320,'1,320 · parents']]),
+          L('Services','',[li('A','t-g','App and API','Vercel','', 'Up','tag g'),li('D','t-g','Database','Supabase','', 'Up','tag g'),li('W','t-g','WhatsApp','provider','', 'Up','tag g'),li('S','t-y','SMS','provider','', 'Slow · 4 min delay','tag y'),li('I','t-g','AI','edge function','', 'Up','tag g')]),
+          N('AI · scaling',['At this growth the database reaches its plan limit in about 4 months; move up one size in February.','8–9 am is 2.3× normal load; cache attendance lists to cut it by half.']) ] },
+      team: { group:'Safety', title:'Platform team', sub:'Your own staff: sales, support and developers, with limited access.', cta:'Invite',
+        kpis:[K('Team','7',''),K('Can log in as schools','3','support only'),K('Can see billing','2',''),K('2FA','7 of 7','#15803d')],
+        blocks:[ T('Team and roles','',['Person','Role','Can do'],[['admin@ilmora.pk','Super admin','Everything'],['Sana (support)','Support','Tickets, log in as school (logged)'],['Bilal (sales)','Sales','Trials, onboarding, no billing'],['Hira (finance)','Finance','Billing and invoices only']],true) ] },
+      templates: { group:'Setup', title:'School templates', sub:'What a new school gets on day 1, per board and city.', cta:'New template',
+        kpis:[K('Templates','5','Punjab, Federal, Sindh, KP, O/A Level'),K('Grading scales','4',''),K('Fee head sets','3',''),K('Subject lists','11','')],
+        blocks:[ L('Templates','used when you create a school',[li('P','t-g','Punjab · BISE Lahore','Class PG–10, Punjab scheme, BISE grading, 6 fee heads','', 'Default','tag g'),li('F','t-b','Federal · FBISE','Class PG–12, FBISE grading','', '', '', 'Edit'),li('S','t-o','Sindh · BSEK','Matric and Inter, Sindh scheme','', '', '', 'Edit'),li('O','t-v','Cambridge O and A Level','grades A*–E, terms','', '', '', 'Edit')],true) ] },
+      settings: { group:'Setup', title:'Platform settings', sub:'Providers, domains and defaults for all schools.', cta:'Save',
+        kpis:[K('Custom domains','14','e.g. lms.azenu.edu.pk'),K('WhatsApp numbers','3',''),K('Payment gateways','3','JazzCash, Easypaisa, 1Link'),K('Languages','2','English, Urdu')],
+        blocks:[ L('Settings','',[li('D','t-b','Custom domains','connect a school’s own domain with SSL','', '', '', 'Open'),li('W','t-g','WhatsApp and SMS providers','numbers, templates, cost per message','', '', '', 'Open'),li('P','t-o','Payment gateways','JazzCash, Easypaisa, 1Link, bank','', '', '', 'Open'),li('A','t-y','AI providers and budget','default company, platform limit','', '', '', 'Open'),li('E','t-v','Emails and branding','welcome, invoice and alert emails','', '', '', 'Open'),li('L','t-n','Legal','terms, privacy policy, data agreement','', '', '', 'Open')],true) ] }
+    };
+    const NAV = [
+      ['Platform',[['overview','Overview','O','t-g'],['schools','Schools','S','t-b'],['onboarding','Onboarding and trials','T','t-g']]],
+      ['Business',[['billing','Billing and invoices','B','t-o'],['plans','Plans and features','P','t-v'],['usage','Usage and limits','U','t-y'],['partners','Partners','R','t-p']]],
+      ['Care',[['support','Support tickets','?','t-o'],['announce','Announcements','A','t-p']]],
+      ['Safety',[['data','Data and backups','D','t-b'],['security','Security and audit','L','t-r'],['health','System health','H','t-g'],['team','Platform team','M','t-n']]],
+      ['Setup',[['templates','School templates','T','t-v'],['settings','Platform settings','G','t-n']]]
+    ];
+    const nav = NAV.map(([label, items]) => ({ label, items: items.map(([id,l,ini,tile]) => ({ label:l, ini, tile: tile==='t-r' ? 't-p' : tile, cls: S0.page===id ? 'nb on':'nb', hasBadge: id==='support' && openTickets>0, badge: openTickets, pick:()=>set({ page:id }) })) }));
+    const scr = P[S0.page];
+    scr.blocks.forEach(b => { if (b.items && b.isList) b.items.forEach(x => { if (x.tile==='t-r') x.tile='t-p'; }); });
+    return { nav, scr };
+  }
+}
+</script>
+</body>
+</html>
