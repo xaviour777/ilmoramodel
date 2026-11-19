@@ -30,6 +30,7 @@ const NAV: Record<Role, NavItem[]> = {
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
     { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
+    { href: "/whatsapp/flows", label: "Auto flows", icon: "chat" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],
   teacher: [
