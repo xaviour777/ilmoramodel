@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Channel } from "@/lib/messages";
+import { evoReady, evoSend } from "@/lib/evolution";
+import { todayPK } from "@/lib/format";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -15,7 +17,10 @@ export type MessagingConfig = {
   sms_sender: string | null;
   whatsapp_token: string | null;
   sms_api_key: string | null;
+  // numbers linked by QR scan (WhatsApp module); used before the Business API when present
+  qr_numbers?: QrNumber[];
 };
+export type QrNumber = { id: string; instance: string; daily_limit: number; sent_today: number; sent_on: string | null; last_used_at: string | null };
 
 export const SETTINGS_COLS = "whatsapp_enabled, whatsapp_phone_number_id, whatsapp_template, whatsapp_template_lang, sms_enabled, sms_method, sms_url, sms_body, sms_sender";
 
@@ -24,13 +29,21 @@ export async function loadMessagingConfig(supabase: Supabase): Promise<Messaging
     supabase.from("campus_settings").select(SETTINGS_COLS).maybeSingle(),
     supabase.from("campus_secrets").select("whatsapp_token, sms_api_key").maybeSingle(),
   ]);
-  return s ? { ...(s as Omit<MessagingConfig, "whatsapp_token" | "sms_api_key">), whatsapp_token: k?.whatsapp_token ?? null, sms_api_key: k?.sms_api_key ?? null } : null;
+  let qr: QrNumber[] = [];
+  if (evoReady()) {
+    const [{ data: on }, { data: nums }] = await Promise.all([
+      supabase.rpc("has_module", { p_module: "whatsapp" }),
+      supabase.from("wa_numbers").select("id, instance, daily_limit, sent_today, sent_on, last_used_at").eq("status", "connected"),
+    ]);
+    if (on) qr = (nums ?? []) as QrNumber[];
+  }
+  return s ? { ...(s as Omit<MessagingConfig, "whatsapp_token" | "sms_api_key">), whatsapp_token: k?.whatsapp_token ?? null, sms_api_key: k?.sms_api_key ?? null, qr_numbers: qr } : null;
 }
 
 // Which channels can go out without a tap.
 export function readyChannels(c: MessagingConfig | null): Channel[] {
   const out: Channel[] = [];
-  if (c?.whatsapp_enabled && c.whatsapp_phone_number_id && c.whatsapp_token) out.push("whatsapp");
+  if ((c?.whatsapp_enabled && c.whatsapp_phone_number_id && c.whatsapp_token) || (c?.qr_numbers?.length ?? 0) > 0) out.push("whatsapp");
   if (c?.sms_enabled && c.sms_url) out.push("sms");
   return out;
 }
@@ -97,6 +110,43 @@ export async function deliverQueued(supabase: Supabase, limit = 60) {
     .eq("status", "queued").in("channel", channels).order("created_at").limit(limit);
   let sent = 0, failed = 0;
   const list = queued ?? [];
+  const qr = config!.qr_numbers ?? [];
+  if (qr.length) {
+    // QR-linked numbers: one at a time, spread over the numbers, with a pause between
+    // messages and a daily cap per number, so the traffic looks like a person and not a bot.
+    const today = todayPK();
+    for (const n of qr) if (n.sent_on !== today) { n.sent_today = 0; n.sent_on = today; }
+    const started = Date.now();
+    for (const m of list) {
+      if (Date.now() - started > 45000) break;           // stay inside the server's time limit
+      if (m.channel !== "whatsapp") {
+        try { await sendOne(config!, m.channel as Channel, m.to_phone, m.body); await supabase.from("messages").update({ status: "sent", sent_at: new Date().toISOString(), error: null }).eq("id", m.id); sent++; }
+        catch (e) { await supabase.from("messages").update({ status: "failed", error: (e as Error).message.slice(0, 300) }).eq("id", m.id); failed++; }
+        continue;
+      }
+      const n = qr.filter((x) => x.sent_today < x.daily_limit).sort((a, b) => a.sent_today - b.sent_today || (a.last_used_at ?? "").localeCompare(b.last_used_at ?? ""))[0];
+      if (!n) break;                                     // every number has reached today's limit
+      try {
+        await evoSend(n.instance, m.to_phone, m.body);
+        await supabase.from("messages").update({ status: "sent", sent_at: new Date().toISOString(), error: null, via_number: n.id }).eq("id", m.id);
+        sent++;
+        n.sent_today++; n.last_used_at = new Date().toISOString();
+        await supabase.from("wa_numbers").update({ sent_today: n.sent_today, sent_on: today, last_used_at: n.last_used_at, last_error: null }).eq("id", n.id);
+      } catch (e) {
+        const msg = (e as Error).message.slice(0, 300);
+        await supabase.from("messages").update({ status: "failed", error: msg }).eq("id", m.id);
+        failed++;
+        if (/close|not connected|logged out|banned|401|404/i.test(msg)) {
+          await supabase.from("wa_numbers").update({ status: /banned/i.test(msg) ? "banned" : "disconnected", last_error: msg }).eq("id", n.id);
+          qr.splice(qr.indexOf(n), 1);
+          if (!qr.length) break;
+        }
+      }
+      await new Promise((r) => setTimeout(r, 2500 + Math.random() * 4000));
+    }
+    const { count: left } = await supabase.from("messages").select("id", { count: "exact", head: true }).eq("status", "queued").in("channel", channels);
+    return { sent, failed, left: left ?? 0, channels };
+  }
   for (let i = 0; i < list.length; i += 6) {
     await Promise.all(list.slice(i, i + 6).map(async (m) => {
       try {
