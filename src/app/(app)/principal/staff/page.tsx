@@ -38,13 +38,16 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
       ? supabase.from("timetable_slots").select("id, teacher_id, period_id, periods!inner(name, starts_at, sort, timing_profiles!inner(is_active)), subjects(name), sections(name, classes(name))").eq("weekday", weekday).eq("periods.timing_profiles.is_active", true)
       : Promise.resolve({ data: [] }),
     supabase.from("substitutions").select("timetable_slot_id, substitute_id").eq("date", today),
-    supabase.from("staff_attendance").select("profile_id, date, status").gte("date", monthStart).lte("date", day),
+    supabase.from("staff_attendance").select("profile_id, date, status, check_in_at, check_out_at").gte("date", monthStart).lte("date", day),
     supabase.from("leave_requests").select("profile_id").eq("status", "approved").lte("from_on", day).gte("to_on", day),
     supabase.from("staff_attendance").select("profile_id, date, status").gte("date", from).lte("date", to),
     supabase.from("substitutions").select("id", { count: "exact", head: true }).gte("date", from).lte("date", to).not("substitute_id", "is", null),
     supabase.from("salary_payments").select("net_paisa, status").eq("month", monthStart),
     supabase.from("leave_requests").select("profile_id, from_on, to_on").eq("status", "approved").gte("to_on", today.slice(0, 4) + "-01-01"),
   ]);
+  // gate QR check-in and check-out times for the day shown
+  const gateTimes = new Map((marked ?? []).filter((m) => m.date === day && m.check_in_at).map((m) => [m.profile_id, { in: m.check_in_at as string, out: m.check_out_at as string | null }]));
+  const hhmm = (t: string) => new Date(t).toLocaleTimeString("en-PK", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Karachi" });
   const onDay = new Map((marked ?? []).filter((m) => m.date === day).map((m) => [m.profile_id, m.status as string]));
   const leaveOnDay = new Set((dayAway ?? []).map((a) => a.profile_id));
   const absentDays = new Map<string, number>();
@@ -79,6 +82,8 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHead kick="School · Staff" title="Staff, leave and salaries" sub="Track attendance and leave over any period, cover periods, and run monthly salaries.">
+        <Link href="/principal/staff/gate" className="btn-ghost">Gate scanner</Link>
+        <Link href="/print/staff-cards" target="_blank" className="btn-ghost">Print staff cards</Link>
         <Link href="/print/payslip/sheet" target="_blank" className="btn-ghost">Salary sheet</Link>
         <Link href="#add" className="btn">Add staff member</Link>
       </PageHead>
@@ -182,6 +187,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
                         <div className="min-w-32 flex-1">
                           <div className="font-black">{s.full_name}</div>
                           <div className="muted text-[12px]">{ROLE[s.role] ?? s.role}{absentDays.get(s.id) ? ` · absent ${absentDays.get(s.id)} day${absentDays.get(s.id) === 1 ? "" : "s"} this month` : ""}</div>
+                          {gateTimes.get(s.id) && <div className="text-[12px] font-extrabold text-[#15803d]">Gate: in {hhmm(gateTimes.get(s.id)!.in)}{gateTimes.get(s.id)!.out ? ` · out ${hhmm(gateTimes.get(s.id)!.out!)}` : ""}</div>}
                         </div>
                         <div className="flex gap-1.5">
                           {([["present", "P", "p"], ["late", "L", "l"], ["absent", "A", "a"], ["leave", "Lv", "v"]] as const).map(([v, l, c]) => (
@@ -209,6 +215,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
                   <span className={`tagx ${s.role === "teacher" ? "b" : s.role === "principal" ? "v" : "y"}`}>{ROLE[s.role] ?? s.role}</span>
                   <Link href={`/principal/staff/${s.id}`} className="flex-1 font-black hover:underline">{s.full_name}{s.employee_code && <span className="muted ml-2 text-[12px] font-bold">{s.employee_code}</span>}</Link>
                   <span className="muted text-[12px]">{s.user_id ? "can log in" : "no login yet"}</span>
+                  <Link href={`/print/staff-cards?id=${s.id}`} target="_blank" className="text-[12px] font-extrabold text-[#0369a1] underline">Card</Link>
                 </Row>
               ))}
             </div>

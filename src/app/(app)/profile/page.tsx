@@ -6,6 +6,8 @@ import Link from "next/link";
 import { rupees, shortDate } from "@/lib/format";
 import { PAY_MODE } from "@/lib/payroll";
 import { changePassword, saveProfile } from "./actions";
+import QRCode from "qrcode";
+import { BADGE_PREFIX } from "@/lib/badge";
 
 const ROLE: Record<string, string> = { owner: "Owner", principal: "Principal", accountant: "Accountant", teacher: "Teacher", parent: "Parent", student: "Student" };
 
@@ -14,12 +16,15 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const supabase = await createClient();
   const staff = ["principal", "teacher", "accountant", "owner"].includes(me.role);
-  const [{ data: p }, { data: { user } }, { data: d }, { data: slips }] = await Promise.all([
+  const [{ data: p }, { data: { user } }, { data: d }, { data: slips }, { data: badge }] = await Promise.all([
     supabase.from("profiles").select("full_name, phone, avatar_url").eq("id", me.id).single(),
     supabase.auth.getUser(),
     staff ? supabase.from("staff_details").select("*").eq("profile_id", me.id).maybeSingle() : Promise.resolve({ data: null }),
     staff ? supabase.from("salary_payments").select("id, month, net_paisa, status").eq("profile_id", me.id).order("month", { ascending: false }).limit(6) : Promise.resolve({ data: null }),
+    staff ? supabase.from("staff_badges").select("token").eq("profile_id", me.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
+  // the same QR as on the staff card, so the phone works at the gate when the card is at home
+  const gateQr = badge?.token ? await QRCode.toString(BADGE_PREFIX + badge.token, { type: "svg", margin: 1, errorCorrectionLevel: "M" }) : null;
   // what the office keeps about this person; they read it here and ask the office to correct it
   const record: [string, string | null | undefined][] = d ? [
     ["Designation", d.designation], ["CNIC", d.cnic], ["Date of birth", d.date_of_birth && shortDate(d.date_of_birth)],
@@ -38,6 +43,13 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved === "details" && <div className="notice-ok">Saved.</div>}
+      {gateQr && (
+        <details className="card max-w-md" id="gate">
+          <summary className="flex cursor-pointer items-center gap-2 font-bold">My gate QR (show it at the gate to check in)</summary>
+          <div className="mx-auto mt-3 w-64 max-w-full rounded-xl bg-white p-3" dangerouslySetInnerHTML={{ __html: gateQr }} />
+          <p className="muted mt-2 text-center text-sm">Turn the screen brightness up. Do not share a photo of this code.</p>
+        </details>
+      )}
       {sp.saved === "password" && <div className="notice-ok">Password changed. Use the new one next time you sign in.</div>}
       <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
         <section className="card">

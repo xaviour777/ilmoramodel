@@ -18,6 +18,7 @@ const I: Record<string, string> = {
   ai: "M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z",
   students: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8",
   staff: "M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18",
+  fam: "M6 7a3 3 0 1 0 6 0a3 3 0 1 0-6 0M15 9a2 2 0 1 0 4 0a2 2 0 1 0-4 0M3 21v-2a6 6 0 0 1 12 0v2M15 15.5a4 4 0 0 1 6 3.5v2",
   adm: "M15 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6",
   fees: "M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M17 14h.01",
   reports: "M4 20V10M10 20V4M16 20v-7M22 20H2",
@@ -44,6 +45,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
   ] },
   { label: "People", items: [
     { id: "students", href: "/principal/students", label: "Students", tile: "t-g", icon: "students" },
+    { id: "fam", href: "/principal/families", label: "Families", tile: "t-o", icon: "fam" },
     { id: "staff", href: "/principal/staff", label: "Staff & pay", tile: "t-b", icon: "staff" },
     { id: "adm", href: "/principal/admissions", label: "Admissions", tile: "t-p", icon: "adm" },
   ] },
