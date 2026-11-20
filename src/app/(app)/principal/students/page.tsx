@@ -6,7 +6,7 @@ import { PageHead, Stats, Stat, Chips, Insight, Empty, Bar } from "@/components/
 import { addStudent } from "./actions";
 
 type Search = { q?: string; section?: string; status?: string; f?: string; id?: string; page?: string; error?: string };
-const STATUS: Record<string, [string, string]> = { enrolled: ["Studying", "g"], left: ["Left", ""], struck_off: ["Struck off", "r"] };
+const STATUS: Record<string, [string, string]> = { enrolled: ["Studying", "g"], left: ["Left", ""], struck_off: ["Struck off", "r"], passed_out: ["Passed out", "b"] };
 const PAGE = 50;
 const DAY = 86400000;
 const NONE = ["00000000-0000-0000-0000-000000000000"];
@@ -17,8 +17,8 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   const supabase = await createClient();
   const today = todayPK();
   const page = Math.max(0, Number(sp.page) || 0);
-  const filter = ["fees", "absent", "low", "left", "struck_off"].includes(sp.f ?? "") ? sp.f! : "all";
-  const status = filter === "left" || filter === "struck_off" ? filter : sp.status && STATUS[sp.status] ? sp.status : "enrolled";
+  const filter = ["fees", "absent", "low", "left", "struck_off", "passed_out"].includes(sp.f ?? "") ? sp.f! : "all";
+  const status = filter === "left" || filter === "struck_off" || filter === "passed_out" ? filter : sp.status && STATUS[sp.status] ? sp.status : "enrolled";
   const q = (sp.q ?? "").replace(/[%,()]/g, "").trim();
   const since = new Date(Date.parse(today) - 20 * DAY).toISOString().slice(0, 10);
 
@@ -53,7 +53,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   const lowIds = en.filter((s) => (avg(s.id) ?? 1) < 0.5).map((s) => s.id);
   const atRisk = new Set([...absentIds, ...lowIds]);
   const { data: nextId } = await supabase.rpc("peek_student_code");
-  const { count: leftThisSession } = await supabase.from("students").select("id", { count: "exact", head: true }).neq("status", "enrolled").gte("created_at", sessionStart);
+  const { count: leftThisSession } = await supabase.from("students").select("id", { count: "exact", head: true }).neq("status", "enrolled").gte("left_on", sessionStart);
 
   // a phone number finds the family's children too
   let familyIds: string[] = [];
@@ -109,7 +109,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
 
       <Stats>
         <Stat label="Enrolled" value={en.length.toLocaleString("en-IN")} sub={boys + girls ? `${boys} boys · ${girls} girls` : "gender not recorded"} />
-        <Stat label="New this session" value={en.filter((s) => (s.admitted_on ?? s.created_at?.slice(0, 10) ?? "") >= sessionStart).length} tone="#15803d" sub={`${leftThisSession ?? 0} left or struck off`} />
+        <Stat label="New this session" value={en.filter((s) => (s.admitted_on ?? s.created_at?.slice(0, 10) ?? "") >= sessionStart).length} tone="#15803d" sub={`${leftThisSession ?? 0} left, struck off or passed out`} />
         <Stat label="Siblings" value={[...famSize.values()].filter((n) => n >= 2).length} sub="families with 2+ children" />
         <Stat label="At risk" value={atRisk.size} tone={atRisk.size ? "#b91c1c" : undefined} sub="3+ absences in 3 weeks, or below 50%" href={link({ f: "absent", page: undefined, id: undefined })} />
       </Stats>
@@ -125,7 +125,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
         </form>
         <Chips label="Filter students" current={filter} items={[
           { id: "all", label: "All" }, { id: "fees", label: `Fee due (${owingFam.size} families)` }, { id: "absent", label: `Absent often (${absentIds.length})` },
-          { id: "low", label: `Below 50% (${lowIds.length})` }, { id: "left", label: "Left" }, { id: "struck_off", label: "Struck off" },
+          { id: "low", label: `Below 50% (${lowIds.length})` }, { id: "left", label: "Left" }, { id: "struck_off", label: "Struck off" }, { id: "passed_out", label: "Passed out" },
         ].map((c) => ({ ...c, href: link({ f: c.id === "all" ? undefined : c.id, page: undefined, id: undefined }) }))} />
       </div>
 

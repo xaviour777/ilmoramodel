@@ -34,8 +34,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               : error === "wrong-school" ? `This login belongs to another school. Use your own school's address${brand ? `, not ${brand.name}'s` : ""}.` : error}
           </div>
         )}
-        <label className="field">Email
-          <input className="input" name="email" type="email" required autoComplete="email" />
+        <label className="field">Email (drivers: mobile number)
+          <input className="input" name="email" type="text" inputMode="email" required autoComplete="username" />
         </label>
         <label className="field">Password
           <input className="input" name="password" type="password" required autoComplete="current-password" />

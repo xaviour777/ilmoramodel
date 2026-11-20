@@ -95,7 +95,7 @@ export async function promoteStudents(f: FormData) {
     for (let i = 0; i < m.ids.length; i += 150) {
       const ids = m.ids.slice(i, i + 150);
       const { error } = m.to === "out"
-        ? await supabase.from("students").update({ status: "left" }).in("id", ids)
+        ? await supabase.from("students").update({ status: "passed_out", leave_reason: "Completed the final class" }).in("id", ids)
         : await supabase.from("students").update({ section_id: m.to }).in("id", ids);
       if (error) back(`${moved} students moved, then: ${error.message}`);
       moved += ids.length;

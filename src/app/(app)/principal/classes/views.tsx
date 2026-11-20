@@ -260,10 +260,12 @@ export async function PromotionTab({ sectionId, batch, all }: { sectionId?: stri
     return { ...k, overall, failed, ar, suggest, why };
   });
   const count = (k: string) => rows.filter((r) => r.suggest === k).length;
-  const { data: recent } = await supabase.from("student_moves").select("batch_id, created_at, kind, undone_at").eq("from_section_id", sec.id).in("kind", ["promote", "conditional", "detain", "leave"]).order("created_at", { ascending: false }).limit(200);
+  const { data: recent } = await supabase.from("student_moves").select("batch_id, created_at, kind, undone_at").eq("from_section_id", sec.id).in("kind", ["promote", "conditional", "detain", "leave", "pass_out"]).order("created_at", { ascending: false }).limit(200);
   const batches = [...new Map((recent ?? []).filter((r) => !r.undone_at).map((r) => [r.batch_id, r])).values()].slice(0, 3);
   const week = Date.now() - 7 * 864e5;
-  const DEC = [["promote", "Promote", "p"], ["conditional", "Conditional", "l"], ["detain", "Detain", "a"], ["leave", "Leaving", "v"]] as const;
+  const DEC = [["promote", "Promote", "p"], ["conditional", "Conditional", "l"], ["detain", "Detain", "a"], ["pass_out", "Passed out", "v"], ["leave", "Leaving", "v"]] as const;
+  // the last class has nowhere to go: the default there is "Passed out"
+  const pick = (sug: string) => { const v = all ? "promote" : sug; return !defaultTarget && (!toMatric || programs.length === 0) && (v === "promote" || v === "conditional") ? "pass_out" : v; };
 
   return (
     <>
@@ -311,7 +313,7 @@ export async function PromotionTab({ sectionId, batch, all }: { sectionId?: stri
               )}
               <div className="flex gap-1" role="radiogroup" aria-label={`Decision for ${r.full_name}`}>
                 {DEC.map(([v, l, c]) => (
-                  <label key={v} className={`seg ${c}`}><input type="radio" name={`dec:${r.id}`} value={v} defaultChecked={(all ? "promote" : r.suggest) === v} /><span className="px-2 text-[12px]">{l}</span></label>
+                  <label key={v} className={`seg ${c}`}><input type="radio" name={`dec:${r.id}`} value={v} defaultChecked={pick(r.suggest) === v} /><span className="px-2 text-[12px]">{l}</span></label>
                 ))}
               </div>
             </Row>
