@@ -48,7 +48,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
   parent: [
-    { href: "/parent", label: "My children", icon: "home" },
+    { href: "/parent", label: "My Child Today", icon: "home", also: ["/parent/details", "/parent/passport"] },
     { href: "/parent/tutor", label: "Homework tutor", icon: "chat" },
     { href: "/parent/progress", label: "Progress & practice", icon: "star" },
     { href: "/parent/exams", label: "Exams & report card", icon: "star" },
@@ -57,7 +57,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
-    { href: "/student", label: "Home", icon: "home" },
+    { href: "/student", label: "My Learning Space", icon: "home", also: ["/student/passport"] },
     { href: "/student/tutor", label: "Homework tutor", icon: "chat" },
     { href: "/student/progress", label: "My progress", icon: "star" },
     { href: "/student/exams", label: "My exams", icon: "star" },
@@ -86,7 +86,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <Nav items={NAV[me.role]} />
-        <div className="flex flex-wrap items-center gap-2 px-3">{(me.role === "parent" || me.role === "student") && <UrduSwitch />}<PushToggle /></div>
+        <div className="flex flex-wrap items-center gap-2 px-3">{(me.role === "parent" || me.role === "student") && <UrduSwitch urduFirst={me.role === "parent"} />}<PushToggle /></div>
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
           <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
             <Avatar name={me.full_name} url={me.avatar_url} size={40} />

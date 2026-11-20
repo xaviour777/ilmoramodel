@@ -6,6 +6,7 @@ import { pct, shortDate, todayPK } from "@/lib/format";
 import { mobilePK, whatsappLink } from "@/lib/messages";
 import { Tabs } from "@/components/tabs";
 import { addRemedial, endRemedial, noticeToSection } from "./actions";
+import { classExtraTabs } from "./extra-tabs";
 
 type Search = { section?: string; tab?: string; exam?: string; hw?: string; saved?: string; error?: string };
 type M = { exam_id: string; student_id: string; subject_id: string; obtained: number | null; is_absent: boolean };
@@ -53,7 +54,7 @@ export default async function TeacherClass({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="h1">My class</h1><p className="muted text-base">Gradebook, test analysis, remedial list and messages to parents.</p></div>
-        <Tabs current={tab} tabs={[["grades", "Gradebook"], ["analysis", "Test analysis"], ["remedial", "Remedial"], ["message", "Message parents"]].map(([id, label]) => ({ id, label, href: base({ tab: id }) }))} />
+        <Tabs current={tab} tabs={[...[["grades", "Gradebook"], ["analysis", "Test analysis"], ["remedial", "Remedial"], ["message", "Message parents"]].map(([id, label]) => ({ id, label, href: base({ tab: id }) })), ...classExtraTabs(sec.id)]} />
       </div>
       <div className="flex flex-wrap gap-2">{sections.map((s) => <Link key={s.id} href={`/teacher/class?section=${s.id}&tab=${tab}`} className="chip" style={s.id === sec.id ? { borderColor: "var(--blue-ring)", background: "var(--blue-soft)" } : undefined}>{s.label}</Link>)}</div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
