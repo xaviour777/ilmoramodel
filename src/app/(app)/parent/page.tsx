@@ -1,49 +1,38 @@
-import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
-import { ChildOverview } from "@/components/child-overview";
+import { ChildToday } from "@/components/child-today";
 import { NoticesList } from "@/components/notices-list";
 import { LiveRefresh } from "@/components/live-refresh";
-import { rupees, shortDate } from "@/lib/format";
+import { ChildSwitch, ParentTabs } from "@/components/family-tabs";
+import { familyUrdu, KID_SELECT, type Kid } from "@/lib/learning";
 
+// My Child Today: one screen a parent understands in 30 seconds.
 export default async function ParentHome({ searchParams }: { searchParams: Promise<{ child?: string }> }) {
   const me = await requireRole("parent");
   const sp = await searchParams;
+  const ur = await familyUrdu(me.role);
   const supabase = await createClient();
   const [{ data: kids }, { data: balances }, { data: invoice }] = await Promise.all([
-    supabase.from("students").select("id, full_name, section_id, sections(name, classes(name))").eq("status", "enrolled").order("full_name"),
+    supabase.from("students").select(KID_SELECT).eq("status", "enrolled").order("full_name"),
     supabase.from("family_balances").select("family_id, balance_paisa"),
     supabase.from("invoices").select("challan_no, due_on").order("billing_month", { ascending: false }).limit(1).maybeSingle(),
   ]);
-  type Kid = { id: string; full_name: string; section_id: string | null; sections: { name: string; classes: { name: string } } | null };
   const list = (kids ?? []) as unknown as Kid[];
   const child = list.find((k) => k.id === sp.child) ?? list[0];
   const due = (balances ?? []).reduce((t, b) => t + Number(b.balance_paisa), 0);
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone: "Asia/Karachi" }).format(new Date()));
+  const hi = ur ? (hour < 12 ? "صبح بخیر" : "السلام علیکم") : hour < 12 ? "Good morning" : "Assalam-o-Alaikum";
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="h1">Assalam-o-Alaikum, {me.full_name.split(" ")[0]}</h1><p className="muted text-base">{me.campus_name}</p></div>
+      <div className="flex flex-wrap items-end justify-between gap-3" dir={ur ? "rtl" : "ltr"}>
+        <div><h1 className="h1" lang={ur ? "ur" : "en"}>{hi}{ur ? "،" : ","} {me.full_name.split(" ")[0]}</h1>
+          <p className="muted text-base" lang={ur ? "ur" : "en"}>{ur ? "آئیں آج کا دن اچھا بنائیں۔" : "Let's make today count."} · {me.campus_name}</p></div>
         <LiveRefresh tables={["attendance", "homework", "notices", "payments"]} />
       </div>
-      <div className="flex flex-wrap gap-2">
-        {list.map((k) => (
-          <Link key={k.id} href={`/parent?child=${k.id}`} className="inline-flex min-h-11 items-center rounded-xl border-2 bg-white px-4 font-black"
-            style={k.id === child?.id ? { borderColor: "var(--blue-ring)", background: "var(--blue-soft)", color: "var(--blue-ink)" } : { borderColor: "var(--line)" }}>
-            {k.full_name.split(" ")[0]} · {k.sections ? `${k.sections.classes.name.replace("Class ", "")}-${k.sections.name}` : ""}
-          </Link>
-        ))}
-      </div>
-      <section className="card">
-        <div className="flex items-center justify-between"><h2 className="h2">Fees</h2><span className={`pill ${due > 0 ? "pill-orange" : "pill-green"}`}>{due > 0 ? "Due" : "All paid"}</span></div>
-        <div className="text-3xl font-black tabular-nums">{rupees(due)}</div>
-        {invoice && <div className="muted">Challan {invoice.challan_no} · due {shortDate(invoice.due_on)} · pay with JazzCash or Easypaisa, or in cash at the school counter</div>}
-        <div className="flex flex-wrap gap-2">
-          {due > 0 && <Link href="/parent/fees#pay" className="btn">Pay now</Link>}
-          <Link href="/parent/fees" className="btn-ghost">Fee record and receipts</Link>
-        </div>
-      </section>
-      {child ? <ChildOverview child={child} /> : <p className="muted">No children linked to your account yet. Please contact the school office.</p>}
+      <ParentTabs current="today" child={child?.id} ur={ur} />
+      <ChildSwitch kids={list} current={child?.id} path="/parent" />
+      {child ? <ChildToday kid={child} ur={ur} due={due} challan={invoice ?? null} /> : <p className="muted">No children linked to your account yet. Please contact the school office.</p>}
       <NoticesList />
     </>
   );
