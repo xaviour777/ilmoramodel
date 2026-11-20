@@ -14,6 +14,7 @@ const FEATURE_ROLES: Record<string, string[]> = {
   marks: ["teacher", "principal", "owner"],
   notice: ["principal", "owner"],
   quiz: ["teacher", "principal", "owner"],
+  ask: ["principal", "owner", "accountant"],
 };
 
 // Companies that speak the OpenAI chat format, and where.

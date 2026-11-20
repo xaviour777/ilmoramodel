@@ -6,8 +6,11 @@ import { getBranding } from "@/lib/branding";
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
+  // drivers sign in with their mobile number
+  const typed = String(formData.get("email") ?? "").trim();
+  const mobile = typed.replace(/[\s-]/g, "");
   const { data: auth, error } = await supabase.auth.signInWithPassword({
-    email: String(formData.get("email") ?? "").trim(),
+    email: /^03\d{9}$/.test(mobile) ? `${mobile}@phone.ilmora.pk` : typed,
     password: String(formData.get("password") ?? "").trim(),
   });
   if (error) redirect("/login?error=" + encodeURIComponent(error.message));

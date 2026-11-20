@@ -10,7 +10,7 @@ import { allRows, queueForFamilies, type FamilyContact } from "@/lib/outbox";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const office = () => requireRole("principal", "owner", "accountant");
-const STATUSES = ["enrolled", "left", "struck_off"];
+const STATUSES = ["enrolled", "left", "struck_off", "passed_out"];
 const CHANNELS = ["auto", "whatsapp", "sms"];
 
 // Adds a student straight away (no inquiry), joining the family that has the same phone, or a new one.
@@ -42,11 +42,12 @@ export async function saveStudent(f: FormData) {
   const supabase = await createClient();
   const id = str(f, "student_id");
   const back = `/principal/students/${id}`;
-  const status = STATUSES.includes(str(f, "status")) ? str(f, "status") : "enrolled";
+  // leaving and re-joining go through the "Leave / re-join" tab, so the date and reason are kept
+  const status = STATUSES.includes(str(f, "status")) ? { status: str(f, "status") } : {};
   const { error } = await supabase.from("students").update({
     full_name: str(f, "full_name"), roll_no: str(f, "roll_no") || null,
     gender: str(f, "gender") || null, date_of_birth: str(f, "date_of_birth") || null,
-    section_id: str(f, "section_id") || null, status,
+    section_id: str(f, "section_id") || null, ...status,
   }).eq("id", id);
   if (error) redirect(`${back}?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/principal/students");
