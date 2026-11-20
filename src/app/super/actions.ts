@@ -59,3 +59,14 @@ export async function setPassword(f: FormData) {
   if (error) fail(`/super/${id}`, error.message);
   redirect(`/super/${id}?saved=password`);
 }
+
+// Premium modules (e.g. WhatsApp automation) per school.
+export async function setModule(f: FormData) {
+  await requireSuper();
+  const supabase = await createClient();
+  const id = str(f, "school_id");
+  const { error } = await supabase.rpc("super_set_module", { p_school: id, p_module: str(f, "module"), p_on: str(f, "on") === "1" });
+  if (error) fail(`/super/${id}`, error.message);
+  revalidatePath(`/super/${id}`);
+  redirect(`/super/${id}?saved=1`);
+}

@@ -1,4 +1,4 @@
--- Security checks for the school website (20261121000001). Run on a LOCAL Postgres only, never on live:
+-- Security checks for the school website (20261124000001). Run on a LOCAL Postgres only, never on live:
 -- local_shim.sql, then every migration, supabase/seed.sql, demo_users.sql (with session_replication_role = replica), then this file.
 -- Each line prints ok = t or a NOTICE "ok: ..."; any ERROR is a failure.
 \set ON_ERROR_STOP 1

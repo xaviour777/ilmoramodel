@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   // the school's public website (each page shows nothing on an address with no website)
   const isSite = SITE_PATHS.has(path) || path.startsWith("/admissions/") || path === "/site-preview" || path === "/sitemap.xml" || path === "/robots.txt";
-  const isLogin = isSite || path.startsWith("/login") || path === "/results" || path.startsWith("/results/") || path.startsWith("/verify/") || path.startsWith("/api/cron/") || path.startsWith("/api/pay/") || path === "/manifest.webmanifest" || path.endsWith(".png") || path === "/sw.js" || path.startsWith("/icon");
+  const isLogin = isSite || path.startsWith("/login") || path === "/results" || path.startsWith("/results/") || path.startsWith("/verify/") || path.startsWith("/passport/") || path.startsWith("/api/cron/") || path.startsWith("/api/pay/") || path === "/manifest.webmanifest" || path.endsWith(".png") || path === "/sw.js" || path.startsWith("/icon");
   if (!user && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

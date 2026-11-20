@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { stateOf } from "@/lib/super";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Row, Empty } from "@/components/ilm";
-import { setPassword, setStatus, updateSchool } from "../actions";
+import { setModule, setPassword, setStatus, updateSchool } from "../actions";
 
 type Detail = {
   school: { id: string; name: string; city: string | null; custom_domain: string | null; logo_url: string | null; primary_color: string | null; support_email: string | null;
@@ -84,6 +84,16 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
               {s.status !== "suspended" && <form action={setStatus}><input type="hidden" name="school_id" value={s.id} /><input type="hidden" name="status" value="suspended" /><input type="hidden" name="label" value="suspended" />
                 <button className="btn-ghost" style={{ ...btn, color: "#b91c1c" }} type="submit">Suspend</button></form>}
             </div>
+          </div>
+
+          <div className="card flex flex-col gap-2.5">
+            <h2 className="h2">Premium modules</h2>
+            {(() => { const on = ((s as unknown as { modules?: string[] }).modules ?? []).includes("whatsapp"); return (
+              <form action={setModule} className="flex flex-wrap items-center justify-between gap-2">
+                <input type="hidden" name="school_id" value={s.id} /><input type="hidden" name="module" value="whatsapp" /><input type="hidden" name="on" value={on ? "0" : "1"} />
+                <div><b>WhatsApp automation</b><div className="muted text-[13px]">QR-linked numbers with rotation, and drag-and-drop auto flows.</div></div>
+                <button className={on ? "btn-ghost" : "btn"} style={btn} type="submit">{on ? "On · switch off" : "Switch on"}</button>
+              </form>); })()}
           </div>
 
           <div className="card">

@@ -8,7 +8,7 @@ export async function signIn(formData: FormData) {
   const supabase = await createClient();
   const { data: auth, error } = await supabase.auth.signInWithPassword({
     email: String(formData.get("email") ?? "").trim(),
-    password: String(formData.get("password") ?? ""),
+    password: String(formData.get("password") ?? "").trim(),
   });
   if (error) redirect("/login?error=" + encodeURIComponent(error.message));
   // the platform admin goes to the schools dashboard

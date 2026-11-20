@@ -126,7 +126,7 @@ grant execute on function public.school_branding(text) to anon, authenticated;
 
 -- ---------- Online admission enquiry ----------
 alter table public.admissions
-  add column if not exists source text not null default 'office' check (source in ('office', 'website')),
+  add column if not exists source text,  -- free text, shared with the owner's admissions sources; the website writes 'website'
   add column if not exists enquiry_ref text,
   add column if not exists visit_wanted_on date;
 create unique index if not exists admissions_enquiry_ref on public.admissions (enquiry_ref) where enquiry_ref is not null;
