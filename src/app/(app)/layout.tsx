@@ -10,6 +10,9 @@ import { PrincipalSidebar, PrincipalBottomBar } from "@/components/principal-nav
 import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
 import { getBranding } from "@/lib/branding";
+import { PlatformBanner } from "@/components/platform-banner";
+
+const STAFF: Role[] = ["principal", "owner", "accountant", "teacher"];
 
 const NAV: Record<Role, NavItem[]> = {
   principal: [
@@ -95,7 +98,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="mt-2 flex gap-3"><Link href="/profile" className="underline">My profile</Link><form action={signOut}><button className="underline" type="submit">Sign out</button></form></div>
         </div>
       </aside>
-      <main className="flex min-w-0 flex-1 flex-col gap-5">{children}</main>
+      <main className="flex min-w-0 flex-1 flex-col gap-5">{STAFF.includes(me.role) && <PlatformBanner />}{children}</main>
     </div>
   );
 }
@@ -140,7 +143,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
           <Link href="/profile" className="text-[#0369a1] hover:underline">My profile</Link>
           <form action={signOut}><button type="submit" className="cursor-pointer text-[#0369a1] hover:underline">Sign out</button></form>
         </div>
-        <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12">{children}</main>
+        <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12"><PlatformBanner />{children}</main>
       </div>
       <PrincipalBottomBar badges={badges} groups={owner ? OWNER_GROUPS : undefined} tabs={owner ? OWNER_TABS : undefined} />
     </div>
