@@ -16,6 +16,7 @@ export async function createSchool(f: FormData) {
   p.custom_domain = p.custom_domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase();
   const { data, error } = await supabase.rpc("super_create_school", { p });
   if (error) fail("/super/new", error.message);
+  if (f.get("owner_is_principal") === "1") await supabase.rpc("super_update_school", { p_school: data, p: { owner_is_principal: "true", _action: "owner is also the principal" } });
   revalidatePath("/super");
   redirect(`/super/${data}?saved=created`);
 }
@@ -138,4 +139,16 @@ export async function endAnnouncement(f: FormData) {
   if (error) fail("/super/announcements", error.message);
   revalidatePath("/", "layout");
   redirect("/super/announcements?saved=ended");
+}
+
+// Owner and principal: one person (one dashboard) or two people (separate logins).
+export async function setOwnerMode(f: FormData) {
+  await requireSuper();
+  const supabase = await createClient();
+  const id = str(f, "school_id");
+  const on = str(f, "on") === "1";
+  const { error } = await supabase.rpc("super_update_school", { p_school: id, p: { owner_is_principal: on ? "true" : "false", _action: on ? "owner is also the principal" : "owner and principal are separate" } });
+  if (error) fail(`/super/${id}`, error.message);
+  revalidatePath("/super", "layout");
+  redirect(`/super/${id}?saved=1`);
 }

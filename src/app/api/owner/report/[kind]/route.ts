@@ -5,7 +5,7 @@ import { buildReport } from "@/lib/owner-reports";
 // Excel download: the report as a CSV file (opens in Excel).
 export async function GET(req: Request, { params }: { params: Promise<{ kind: string }> }) {
   const me = await getMe();
-  if (me.role !== "owner") return NextResponse.json({ error: "Owner only" }, { status: 403 });
+  if (!me.is_owner) return NextResponse.json({ error: "Owner only" }, { status: 403 });
   const u = new URL(req.url);
   const r = await buildReport((await params).kind, { c: u.searchParams.get("c") ?? undefined, p: u.searchParams.get("p") ?? undefined });
   if (!r) return NextResponse.json({ error: "Unknown report" }, { status: 404 });

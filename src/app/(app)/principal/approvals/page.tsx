@@ -6,7 +6,7 @@ import { askApproval } from "@/app/(app)/owner/actions";
 const KIND: Record<string, string> = { expense: "Expense", concession: "Fee concession", hiring: "Hiring", payroll: "Payroll", fee_change: "Fee change", other: "Other" };
 const PILL: Record<string, string> = { pending: "pill-orange", approved: "pill-green", declined: "pill-gray" };
 
-// A principal or accounts asks the owner for anything above their limit.
+// A principal or accounts asks the director (owner) for anything above their limit.
 export default async function AskOwner({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
   const me = await requireRole("principal", "accountant", "owner");
   const sp = await searchParams;
@@ -18,8 +18,8 @@ export default async function AskOwner({ searchParams }: { searchParams: Promise
   const mine = (limits ?? []).filter((l) => l.role === (me.role === "accountant" ? "accountant" : "principal"));
   return (
     <>
-      <div><h1 className="h1">Ask the owner</h1><p className="muted text-base">Anything above your limit goes to the owner for a yes or no.</p></div>
-      {sp.error && <div className="notice-bad">{sp.error}</div>}{sp.saved && <div className="notice-ok">Sent to the owner.</div>}
+      <div><h1 className="h1">Director requests</h1><p className="muted text-base">Anything above your limit goes to the director for a yes or no.</p></div>
+      {sp.error && <div className="notice-bad">{sp.error}</div>}{sp.saved && <div className="notice-ok">Sent to the director.</div>}
       <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
         <form action={askApproval} className="card">
           <input type="hidden" name="back" value="/principal/approvals" /><input type="hidden" name="campus_id" value={me.campus_id} />
@@ -30,8 +30,8 @@ export default async function AskOwner({ searchParams }: { searchParams: Promise
             <label className="field">Amount (Rs)<input className="input" type="number" min={0} name="amount" /></label>
             <label className="flex items-end gap-2 pb-3 text-sm font-extrabold"><input type="checkbox" name="monthly" className="h-5 w-5" /> Every month</label>
           </div>
-          <button className="btn self-start" type="submit">Send to the owner</button>
-          {mine.length > 0 && <div className="muted text-xs">Your limits: {mine.map((l) => `${KIND[l.kind]} ${l.limit_paisa != null ? `up to ${rs(Number(l.limit_paisa))}` : l.note ?? "owner always"}`).join(" · ")}</div>}
+          <button className="btn self-start" type="submit">Send to the director</button>
+          {mine.length > 0 && <div className="muted text-xs">Your limits: {mine.map((l) => `${KIND[l.kind]} ${l.limit_paisa != null ? `up to ${rs(Number(l.limit_paisa))}` : l.note ?? "director always"}`).join(" · ")}</div>}
         </form>
         <section className="card">
           <h2 className="h2">Sent</h2>

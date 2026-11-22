@@ -39,6 +39,8 @@ export default async function NewSchool({ searchParams }: { searchParams: Promis
           </section>
           <section className="card flex flex-col gap-3">
             <h2 className="h2">Principal&apos;s login</h2>
+            <label className="flex items-start gap-2.5 text-[14px] font-bold"><input type="checkbox" name="owner_is_principal" value="1" defaultChecked className="mt-1 h-5 w-5" />
+              <span>The owner is also the principal<span className="muted block text-[12px] font-semibold">One dashboard with a Director section. Untick if the owner will have a separate login.</span></span></label>
             <label className="field">Full name<input className="input" name="principal_name" required /></label>
             <label className="field">Email<input className="input" name="principal_email" type="email" required /></label>
             <label className="field">Phone<input className="input" name="principal_phone" inputMode="tel" placeholder="03001234567" /></label>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { combinedGroups } from "./owner-nav";
 
 // Principal and owner menu: sidebar on desktop, bottom bar on phones
 // (design/Sidebar.dc.html and design/Mobile.dc.html).
@@ -33,8 +34,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
     { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
-    { id: "wa", href: "/whatsapp", label: "WhatsApp", tile: "t-g", icon: "notices" },
-    { id: "ask", href: "/principal/approvals", label: "Ask the owner", tile: "t-o", icon: "staff" },
+    { id: "ask", href: "/principal/approvals", label: "Director requests", tile: "t-o", icon: "check2" },
     { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
   ] },
   { label: "Academics", items: [
@@ -50,7 +50,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
   { label: "Money", items: [
     { id: "fees", href: "/accounts", label: "Fees", tile: "t-o", icon: "fees" },
     { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
-    { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile"] },
+    { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile", "/whatsapp"] },
   ] },
 ];
 
@@ -73,9 +73,10 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
 
 const fmt = (n: number) => (n > 999 ? "999+" : String(n));
 
-export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials, groups = PRINCIPAL_GROUPS }: {
-  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string; groups?: PGroup[];
+export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials, groups: given, combined }: {
+  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string; groups?: PGroup[]; combined?: boolean;
 }) {
+  const groups = given ?? (combined ? combinedGroups(PRINCIPAL_GROUPS) : PRINCIPAL_GROUPS);
   const cur = currentId(usePathname(), groups.flatMap((g) => g.items));
   return (
     <nav aria-label="Main" className="ilm-side">
@@ -111,7 +112,8 @@ export function PrincipalSidebar({ badges, school, logo, campus, year, name, rol
 
 const TABS = ["home", "classes", "exams", "staff"];
 
-export function PrincipalBottomBar({ badges, groups = PRINCIPAL_GROUPS, tabs = TABS }: { badges: Record<string, number>; groups?: PGroup[]; tabs?: string[] }) {
+export function PrincipalBottomBar({ badges, groups: given, tabs = TABS, combined }: { badges: Record<string, number>; groups?: PGroup[]; tabs?: string[]; combined?: boolean }) {
+  const groups = given ?? (combined ? combinedGroups(PRINCIPAL_GROUPS) : PRINCIPAL_GROUPS);
   const path = usePathname();
   const ALL = groups.flatMap((g) => g.items);
   const TABS = tabs;
