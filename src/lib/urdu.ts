@@ -1,7 +1,7 @@
 // Urdu for the family (parent and student) screens: exact phrases shown on screen.
 export const UR: Record<string, string> = {
   "My children": "میرے بچے", "My Child Today": "آج میرا بچہ", "My Learning Space": "میری سیکھنے کی جگہ", "Notices": "اعلانات", "No notices.": "کوئی اعلان نہیں۔", "Coming holidays": "آنے والی چھٹیاں", "Homework tutor": "ہوم ورک ٹیوٹر", "Progress & practice": "ترقی اور مشق", "Exams & report card": "امتحان اور رزلٹ کارڈ",
-  "Leave & meetings": "چھٹی اور ملاقات", "Complaints & ideas": "شکایت اور مشورہ", "Home": "ہوم", "My progress": "میری ترقی", "My exams": "میرے امتحان",
+  "Leave & meetings": "چھٹی اور ملاقات", "Book shop": "کتابیں اور یونیفارم", "Complaints & ideas": "شکایت اور مشورہ", "Home": "ہوم", "My progress": "میری ترقی", "My exams": "میرے امتحان",
   "Suggestions": "مشورے", "Fees": "فیس", "Sign out": "لاگ آؤٹ", "My profile": "میری پروفائل", "Parent": "والدین", "Student": "طالب علم",
   "To pay now": "ابھی ادا کریں", "Challans": "چالان", "Payments and receipts": "ادائیگیاں اور رسیدیں", "Pay by JazzCash or Easypaisa": "جاز کیش یا ایزی پیسہ سے ادا کریں",
   "Due": "واجب الادا", "All paid": "سب ادا ہو گیا", "Progress and practice": "ترقی اور مشق", "Exams": "امتحانات", "Leave and meetings": "چھٹی اور ملاقاتیں",

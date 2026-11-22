@@ -34,6 +34,7 @@ export function combinedGroups(principal: PGroup[]): PGroup[] {
   const approvals = { ...owner.find((i) => i.id === "o-approvals")!, label: "Approvals" };
   const director = owner.filter((i) => DIRECTOR_IDS.includes(i.id))
     .map((i) => (i.id === "o-home" ? { ...i, label: "Director overview" } : i.id === "o-settings" ? { ...i, label: "Director settings" } : i));
-  const [main, ...rest] = principal;
-  return [{ ...main, items: main.items.map((i) => (i.id === "ask" ? approvals : i)) }, { label: "Director", items: director }, ...rest];
+  const [main, academics, ...rest] = principal;
+  // daily work first: Academics, then the Director group
+  return [{ ...main, items: main.items.map((i) => (i.id === "ask" ? approvals : i)) }, academics, { label: "Director", items: director }, ...rest];
 }

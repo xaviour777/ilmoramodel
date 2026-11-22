@@ -29,6 +29,9 @@ const I: Record<string, string> = {
   pl: "M3 3v18h18M7 15l4-4 3 3 5-6",
   search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
   chev: "M9 6l6 6-6 6",
+  chat: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  van: "M3 6h11v10H3zM14 9h4l3 3v4h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  shop: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0",
   director: "M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.5 6.5 19.5l1-6.3L3 8.9 9 8z",
 };
 
@@ -53,8 +56,12 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
   ] },
   { label: "School", items: [
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
-    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
+    { id: "care", href: "/principal/care", label: "Complaints", tile: "t-y", icon: "chat" },
     { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
+  ] },
+  { label: "Services", items: [
+    { id: "vans", href: "/principal/transport", label: "Vans", tile: "t-b", icon: "van" },
+    { id: "shop", href: "/principal/shop", label: "Book shop", tile: "t-g", icon: "shop" },
   ] },
   { label: "_bottom", items: [
     { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile", "/whatsapp"] },

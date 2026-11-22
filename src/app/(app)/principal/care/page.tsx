@@ -7,11 +7,11 @@ import { buildBrief } from "@/lib/brief";
 import { Tabs } from "@/components/tabs";
 import { addObservation, assignVan, markTrip, replyFeedback, saveBrief, saveVan } from "./actions";
 
-type Search = { tab?: string; van?: string; saved?: string; error?: string };
+type Search = { tab?: string; van?: string; saved?: string; error?: string; only?: string };
 const STATUS: Record<string, string> = { open: "pill-orange", in_progress: "pill-blue", resolved: "pill-green" };
 const SCORES = [["planning", "Planning"], ["delivery", "Teaching"], ["engagement", "Class involvement"], ["discipline", "Discipline"]] as const;
 
-// Complaints box, teacher observations, transport and the morning brief.
+// Complaints box, teacher observations and the morning brief; /principal/transport shows the vans tab on its own.
 export default async function Care({ searchParams }: { searchParams: Promise<Search> }) {
   const me = await requireRole("principal", "owner");
   const sp = await searchParams;
@@ -103,7 +103,7 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
           <div className="tile"><span className="muted">Van fee / month</span><b>{rupees((vs ?? []).reduce((t, x) => t + Number((vans ?? []).find((v) => v.id === x.van_id)?.monthly_fee_paisa ?? 0), 0))}</b></div>
           <div className="tile"><span className="muted">Trips marked today</span><b>{(trips ?? []).length}</b></div>
         </div>
-        <div className="flex flex-wrap gap-2">{(vans ?? []).map((v) => <Link key={v.id} href={`/principal/care?tab=transport&van=${v.id}`} className={`pill ${v.id === van?.id ? "pill-blue" : "pill-gray"}`}>{v.name}</Link>)}</div>
+        <div className="flex flex-wrap gap-2">{(vans ?? []).map((v) => <Link key={v.id} href={`/principal/transport?tab=transport&van=${v.id}`} className={`pill ${v.id === van?.id ? "pill-blue" : "pill-gray"}`}>{v.name}</Link>)}</div>
         <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
           <form action={saveVan} className="card">
             <input type="hidden" name="id" value={van?.id ?? ""} />
@@ -117,7 +117,7 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
               <label className="field">Fee / month (Rs)<input className="input" type="number" name="fee" defaultValue={van ? van.monthly_fee_paisa / 100 : ""} /></label>
             </div>
             <label className="field">Route<input className="input" name="route" defaultValue={van?.route ?? ""} placeholder="Model Town → Faisal Town → School" /></label>
-            <div className="flex gap-2"><button className="btn" type="submit">Save</button>{van && <Link className="btn-ghost" href="/principal/care?tab=transport&van=new">New van</Link>}</div>
+            <div className="flex gap-2"><button className="btn" type="submit">Save</button>{van && <Link className="btn-ghost" href="/principal/transport?tab=transport&van=new">New van</Link>}</div>
           </form>
           {van && <section className="card">
             <h2 className="h2">{van.name} · {riders.length}{van.seats ? `/${van.seats}` : ""} students</h2>
@@ -177,8 +177,10 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="h1">School care</h1><p className="muted text-base">Complaints box, lesson observations, vans and your morning brief.</p></div>
-        <Tabs current={tab} tabs={[["feedback", "Complaints"], ["observe", "Observations"], ["transport", "Transport"], ["brief", "Morning brief"]].map(([id, label]) => ({ id, label, href: `/principal/care?tab=${id}` }))} />
+        {tab === "transport"
+          ? <div><h1 className="h1">Vans</h1><p className="muted text-base">Vans, drivers, routes, who rides where and today&apos;s trips.</p></div>
+          : <div><h1 className="h1">Complaints &amp; care</h1><p className="muted text-base">Complaints box, lesson observations and your morning brief.</p></div>}
+        {tab !== "transport" && <Tabs current={tab} tabs={[["feedback", "Complaints"], ["observe", "Observations"], ["brief", "Morning brief"]].map(([id, label]) => ({ id, label, href: `/principal/care?tab=${id}` }))} />}
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}

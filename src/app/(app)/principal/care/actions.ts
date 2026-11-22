@@ -10,8 +10,9 @@ import { requireRole } from "@/lib/me";
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const num = (f: FormData, k: string) => (str(f, k) ? Number(str(f, k)) : null);
 const go = (tab: string, error?: string): never => {
-  revalidatePath("/principal/care");
-  redirect(`/principal/care?tab=${tab}${error ? `&error=${encodeURIComponent(error)}` : "&saved=1"}`);
+  const base = tab === "transport" ? "/principal/transport" : "/principal/care";
+  revalidatePath(base);
+  redirect(`${base}?tab=${tab}${error ? `&error=${encodeURIComponent(error)}` : "&saved=1"}`);
 };
 
 export async function replyFeedback(f: FormData) {

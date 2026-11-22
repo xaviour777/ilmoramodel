@@ -57,6 +57,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/parent/exams", label: "Exams & report card", icon: "star" },
     { href: "/parent/board", label: "Board exam prep", icon: "book" },
     { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
+    { href: "/parent/shop", label: "Book shop", icon: "book" },
     { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
@@ -65,6 +66,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/student/progress", label: "My progress", icon: "star" },
     { href: "/student/exams", label: "My exams", icon: "star" },
     { href: "/student/board", label: "Board exam prep", icon: "book" },
+    { href: "/student/shop", label: "Book shop", icon: "book" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
 };
