@@ -44,6 +44,8 @@ The rules live in `supabase/migrations/`.
    13. `supabase/seed.sql` (dummy school: 6 sections, 8 staff, 29 families, 42 students, 4 weeks of attendance, homework, exams and fees)
    14. optional: `supabase/seed_journey.sql` (adds Class 5 to 7 and a full Class 9 of 200 for board registration, and Ali Raza's story from admission into Class 9 to Class 10; runs once)
    15. optional: `supabase/seed_model_school.sql` (renames the school to Model School and the principal to Dr Saim, gives Play group and Class 1 to 4 a class teacher, subjects and 25 students each, tops Class 8 and 10 up to 25; runs once)
+   16. `supabase/migrations/20261126000001_syllabus_roadmap.sql` (whole-year syllabus: the book as one lesson per period, done vs. planned, road to the final for families)
+   17. optional: `supabase/seed_syllabus_demo.sql` (a whole-year syllabus for every class and subject with a teacher, some classes behind, and the Mid-term half-way through marks entry; safe to re-run)
 
 With the Supabase CLI instead: `supabase link --project-ref <ref>` then `supabase db push` and `supabase db reset --linked` (careful: reset wipes the database).
 
