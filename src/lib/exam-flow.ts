@@ -31,3 +31,25 @@ export function positions<T extends { total: number }>(rows: T[]) {
 
 export const ordinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 export const dayLabel = (d: string) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+
+// Rough minutes for each exam job, done by hand vs. in Ilmora. Shown as an estimate, with the
+// assumptions next to it, so a principal can see where the time goes.
+export const TIME_MODEL = [
+  { id: "sheet", job: "Date sheet", unit: "once", byHand: 90, ilmora: 2, how: "typed, checked for clashes and holidays, photocopied" },
+  { id: "papers", job: "Question papers", unit: "paper", byHand: 120, ilmora: 15, how: "set, typed and proofread per subject per class; AI draft + teacher check" },
+  { id: "print", job: "Admit cards and roll slips", unit: "student", byHand: 1, ilmora: 0.05, how: "written or typed one by one" },
+  { id: "check", job: "MCQ checking", unit: "answer sheet", byHand: 1.5, ilmora: 0.2, how: "ticked by hand vs. phone scan" },
+  { id: "marks", job: "Marks register and totals", unit: "answer sheet", byHand: 1, ilmora: 0.3, how: "award list → register → calculator" },
+  { id: "result", job: "Result cards and positions", unit: "student", byHand: 5, ilmora: 0.2, how: "totals, %, grade, position, card written" },
+  { id: "parents", job: "Telling parents", unit: "family", byHand: 3, ilmora: 0, how: "calls, diary notes, PTM queue" },
+] as const;
+
+export function timeSaved(n: { papers: number; students: number; sheets: number; families: number }) {
+  const qty = { sheet: 1, papers: n.papers, print: n.students, check: n.sheets, marks: n.sheets, result: n.students, parents: n.families };
+  const rows = TIME_MODEL.map((t) => ({ ...t, qty: qty[t.id], hand: t.byHand * qty[t.id], app: t.ilmora * qty[t.id] }));
+  const hand = rows.reduce((s, r) => s + r.hand, 0);
+  const app = rows.reduce((s, r) => s + r.app, 0);
+  return { rows, hand, app, saved: hand - app };
+}
+
+export const hours = (min: number) => (min < 60 ? `${Math.round(min)} min` : `${(min / 60).toFixed(min < 600 ? 1 : 0)} hrs`);

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchAll } from "@/lib/fetch-all";
 import { pct, shortDate, time, todayPK } from "@/lib/format";
 import { Empty } from "@/components/ilm";
-import { dayLabel, positions } from "@/lib/exam-flow";
+import { dayLabel, hours, positions, timeSaved } from "@/lib/exam-flow";
 import { addPaper, addStandardClasses, createExam, setExamStatus } from "../actions";
 import { autoDateSheet, remindLateTeachers, sendDateSheet, sendResults } from "./actions";
 
@@ -22,7 +22,7 @@ const TEMPLATES = [
 const STEPS = [
   { id: "setup", n: 1, label: "Make the exam" },
   { id: "sheet", n: 2, label: "Date sheet" },
-  { id: "day", n: 3, label: "Exam days" },
+  { id: "day", n: 3, label: "Papers & exam days" },
   { id: "marks", n: 4, label: "Marks" },
   { id: "result", n: 5, label: "Result" },
 ] as const;
@@ -50,7 +50,7 @@ export async function ExamFlow({ sp }: { sp: FlowSearch }) {
   ]);
   const term = (terms ?? []).find((t) => t.id === sp.term) ?? (terms ?? []).find((t) => t.starts_on <= today && t.ends_on >= today) ?? (terms ?? [])[0];
   const { data: exams } = term
-    ? await supabase.from("exams").select("id, name, kind, starts_on, ends_on, total_marks, weight_percent, status, exam_sections(section_id)").eq("term_id", term.id).order("starts_on", { nullsFirst: false })
+    ? await supabase.from("exams").select("id, name, kind, starts_on, ends_on, total_marks, weight_percent, status, created_at, exam_sections(section_id)").eq("term_id", term.id).order("starts_on", { nullsFirst: false })
     : { data: [] };
   const list = exams ?? [];
   const creating = sp.new === "1" || !list.length;
@@ -157,7 +157,7 @@ function CreateCard({ termId, tpl, classes, scales, base, today }: {
   );
 }
 
-type Exam = { id: string; name: string; kind: string; starts_on: string | null; ends_on: string | null; total_marks: number; weight_percent: number; status: string; exam_sections: { section_id: string }[] };
+type Exam = { id: string; name: string; kind: string; starts_on: string | null; ends_on: string | null; total_marks: number; weight_percent: number; status: string; created_at: string; exam_sections: { section_id: string }[] };
 
 async function Steps({ exam, termId, step, base, today }: { exam: Exam; termId: string; step?: string; base: (o: Record<string, string | undefined>) => string; today: string }) {
   const supabase = await createClient();
@@ -167,15 +167,16 @@ async function Steps({ exam, termId, step, base, today }: { exam: Exam; termId: 
   type P = { id: string; class_id: string; subject_id: string; paper_date: string; starts_at: string | null; ends_at: string | null; subjects: { name: string } };
   type SS = { section_id: string; subject_id: string; teacher_id: string | null; subjects: { name: string }; profiles: { full_name: string; phone: string | null } | null };
   type M = { subject_id: string; student_id: string; obtained: number | null; is_absent: boolean };
-  type Kid = { id: string; full_name: string; section_id: string };
+  type Kid = { id: string; full_name: string; section_id: string; family_id: string };
   const [{ data: secData }, { data: paperData }, { data: ssData }, marks, kids, { count: owing }] = await Promise.all([
     supabase.from("sections").select("id, name, class_id, classes(name, sort)").in("id", ids),
     supabase.from("exam_papers").select("id, class_id, subject_id, paper_date, starts_at, ends_at, subjects(name)").eq("exam_id", exam.id).order("paper_date"),
     supabase.from("section_subjects").select("section_id, subject_id, teacher_id, subjects(name), profiles(full_name, phone)").in("section_id", ids),
     fetchAll<M>((a, b) => supabase.from("marks").select("subject_id, student_id, obtained, is_absent").eq("exam_id", exam.id).order("id").range(a, b) as unknown as PromiseLike<{ data: M[] | null; error: unknown }>),
-    fetchAll<Kid>((a, b) => supabase.from("students").select("id, full_name, section_id").eq("status", "enrolled").in("section_id", ids).order("id").range(a, b) as unknown as PromiseLike<{ data: Kid[] | null; error: unknown }>),
+    fetchAll<Kid>((a, b) => supabase.from("students").select("id, full_name, section_id, family_id").eq("status", "enrolled").in("section_id", ids).order("id").range(a, b) as unknown as PromiseLike<{ data: Kid[] | null; error: unknown }>),
     supabase.from("family_balances").select("family_id", { count: "exact", head: true }).gt("balance_paisa", 0),
   ]);
+  const { data: made } = await supabase.from("question_papers").select("id, class_id, subject_id").gte("created_at", exam.created_at);
   const secs = ((secData ?? []) as unknown as Sec[]).sort((a, b) => a.classes.sort - b.classes.sort || a.name.localeCompare(b.name));
   const papers = (paperData ?? []) as unknown as P[];
   const ss = (ssData ?? []) as unknown as SS[];
@@ -291,6 +292,7 @@ async function Steps({ exam, termId, step, base, today }: { exam: Exam; termId: 
 
       {current === "day" && (
         <div className="flex flex-col gap-3">
+          <QuestionPapers papers={papers} made={made ?? []} classes={classes} examName={exam.name} />
           <p className="font-bold">{exam.starts_on && exam.starts_on > today ? `Exams start ${dayLabel(exam.starts_on)}. Print these a day before.` : "Everything for the exam hall."}</p>
           <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
             {[["admit", "Admit cards", `Fee defaulters (${owing ?? 0} families) are held back`], ["admit&allow=1", "Admit cards for all", "Ignores fees"], ["slips", "Roll number slips", "For desks"], ["attendance", "Attendance sheets", "Students sign per paper"], ["labels", "Answer-sheet labels", "Name and roll no"]].map(([t, l, d]) => (
@@ -350,6 +352,7 @@ async function Steps({ exam, termId, step, base, today }: { exam: Exam; termId: 
       ) : (
         <ResultPanel exam={exam} secs={secs} kids={kids} marks={marks} hidden={hidden} />
       ))}
+      <TimeSaved papers={papers.length} students={kids.length} sheets={need || kids.length * new Set(papers.map((p) => p.subject_id)).size} families={new Set(kids.map((k) => k.family_id)).size} />
     </section>
   );
 }
@@ -465,5 +468,70 @@ async function ResultPanel({ exam, secs, kids, marks, hidden }: {
         <Link href="#report-cards" className="btn-ghost">Report cards</Link>
       </div>
     </div>
+  );
+}
+
+// Each paper on the date sheet: is its question paper ready? One tap to make it with AI.
+function QuestionPapers({ papers, made, classes, examName }: {
+  papers: { class_id: string; subject_id: string; paper_date: string; subjects: { name: string } }[]; made: { id: string; class_id: string; subject_id: string }[];
+  classes: { id: string; name: string }[]; examName: string;
+}) {
+  if (!papers.length) return null;
+  const ready = new Map(made.map((m) => [`${m.class_id}|${m.subject_id}`, m.id]));
+  const done = papers.filter((p) => ready.has(`${p.class_id}|${p.subject_id}`)).length;
+  const cname = new Map(classes.map((c) => [c.id, c.name]));
+  return (
+    <div className="rounded-[14px] border-2 border-[#ddd6fe] bg-[#faf5ff] p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="font-black">Question papers · {done} of {papers.length} ready</div>
+        <span className="muted text-[12px]">✨ AI writes a board-style paper in about a minute; the teacher checks it.</span>
+      </div>
+      <div className="mt-2 grid gap-1.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
+        {papers.map((p) => {
+          const id = ready.get(`${p.class_id}|${p.subject_id}`);
+          const label = `${p.subjects.name} · ${(cname.get(p.class_id) ?? "").replace("Class ", "")}`;
+          return id ? (
+            <Link key={p.class_id + p.subject_id} href={`/teacher/paper-check/papers/${id}`} className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-2 text-[13px] font-bold">
+              <span className="text-[#16a34a]">✓</span><span className="flex-1 truncate">{label}</span><span className="muted text-[11px]">open</span>
+            </Link>
+          ) : (
+            <Link key={p.class_id + p.subject_id} href={`/teacher/paper-check/papers?class=${p.class_id}&subject=${p.subject_id}&title=${encodeURIComponent(`${examName} · ${label}`)}`}
+              className="flex items-center gap-2 rounded-xl border-2 border-dashed border-[#c4b5fd] bg-white px-2.5 py-2 text-[13px] font-bold">
+              <span>✨</span><span className="flex-1 truncate">{label}</span><span className="text-[11px] text-[#6d28d9]">make</span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// What this exam would take by hand vs. in Ilmora, worked out from its own numbers.
+function TimeSaved(n: { papers: number; students: number; sheets: number; families: number }) {
+  const t = timeSaved(n);
+  if (!n.students) return null;
+  return (
+    <details className="rounded-[14px] border-2 border-[#bbf7d0] bg-[#f0fdf4] p-3">
+      <summary className="cursor-pointer list-none">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span className="text-[22px] font-black text-[#15803d]">⏱ {hours(t.saved)} saved</span>
+          <span className="text-[13px] font-bold">By hand about {hours(t.hand)} · with Ilmora about {hours(t.app)}</span>
+          <span className="muted text-[12px]">≈ {Math.round(t.saved / 60 / 6)} teacher-days · tap for details</span>
+        </div>
+      </summary>
+      <div className="tbl mt-2 overflow-x-auto"><table className="w-full text-[13px]">
+        <thead><tr><th className="text-left">Job</th><th className="text-left">How many</th><th className="text-right">By hand</th><th className="text-right">Ilmora</th><th className="text-right">Saved</th></tr></thead>
+        <tbody>{t.rows.map((r) => (
+          <tr key={r.id}>
+            <td><b>{r.job}</b><div className="muted text-[11px]">{r.how}</div></td>
+            <td className="tabular-nums">{r.qty} {r.unit}{r.qty === 1 || r.unit === "once" ? "" : "s"}</td>
+            <td className="text-right tabular-nums">{hours(r.hand)}</td>
+            <td className="text-right tabular-nums">{hours(r.app)}</td>
+            <td className="text-right font-black text-[#15803d] tabular-nums">{hours(r.hand - r.app)}</td>
+          </tr>
+        ))}</tbody>
+      </table></div>
+      <p className="muted mt-1 text-[11px]">An estimate from {n.papers} papers, {n.students} students and {n.families} families in this exam, with typical minutes for each job in a Pakistani school. Real time depends on your staff.</p>
+    </details>
   );
 }
