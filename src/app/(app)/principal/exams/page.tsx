@@ -1,30 +1,15 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
-import { pct, shortDate, time, todayPK } from "@/lib/format";
+import { pct } from "@/lib/format";
 import { PageHead, Stats, Stat, Chips, Insight, Empty, Bar, Bars, Row } from "@/components/ilm";
 import { UnderTabs } from "@/components/classes-tabs";
 import { fetchAll } from "@/lib/fetch-all";
 import { BoardTarget, ExamDayTab, ExamGapsTab, MarksLogTab } from "./day";
+import { ExamFlow } from "./flow";
 import { PrintButton } from "@/app/print/paper-check/[id]/print-button";
-import { addPaper, addStandardClasses, createExam, setExamStatus } from "../actions";
 
-type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string; q?: string };
-const KIND: Record<string, string> = { class_test: "Class test", monthly: "Monthly test", term: "Term exam", sendup: "Send-up", final: "Final", other: "Other" };
-// Ideas for the name box; the principal can type any name instead.
-const NAME_IDEAS = ["Weekly test", "Monthly test · November", "December test", "Mid-term exam", "Pre-board test", "Send-up exam", "Final exam", "Surprise quiz", "Chapter 3 test", "Summer homework test"];
-const STATUS: Record<string, [string, string, string]> = {
-  draft: ["Draft", "pill-gray", "var(--line)"],
-  date_sheet: ["Date sheet out", "pill-blue", "var(--blue)"],
-  marks_entry: ["Marks entry", "pill-orange", "var(--orange)"],
-  results: ["Results out", "pill-green", "var(--green)"],
-};
-const NEXT: Record<string, [string, string] | undefined> = {
-  draft: ["date_sheet", "Publish date sheet"],
-  date_sheet: ["marks_entry", "Open marks entry"],
-  marks_entry: ["results", "Publish results and lock marks"],
-};
-
+type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string; q?: string; step?: string; tpl?: string; new?: string };
 export default async function ExamsPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
@@ -34,10 +19,10 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
     <>
       <PageHead kick="School · Exams" title="Exams, results and board prep" sub="Plan every test, see who is slipping, and lift Class 9–12 board marks with a clear plan.">
         <Link href={q({ tab: "plan" }) + "#report-cards"} className="btn-ghost">Report cards</Link>
-        <Link href={q({ tab: "plan" }) + "#create"} className="btn">Create test or exam</Link>
+        <Link href="/principal/exams?new=1#create" className="btn">New exam</Link>
       </PageHead>
       <UnderTabs current={tab} tabs={[
-        { id: "plan", label: "Plan & marks entry", href: q({ tab: "plan" }) },
+        { id: "plan", label: "Exam steps", href: q({ tab: "plan" }) },
         { id: "results", label: "Results & reports", href: q({ tab: "results" }) },
         { id: "board", label: "BISE board prep · 9–12", href: q({ tab: "board" }) },
         { id: "day", label: "Exam day", href: q({ tab: "day" }) },
@@ -45,210 +30,13 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
         { id: "log", label: "Marks log", href: q({ tab: "log" }) },
       ]} />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
-      {sp.saved && <div className="notice-ok">Saved.</div>}
-      {tab === "plan" && <PlanTab sp={sp} />}
+      {sp.saved && tab !== "plan" && <div className="notice-ok">Saved.</div>}
+      {tab === "plan" && <ExamFlow sp={sp} />}
       {tab === "results" && <ResultsTab sp={sp} />}
       {tab === "board" && <BoardTab sp={sp} />}
       {tab === "day" && <ExamDayTab date={sp.date} roomId={sp.room} />}
       {tab === "gaps" && <ExamGapsTab />}
       {tab === "log" && <MarksLogTab q={sp.q} />}
-    </>
-  );
-}
-
-async function PlanTab({ sp }: { sp: Search }) {
-  const supabase = await createClient();
-  const today = todayPK();
-  const [{ data: terms }, { data: classes }, { data: subjects }, { data: scales }, { data: staff }, { data: sectionList }] = await Promise.all([
-    supabase.from("terms").select("id, name, starts_on, ends_on, exams(id, status), academic_sessions!inner(is_current)").eq("academic_sessions.is_current", true).order("sort"),
-    supabase.from("classes").select("id, name").order("sort"),
-    supabase.from("subjects").select("id, name").order("name"),
-    supabase.from("grading_scales").select("id, name"),
-    supabase.from("profiles").select("id, full_name").in("role", ["teacher", "principal"]).order("full_name"),
-    supabase.from("sections").select("id, name, classes(name, sort)"),
-  ]);
-  const term = (terms ?? []).find((t) => t.id === sp.term)
-    ?? (terms ?? []).find((t) => t.starts_on <= today && t.ends_on >= today) ?? (terms ?? [])[0];
-  const { data: exams } = term
-    ? await supabase.from("exams").select("id, name, kind, starts_on, ends_on, total_marks, weight_percent, status, exam_sections(section_id)").eq("term_id", term.id).order("starts_on")
-    : { data: [] };
-  const exam = (exams ?? []).find((e) => e.id === sp.exam) ?? (exams ?? []).find((e) => e.status === "marks_entry") ?? (exams ?? [])[0];
-
-  // how far teachers are with marks: entered marks vs students × subjects in the exam's sections
-  const progress = new Map<string, number>();
-  for (const e of exams ?? []) {
-    const secIds = e.exam_sections.map((s: { section_id: string }) => s.section_id);
-    const [{ count: studs }, { count: entered }] = await Promise.all([
-      supabase.from("students").select("id", { count: "exact", head: true }).in("section_id", secIds.length ? secIds : ["00000000-0000-0000-0000-000000000000"]).eq("status", "enrolled"),
-      supabase.from("marks").select("id", { count: "exact", head: true }).eq("exam_id", e.id),
-    ]);
-    const expected = (studs ?? 0) * (subjects?.length ?? 1);
-    progress.set(e.id, expected ? Math.min(1, (entered ?? 0) / expected) : 0);
-  }
-  // marks entry by subject teacher for the chosen exam
-  const secIds: string[] = exam ? exam.exam_sections.map((x: { section_id: string }) => x.section_id) : [];
-  const [{ data: papers }, { data: teach }, { data: entered }, { data: studs }] = exam
-    ? await Promise.all([
-      supabase.from("exam_papers").select("id, paper_date, starts_at, ends_at, classes(name, sort), subjects(name), profiles(full_name)").eq("exam_id", exam.id).order("paper_date"),
-      supabase.from("section_subjects").select("section_id, subject_id, teacher_id, subjects(name), profiles(full_name), sections(name, classes(name))").in("section_id", secIds.length ? secIds : ["00000000-0000-0000-0000-000000000000"]),
-      supabase.from("marks").select("subject_id, students(section_id)").eq("exam_id", exam.id),
-      supabase.from("students").select("section_id").eq("status", "enrolled").in("section_id", secIds.length ? secIds : ["00000000-0000-0000-0000-000000000000"]),
-    ])
-    : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
-  type Paper = { id: string; paper_date: string; starts_at: string | null; ends_at: string | null; classes: { name: string; sort: number }; subjects: { name: string }; profiles: { full_name: string } | null };
-  type T = { section_id: string; subject_id: string; teacher_id: string | null; subjects: { name: string }; profiles: { full_name: string } | null; sections: { name: string; classes: { name: string } } };
-  const size = new Map<string, number>();
-  for (const st of studs ?? []) size.set(st.section_id, (size.get(st.section_id) ?? 0) + 1);
-  const done = new Map<string, number>();
-  for (const m of (entered ?? []) as unknown as { subject_id: string; students: { section_id: string } | null }[]) {
-    const k = `${m.students?.section_id}-${m.subject_id}`; done.set(k, (done.get(k) ?? 0) + 1);
-  }
-  const byTeacher = new Map<string, { name: string; parts: string[]; need: number; got: number }>();
-  for (const t of (teach ?? []) as unknown as T[]) {
-    const key = t.teacher_id ?? "none";
-    const cur = byTeacher.get(key) ?? { name: t.profiles?.full_name ?? "No teacher", parts: [], need: 0, got: 0 };
-    cur.parts.push(`${t.subjects.name} ${t.sections.classes.name.replace("Class ", "")}-${t.sections.name}`);
-    cur.need += size.get(t.section_id) ?? 0; cur.got += Math.min(size.get(t.section_id) ?? 0, done.get(`${t.section_id}-${t.subject_id}`) ?? 0);
-    byTeacher.set(key, cur);
-  }
-  const teacherRows = [...byTeacher.values()].sort((a, b) => a.got / Math.max(1, a.need) - b.got / Math.max(1, b.need));
-  const late = exam?.ends_on && exam.ends_on < today;
-
-  return (
-    <>
-      <ol className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }} aria-label="Terms">
-        {(terms ?? []).map((t) => {
-          const tag = t.ends_on < today ? ["Done", "g"] : t.starts_on <= today ? ["Now", "b"] : ["Later", ""];
-          return (
-            <li key={t.id}>
-              <Link href={`/principal/exams?term=${t.id}`} className={`card flex flex-col gap-1 ${t.id === term?.id ? "!border-[#7dd3fc] !bg-[#f0f9ff] !shadow-[0_4px_0_#7dd3fc]" : ""}`}>
-                <span className={`tagx ${tag[1]} self-start`}>{tag[0]}</span>
-                <span className="text-[17px] font-black">{t.name}</span>
-                <span className="muted text-[12px]">{shortDate(t.starts_on)} – {shortDate(t.ends_on)} · {t.exams.length} test{t.exams.length === 1 ? "" : "s"}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
-      {(terms ?? []).length === 0 && <Empty>No terms in the current session. Add them in Settings → Session.</Empty>}
-
-      <section className="flex flex-wrap items-start gap-5">
-        <div className="card flex min-w-0 flex-[3_1_480px] flex-col gap-2">
-          <h2 className="h2">Marks entry{exam ? ` · ${exam.name}` : ""}</h2>
-          {exam ? <p className="muted text-[13px]">{KIND[exam.kind]} · {exam.exam_sections.length} sections · out of {exam.total_marks} · {STATUS[exam.status][0]}. Marks lock when you publish results.</p>
-            : <Empty>Nothing planned in this term yet. Create a test below.</Empty>}
-          {exam && teacherRows.map((t) => {
-            const r = t.need ? t.got / t.need : 0;
-            return (
-              <Row key={t.name + t.parts[0]}>
-                <span className="min-w-[180px] flex-[1_1_220px] text-[14px] font-bold"><b className="font-black">{t.name}</b> · {t.parts.join(", ")}</span>
-                <div className="min-w-[100px] flex-1"><Bar value={r} color={r >= 1 ? "#16a34a" : r > 0 ? "#0284c7" : "#e5e7eb"} /></div>
-                <span className={`tagx ${r >= 1 ? "g" : late ? "r" : r > 0 ? "b" : "y"}`}>{r >= 1 ? "Done" : r > 0 ? pct(r) : late ? "Late" : "Not started"}</span>
-              </Row>
-            );
-          })}
-          {exam && teacherRows.length === 0 && <p className="muted text-[13px]">No subject teachers are set for these sections, so marks can&apos;t be tracked by teacher. Overall: {pct(progress.get(exam.id) ?? 0)} entered.</p>}
-
-          <div className="kick mt-3">All tests in {term?.name}</div>
-          {(exams ?? []).map((e) => {
-            const st = STATUS[e.status]; const pr = progress.get(e.id) ?? 0; const next = NEXT[e.status];
-            return (
-              <Row key={e.id}>
-                <Link href={`/principal/exams?term=${term!.id}&exam=${e.id}`} className="min-w-0 flex-[1_1_220px]">
-                  <div className={`font-black ${e.id === exam?.id ? "text-[#0369a1]" : ""}`}>{e.name}</div>
-                  <div className="muted text-[12px]">{KIND[e.kind]} · {e.starts_on ? `${shortDate(e.starts_on)} – ${shortDate(e.ends_on ?? e.starts_on)}` : "No dates"} · counts {Number(e.weight_percent)}% · {pct(pr)} marks in</div>
-                </Link>
-                <span className={`tagx ${{ draft: "", date_sheet: "b", marks_entry: "y", results: "g" }[e.status as string]}`}>{st[0]}</span>
-                {next && (
-                  <form action={setExamStatus}>
-                    <input type="hidden" name="exam_id" value={e.id} /><input type="hidden" name="term_id" value={term!.id} /><input type="hidden" name="status" value={next[0]} />
-                    <button className={next[0] === "results" ? "btn" : "btn-ghost"} style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }} type="submit">{next[1]}</button>
-                  </form>
-                )}
-              </Row>
-            );
-          })}
-          <div className="mt-2 flex flex-wrap gap-2.5">
-            <Link href="/teacher/paper-check" className="btn-ghost">Check with AI paper checking</Link>
-            <Link href="/principal/exams?tab=results" className="btn-ghost">See results</Link>
-          </div>
-        </div>
-
-        <div className="card flex min-w-0 flex-[2_1_320px] flex-col gap-2">
-          <h2 className="h2">Date sheet</h2>
-          {exam && ((papers ?? []) as unknown as Paper[]).map((p) => (
-            <Row key={p.id}>
-              <span className="w-[72px] font-black tabular-nums">{shortDate(p.paper_date)}</span>
-              <span className="flex-1 font-bold">{p.subjects.name} · {p.classes.name}</span>
-              <span className="muted text-[12px]">{time(p.starts_at)}{p.ends_at ? `–${time(p.ends_at)}` : ""}{p.profiles ? ` · ${p.profiles.full_name}` : ""}</span>
-            </Row>
-          ))}
-          {exam && (papers ?? []).length === 0 && <Empty>No papers on the date sheet yet.</Empty>}
-          {exam && (
-            <form action={addPaper} className="mt-2 grid grid-cols-2 items-end gap-2">
-              <input type="hidden" name="exam_id" value={exam.id} /><input type="hidden" name="term_id" value={term!.id} />
-              <label className="field">Class<select className="input" name="class_id">{(classes ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-              <label className="field">Subject<select className="input" name="subject_id">{(subjects ?? []).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
-              <label className="field">Date<input className="input" type="date" name="paper_date" required /></label>
-              <label className="field">Invigilator<select className="input" name="invigilator_id"><option value="">None</option>{(staff ?? []).map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}</select></label>
-              <label className="field">Starts<input className="input" type="time" name="starts_at" defaultValue="08:30" /></label>
-              <label className="field">Ends<input className="input" type="time" name="ends_at" defaultValue="11:00" /></label>
-              <button className="btn col-span-2" type="submit">Add paper</button>
-            </form>
-          )}
-          <p className="muted text-[12px]">One paper per class and subject; adding it again moves it.</p>
-        </div>
-      </section>
-
-      <section className="flex flex-wrap items-start gap-5">
-        <form id="create" action={createExam} className="card flex min-w-0 flex-[3_1_480px] scroll-mt-6 flex-col gap-3">
-          <h2 className="h2">Create a test or exam</h2>
-          <input type="hidden" name="term_id" value={term?.id ?? ""} /><input type="hidden" name="back" value="exams" />
-          <label className="field">Name (write any name you like)
-            <input className="input" name="name" required list="exam-name-ideas" placeholder="December test, Pre-board, Chapter 3 quiz" />
-            <datalist id="exam-name-ideas">{NAME_IDEAS.map((n) => <option key={n} value={n} />)}</datalist>
-          </label>
-          <label className="field">Kind (for the report card)
-            <select className="input" name="kind">{Object.entries(KIND).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-          </label>
-          <fieldset className="field">
-            <legend className="mb-1.5">Classes</legend>
-            <div className="flex flex-wrap gap-2">
-              {(classes ?? []).map((c) => (
-                <label key={c.id} className="flex items-center gap-1.5 rounded-xl border-2 border-[#e5e7eb] bg-white px-3 py-1.5 text-sm">
-                  <input type="checkbox" name="class_id" value={c.id} defaultChecked /> {c.name}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          {(classes ?? []).length < 10 && (
-            <p className="muted">Only {(classes ?? []).length} classes are set up. <button formAction={addStandardClasses} formNoValidate className="underline" type="submit">Add Class 1 to Class 10</button></p>
-          )}
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            <label className="field">Starts<input className="input" type="date" name="starts_on" /></label>
-            <label className="field">Ends<input className="input" type="date" name="ends_on" /></label>
-            <label className="field">Total marks<input className="input" type="number" name="total_marks" defaultValue={25} min={1} /></label>
-            <label className="field">Counts toward final %<input className="input" type="number" name="weight_percent" defaultValue={10} min={0} max={100} /></label>
-          </div>
-          <label className="field">Grading
-            <select className="input" name="grading_scale_id">{(scales ?? []).map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select>
-          </label>
-          <button className="btn self-start" type="submit">Create</button>
-          <p className="muted text-[13px]">Subject teachers fill marks when you open marks entry. Publishing results locks them.</p>
-        </form>
-        <form id="report-cards" action="/print/report-cards" target="_blank" className="card flex min-w-0 flex-[2_1_320px] scroll-mt-6 flex-col gap-3">
-          <h2 className="h2">Report cards</h2>
-          <p className="muted text-[14px]">Every student&apos;s card for one section: marks of all published exams this session, grade, position in class and attendance. Print on A4.</p>
-          <label className="field">Section
-            <select className="input" name="section" required>
-              {((sectionList ?? []) as unknown as { id: string; name: string; classes: { name: string; sort: number } }[])
-                .sort((a, b) => a.classes.sort - b.classes.sort || a.name.localeCompare(b.name))
-                .map((s) => <option key={s.id} value={s.id}>{s.classes.name}-{s.name}</option>)}
-            </select>
-          </label>
-          <button className="btn self-start" type="submit">Open report cards</button>
-        </form>
-      </section>
     </>
   );
 }
