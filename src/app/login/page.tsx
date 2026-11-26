@@ -11,6 +11,9 @@ const demo = [
   ["Student", "student@demo.ilmora.pk"],
 ];
 
+// Demo logins are shown only when SHOW_DEMO_LOGINS=1 is set (e.g. on a test deploy), never on a school's own address.
+const showDemo = process.env.SHOW_DEMO_LOGINS === "1";
+
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const brand = await getBranding();
@@ -45,7 +48,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </form>
       {brand ? (
         brand.support_email && <p className="muted text-center text-sm">Trouble signing in? Write to <a className="underline" href={`mailto:${brand.support_email}`}>{brand.support_email}</a></p>
-      ) : (
+      ) : showDemo && (
         <div className="card">
           <div className="eyebrow">Demo logins · tap one to sign in</div>
           <p className="muted text-sm">Password for all: <code className="rounded bg-[#f1f5f9] px-1.5 py-0.5 font-black text-[#1f2937]">Ilmora@2026</code> (capital I, small lmora)</p>
