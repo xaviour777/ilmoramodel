@@ -1,4 +1,4 @@
--- Checks for the Report Center, student 360 and transport (20261124000001..3). Run on a LOCAL Postgres only, never on live:
+-- Checks for the Report Center, student 360 and transport (20261126000001..3). Run on a LOCAL Postgres only, never on live:
 -- the Supabase shim, every migration, seed.sql + seed_demo_all.sql, demo_users.sql (session_replication_role = replica), then this file.
 -- Each check prints ok = t or a NOTICE "ok: ..."; any ERROR or ok = f is a failure.
 \set ON_ERROR_STOP 1
@@ -79,7 +79,7 @@ select 'S12 passed_out status' as test, status::text = 'passed_out' as ok from s
 update students set status = 'enrolled' where id = (select id from s360);
 -- contacts and documents
 insert into student_contacts (student_id, name, relation, phone, is_emergency) values ((select id from s360), 'Uncle Asif', 'uncle', '03001112233', true);
-insert into student_documents (student_id, kind, number, expires_on) values ((select id from s360), 'medical', 'M-1', current_date + 10);
+insert into student_documents (student_id, kind, number, expires_on) values ((select id from s360), 'medical', 'M-1', ((now() at time zone 'Asia/Karachi')::date) + 10);
 select 'S13 expiring document in report' as test, count(*) = 1 as ok from public.report_rows('documents-expiring', '{"days":"30"}');
 reset role;
 
@@ -112,11 +112,11 @@ select 'T2 driver role' as test, app.my_role()::text = 'driver' as ok;
 select 'T3 board shows only own van' as test, jsonb_array_length(public.driver_board(null)->'vans') = 1 and public.driver_board(null)->'vans'->0->>'name' = 'Van T' as ok;
 select 'T4 driver sees no students table' as test, count(*) = 0 as ok from students;
 -- offline marks: sent twice with the same client id, saved once; the trip opens by itself
-select public.trip_mark('00000000-0000-0000-0000-00000000aa04', current_date, 'morning', (select id from rider), 'boarded', '00000000-0000-0000-0000-00000000bb01');
-select public.trip_mark('00000000-0000-0000-0000-00000000aa04', current_date, 'morning', (select id from rider), 'boarded', '00000000-0000-0000-0000-00000000bb01');
+select public.trip_mark('00000000-0000-0000-0000-00000000aa04', ((now() at time zone 'Asia/Karachi')::date), 'morning', (select id from rider), 'boarded', '00000000-0000-0000-0000-00000000bb01');
+select public.trip_mark('00000000-0000-0000-0000-00000000aa04', ((now() at time zone 'Asia/Karachi')::date), 'morning', (select id from rider), 'boarded', '00000000-0000-0000-0000-00000000bb01');
 select 'T5a driver cannot read the event table' as test, count(*) = 0 as ok from trip_events;
-select public.trip_ping('00000000-0000-0000-0000-00000000aa04', current_date, 'morning', 31.48, 74.28, 12, 5);
-do $$ begin perform public.trip_mark('00000000-0000-0000-0000-00000000aa05', current_date, 'morning', (select id from rider), 'boarded'); raise exception 'marked on another van!'; exception when others then if sqlerrm like 'This child is not on this vehicle%' or sqlerrm like 'This is not your vehicle%' then raise notice 'ok: driver cannot use another van'; else raise; end if; end $$;
+select public.trip_ping('00000000-0000-0000-0000-00000000aa04', ((now() at time zone 'Asia/Karachi')::date), 'morning', 31.48, 74.28, 12, 5);
+do $$ begin perform public.trip_mark('00000000-0000-0000-0000-00000000aa05', ((now() at time zone 'Asia/Karachi')::date), 'morning', (select id from rider), 'boarded'); raise exception 'marked on another van!'; exception when others then if sqlerrm like 'This child is not on this vehicle%' or sqlerrm like 'This is not your vehicle%' then raise notice 'ok: driver cannot use another van'; else raise; end if; end $$;
 do $$ begin perform public.trip_start('00000000-0000-0000-0000-00000000aa05', 'morning'); raise exception 'started another van!'; exception when others then if sqlerrm like 'This is not your vehicle%' then raise notice 'ok: driver cannot start another van'; else raise; end if; end $$;
 select 'T6 sos' as test, public.trip_sos('00000000-0000-0000-0000-00000000aa04', null, 31.48, 74.28, 'Tyre burst', '00000000-0000-0000-0000-00000000bb02') is not null as ok;
 reset role;
@@ -136,12 +136,12 @@ reset role;
 
 -- after the trip closes, the location is no longer shown
 select pg_temp.as_user((select user_id from profiles where id = '00000000-0000-0000-0000-00000000aa03'));
-select public.trip_end('00000000-0000-0000-0000-00000000aa04', current_date, 'morning');
+select public.trip_end('00000000-0000-0000-0000-00000000aa04', ((now() at time zone 'Asia/Karachi')::date), 'morning');
 reset role;
 select pg_temp.as_user((select user_id from profiles where id = (select parent_profile from ids)));
 select 'T12 location hidden after trip' as test, public.my_child_bus((select id from rider))->'trip'->>'lat' is null as ok;
 reset role;
 select pg_temp.as_user((select principal from ids));
-select 'T13 custody gap reported' as test, count(*) = 1 as ok from public.report_rows('custody-exceptions', jsonb_build_object('from', current_date - 1, 'to', current_date));
-select 'T14 sos in log' as test, count(*) = 1 as ok from public.report_rows('sos-log', jsonb_build_object('from', current_date - 1, 'to', current_date));
+select 'T13 custody gap reported' as test, count(*) = 1 as ok from public.report_rows('custody-exceptions', jsonb_build_object('from', ((now() at time zone 'Asia/Karachi')::date) - 1, 'to', ((now() at time zone 'Asia/Karachi')::date)));
+select 'T14 sos in log' as test, count(*) = 1 as ok from public.report_rows('sos-log', jsonb_build_object('from', ((now() at time zone 'Asia/Karachi')::date) - 1, 'to', ((now() at time zone 'Asia/Karachi')::date)));
 reset role;
