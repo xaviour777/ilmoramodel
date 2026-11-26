@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/me";
 import { draftBank, type BankAsk, type BankDraft } from "@/lib/paper-check/quiz";
-import { makePaper, replacement, totalMarks, type BankQuestion, type Pattern, type PaperItem } from "@/lib/question-paper";
+import { makePaper, needs, PRESETS, replacement, totalMarks, type BankQuestion, type Pattern, type PaperItem } from "@/lib/question-paper";
 import { MAX_MCQ } from "@/lib/paper-check/layout";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -160,4 +160,63 @@ export async function mcqTestFromPaper(f: FormData) {
   }).select("id").single();
   if (error) redirect(`${back}?error=${encodeURIComponent(error.message.includes("row-level security") ? "You can only make tests for sections you teach." : error.message)}`);
   redirect(`/teacher/paper-check/${test!.id}`);
+}
+
+// ---------- Whole paper with AI in about a minute ----------
+// The teacher writes the syllabus ("Chapters 1 to 3"), picks a pattern, and gets a full paper to
+// check. The AI's questions are also kept in the bank (marked AI) for the next paper.
+export async function aiQuickPaper(f: FormData) {
+  const me = await staff();
+  const supabase = await createClient();
+  const classId = str(f, "class_id"), subjectId = str(f, "subject_id");
+  const syllabus = str(f, "syllabus").slice(0, 120);
+  const back = `/teacher/paper-check/papers?class=${classId}&subject=${subjectId}`;
+  const fail = (m: string): never => redirect(`${back}&error=${encodeURIComponent(m)}`);
+  if (syllabus.length < 2) fail("Write the syllabus for this paper, like: Chapters 1 to 3.");
+  const preset = PRESETS.find((x) => x.id === str(f, "preset")) ?? PRESETS[2];
+  const p: Pattern = JSON.parse(JSON.stringify(preset.pattern));
+  const [{ data: cls }, { data: subject }] = await Promise.all([
+    supabase.from("classes").select("name").eq("id", classId).single(),
+    supabase.from("subjects").select("name").eq("id", subjectId).single(),
+  ]);
+  if (!cls || !subject) fail("Choose the class and subject.");
+  const need = needs(p);
+  const language = str(f, "language") === "ur" ? "ur" : "en";
+  const ask = (mcq: number, short: number, long: number) => draftBank(supabase, { subject: subject!.name, className: cls!.name, chapter: syllabus, mcq, short, long, language });
+  // three smaller asks at once: faster, and each fits the AI's answer length
+  let drafts: BankDraft = [];
+  try {
+    const parts = await Promise.all([
+      need.mcq ? ask(Math.ceil(need.mcq * 1.2), 0, 0) : Promise.resolve([]),
+      need.short ? ask(0, Math.ceil(need.short * 1.1), 0) : Promise.resolve([]),
+      need.long ? ask(0, 0, need.long + 1) : Promise.resolve([]),
+    ]);
+    drafts = parts.flat();
+  } catch (e) {
+    fail(e instanceof Error ? e.message : "The AI could not make the paper just now.");
+  }
+  if (!drafts.length) fail("The AI sent no usable questions. Try again, or write the syllabus more clearly.");
+  const { data: saved, error } = await supabase.from("question_bank").insert(drafts.map((q) => ({
+    campus_id: me.campus_id, class_id: classId, subject_id: subjectId, chapter: syllabus, kind: q.kind, question: q.question,
+    options: q.kind === "mcq" ? q.options : [], answer: q.answer || null, source: "ai", language: /[\u0600-\u06FF]/.test(q.question) ? "ur" : "en",
+  }))).select("id, chapter, kind, question, options, answer, source");
+  if (error) fail(error.message);
+  const bank = (saved ?? []) as BankQuestion[];
+  // if the AI sent a few less than asked, shrink the paper to what came back
+  const have = (k: string) => bank.filter((q) => q.kind === k).length;
+  p.mcq.count = Math.min(p.mcq.count, have("mcq"));
+  if (p.short.groups) {
+    p.short.perGroup = Math.min(p.short.perGroup, Math.floor(have("short") / p.short.groups));
+    p.short.attempt = Math.min(p.short.attempt, p.short.perGroup);
+  }
+  p.long.count = Math.min(p.long.count, have("long"));
+  p.long.attempt = Math.min(p.long.attempt, p.long.count);
+  const made = makePaper(bank, p);
+  if ("short" in made) fail(`The AI sent too few questions: ${made.short}. Try again.`);
+  const { data, error: e2 } = await supabase.from("question_papers").insert({
+    campus_id: me.campus_id, class_id: classId, subject_id: subjectId, title: str(f, "title") || `${subject!.name} ${cls!.name}`,
+    chapters: [syllabus], pattern: p, items: (made as { items: PaperItem[] }).items, minutes: p.minutes,
+  }).select("id").single();
+  if (e2) fail(e2.message);
+  redirect(`/teacher/paper-check/papers/${data!.id}?ai=1`);
 }
