@@ -22,7 +22,7 @@ export async function signIn(formData: FormData) {
       redirect("/login?error=wrong-school");
     }
   }
-  redirect("/");
+  redirect("/portal");
 }
 
 export async function signOut() {
