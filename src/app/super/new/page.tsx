@@ -1,8 +1,13 @@
 import { PageHead } from "@/components/ilm";
+import { createClient } from "@/lib/supabase/server";
+import { rupees } from "@/lib/format";
+import type { Plan } from "@/lib/super";
 import { createSchool } from "../actions";
 
 export default async function NewSchool({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
+  const supabase = await createClient();
+  const plans = ((await supabase.rpc("super_plans")).data ?? []) as Plan[];
   return (
     <>
       <PageHead kick="Platform" title="Add a school" sub="One form makes the school ready to use: campus, school year and terms, bell timings, Class 1 to 10, subjects, grading, fee heads and the principal's login." />
@@ -28,7 +33,7 @@ export default async function NewSchool({ searchParams }: { searchParams: Promis
               <label className="field">Free trial
                 <select className="input" name="trial_days" defaultValue="14"><option value="0">No trial (active)</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option><option value="60">60 days</option></select>
               </label>
-              <label className="field">Plan<select className="input" name="plan" defaultValue="standard"><option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option></select></label>
+              <label className="field">Plan<select className="input" name="plan" defaultValue="standard">{plans.map((p) => <option key={p.id} value={p.id}>{p.name}{p.price_paisa ? ` · ${rupees(p.price_paisa)}` : ""}</option>)}</select></label>
               <label className="field col-span-2">Student limit (empty for none)<input className="input" name="max_students" type="number" min={1} placeholder="500" /></label>
             </div>
           </section>

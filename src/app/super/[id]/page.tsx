@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { stateOf } from "@/lib/super";
+import { stateOf, type Plan } from "@/lib/super";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Row, Empty } from "@/components/ilm";
 import { setModule, setPassword, setStatus, updateSchool } from "../actions";
@@ -19,7 +19,8 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("super_school", { p_school: id });
+  const [{ data, error }, pl] = await Promise.all([supabase.rpc("super_school", { p_school: id }), supabase.rpc("super_plans")]);
+  const plans = (pl.data ?? []) as Plan[];
   const d = data as Detail | null;
   if (error) return <div className="notice-bad">{error.message}</div>;
   if (!d?.school) notFound();
@@ -59,7 +60,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
             <label className="field">Support email<input className="input" name="support_email" type="email" defaultValue={s.support_email ?? ""} /></label>
             <label className="field">Logo link<input className="input" name="logo_url" type="url" defaultValue={s.logo_url ?? ""} /></label>
             <label className="field">Brand colour<input className="input" name="primary_color" type="color" defaultValue={s.primary_color ?? "#16a34a"} /></label>
-            <label className="field">Plan<select className="input" name="plan" defaultValue={s.plan}><option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option></select></label>
+            <label className="field">Plan<select className="input" name="plan" defaultValue={s.plan}>{plans.map((p) => <option key={p.id} value={p.id}>{p.name}{p.price_paisa ? ` · ${rupees(p.price_paisa)}` : ""}</option>)}{!plans.some((p) => p.id === s.plan) && <option value={s.plan}>{s.plan}</option>}</select></label>
             <label className="field">Student limit<input className="input" name="max_students" type="number" min={1} defaultValue={s.max_students ?? ""} /></label>
           </div>
           <label className="field">Notes (only you see these)<textarea className="input min-h-20 py-2" name="notes" defaultValue={s.notes ?? ""} /></label>
@@ -139,7 +140,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
           {d.audit.map((a, i) => (
             <Row key={i}><span className="flex-1 font-bold">{a.action}</span><span className="muted text-[12px]">{new Date(a.at).toLocaleString("en-GB", { timeZone: "Asia/Karachi", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span></Row>
           ))}
-          <Link href="/super/activity" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">All activity →</Link>
+          <Link href="/super/security" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">All activity →</Link>
         </div>
       </section>
     </>
