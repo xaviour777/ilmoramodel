@@ -7,13 +7,14 @@ import { UnderTabs } from "@/components/classes-tabs";
 import { fetchAll } from "@/lib/fetch-all";
 import { BoardTarget, ExamDayTab, ExamGapsTab, MarksLogTab } from "./day";
 import { ExamFlow } from "./flow";
+import { RoadTab } from "./road";
 import { PrintButton } from "@/app/print/paper-check/[id]/print-button";
 
 type Search = { tab?: string; term?: string; exam?: string; cls?: string; view?: string; show?: string; grade?: string; saved?: string; error?: string; session?: string; sec?: string; subj?: string; teacher?: string; date?: string; room?: string; q?: string; step?: string; tpl?: string; new?: string };
 export default async function ExamsPage({ searchParams }: { searchParams: Promise<Search> }) {
   await requireRole("principal", "owner");
   const sp = await searchParams;
-  const tab = ["results", "board", "day", "gaps", "log"].includes(sp.tab ?? "") ? sp.tab! : "plan";
+  const tab = ["results", "road", "board", "day", "gaps", "log"].includes(sp.tab ?? "") ? sp.tab! : "plan";
   const q = (o: Record<string, string | undefined>) => "/principal/exams?" + new URLSearchParams(Object.entries({ ...o }).filter(([, v]) => v) as [string, string][]);
   return (
     <>
@@ -23,6 +24,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
       </PageHead>
       <UnderTabs current={tab} tabs={[
         { id: "plan", label: "Exam steps", href: q({ tab: "plan" }) },
+        { id: "road", label: "Road to final", href: q({ tab: "road" }) },
         { id: "results", label: "Results & reports", href: q({ tab: "results" }) },
         { id: "board", label: "BISE board prep · 9–12", href: q({ tab: "board" }) },
         { id: "day", label: "Exam day", href: q({ tab: "day" }) },
@@ -32,6 +34,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && tab !== "plan" && <div className="notice-ok">Saved.</div>}
       {tab === "plan" && <ExamFlow sp={sp} />}
+      {tab === "road" && <RoadTab cls={sp.cls} />}
       {tab === "results" && <ResultsTab sp={sp} />}
       {tab === "board" && <BoardTab sp={sp} />}
       {tab === "day" && <ExamDayTab date={sp.date} roomId={sp.room} />}
