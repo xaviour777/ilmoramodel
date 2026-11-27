@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { rupees, shortDate } from "@/lib/format";
+import { moduleOn } from "@/lib/modules";
 import { band, KIND_ICON, say, trendSentence, type Kid } from "@/lib/learning";
 import { kidToday } from "@/lib/kid-today";
 
@@ -97,7 +98,7 @@ export async function ChildToday({ kid, ur, due, challan }: { kid: Kid; ur: bool
         <section className="card">
           <h2 className="h2">{t("Achievements (approved by school)", "کامیابیاں (اسکول سے منظور شدہ)")}</h2>
           {ach.map((i) => <div key={i.id} className="flex gap-2 text-sm font-bold"><span aria-hidden>{KIND_ICON[i.kind]}</span><span className="flex-1">{i.title}</span><span className="muted text-xs">{shortDate(i.happened_on)}</span></div>)}
-          <Link href={`/parent/passport?child=${kid.id}`} className="text-sm font-bold underline">{t("See the Model Passport", "ماڈل پاسپورٹ دیکھیں")}</Link>
+          {await moduleOn("passport") && <Link href={`/parent/passport?child=${kid.id}`} className="text-sm font-bold underline">{t("See the Model Passport", "ماڈل پاسپورٹ دیکھیں")}</Link>}
         </section>
       )}
 

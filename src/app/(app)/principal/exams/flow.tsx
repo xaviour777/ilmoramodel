@@ -506,7 +506,7 @@ function QuestionPapers({ papers, made, classes, examName }: {
   );
 }
 
-// What this exam would take by hand vs. in Ilmora, worked out from its own numbers.
+// What this exam would take by hand vs. in Prinqo, worked out from its own numbers.
 function TimeSaved(n: { papers: number; students: number; sheets: number; families: number }) {
   const t = timeSaved(n);
   if (!n.students) return null;
@@ -515,12 +515,12 @@ function TimeSaved(n: { papers: number; students: number; sheets: number; famili
       <summary className="cursor-pointer list-none">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <span className="text-[22px] font-black text-[#15803d]">⏱ {hours(t.saved)} saved</span>
-          <span className="text-[13px] font-bold">By hand about {hours(t.hand)} · with Ilmora about {hours(t.app)}</span>
+          <span className="text-[13px] font-bold">By hand about {hours(t.hand)} · with Prinqo about {hours(t.app)}</span>
           <span className="muted text-[12px]">≈ {Math.round(t.saved / 60 / 6)} teacher-days · tap for details</span>
         </div>
       </summary>
       <div className="tbl mt-2 overflow-x-auto"><table className="w-full text-[13px]">
-        <thead><tr><th className="text-left">Job</th><th className="text-left">How many</th><th className="text-right">By hand</th><th className="text-right">Ilmora</th><th className="text-right">Saved</th></tr></thead>
+        <thead><tr><th className="text-left">Job</th><th className="text-left">How many</th><th className="text-right">By hand</th><th className="text-right">Prinqo</th><th className="text-right">Saved</th></tr></thead>
         <tbody>{t.rows.map((r) => (
           <tr key={r.id}>
             <td><b>{r.job}</b><div className="muted text-[11px]">{r.how}</div></td>

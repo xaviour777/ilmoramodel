@@ -2,8 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { SendButton } from "@/components/send-button";
-import { FeesTabs } from "@/components/fees-tabs";
-import { SettingsTabs } from "@/components/settings-tabs";
+import { WaTabs } from "@/components/wa-tabs";
 import { CHANNEL_LABEL, SWITCH_AFTER_DAYS, showPhone, type Channel } from "@/lib/messages";
 import { allRows, familiesByIds, withRecommendations } from "@/lib/outbox";
 import { loadMessagingConfig, readyChannels } from "@/lib/deliver";
@@ -37,10 +36,10 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="kick">Money</div><h1 className="h1">WhatsApp and SMS</h1>
+          <div className="kick">Messages</div><h1 className="h1">Outbox and fee reminders</h1>
           <p className="muted text-base">Fee reminders and notices that go to parents&apos; phones, so they get them even if they never open the app.</p>
         </div>
-        {admin ? <SettingsTabs current="messages" /> : <FeesTabs current="messages" salaries />}
+        <WaTabs current="outbox" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.queued && <div className="notice-ok">{sp.queued} reminders are in the outbox.{Number(sp.skipped) > 0 ? ` ${sp.skipped} families were skipped: no mobile number, or reminded in the last ${SWITCH_AFTER_DAYS} days.` : ""}</div>}
@@ -58,7 +57,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         <section className="card xl:w-[400px]">
           <h2 className="h2">Fee reminders</h2>
-          <p className="muted">{recs.length} families have fees due. Ilmora picks the channel for each one:</p>
+          <p className="muted">{recs.length} families have fees due. Prinqo picks the channel for each one:</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="tile"><span className="muted">WhatsApp</span><b>{count("whatsapp")}</b><span className="muted text-xs">free, read sooner</span></div>
             <div className="tile"><span className="muted">SMS</span><b>{count("sms")}</b><span className="muted text-xs">asked for SMS, or WhatsApp got no payment in {SWITCH_AFTER_DAYS} days</span></div>

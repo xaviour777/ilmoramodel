@@ -318,7 +318,8 @@ do $$ declare t text; begin
   end if;
 end $$;
 
--- The principal gives a driver a login: the driver signs in with their mobile number and this password.
+-- The principal gives a driver a login: the driver signs in with their mobile number and this password
+-- (the same phone login the rest of the app uses, see app.phone_login).
 create or replace function public.set_driver_login(p_profile uuid, p_password text) returns text
 language plpgsql security definer set search_path = public, extensions as $$
 declare p record; em text; uid uuid;
@@ -327,22 +328,16 @@ begin
   if length(coalesce(p_password, '')) < 8 then raise exception 'Password must be at least 8 characters.'; end if;
   select * into p from profiles where id = p_profile and campus_id = app.my_campus();
   if p.id is null or p.role::text <> 'driver' then raise exception 'Choose one of your drivers.'; end if;
-  if p.user_id is not null then
-    update auth.users set encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf')), updated_at = now() where id = p.user_id;
-    return (select email from auth.users where id = p.user_id);
+  uid := p.user_id;
+  if uid is null then
+    em := app.phone_login(p.phone);
+    if em is null then raise exception 'Save the driver''s mobile (03001234567) first.'; end if;
+    uid := app.make_login(em, p_password);
+    if exists (select 1 from profiles where user_id = uid and id <> p.id) then raise exception 'This mobile already has a login for someone else.'; end if;
+    update profiles set user_id = uid where id = p.id;
   end if;
-  if coalesce(regexp_replace(p.phone, '\D', '', 'g'), '') !~ '^03\d{9}$' then raise exception 'Save the driver''s mobile (03001234567) first.'; end if;
-  em := regexp_replace(p.phone, '\D', '', 'g') || '@phone.ilmora.pk';
-  if exists (select 1 from auth.users where lower(email) = em) then raise exception 'This mobile already has a login.'; end if;
-  uid := gen_random_uuid();
-  insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
-                          created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
-  values ('00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated', em, extensions.crypt(p_password, extensions.gen_salt('bf')), now(),
-          '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
-  insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-  values (uid::text, uid, jsonb_build_object('sub', uid::text, 'email', em, 'email_verified', true), 'email', now(), now(), now());
-  update profiles set user_id = uid, email = coalesce(email, em) where id = p.id;
-  return em;
+  update auth.users set encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf')), updated_at = now() where id = uid;
+  return (select email from auth.users where id = uid);
 end $$;
 revoke all on function public.set_driver_login(uuid, text) from public, anon;
 grant execute on function public.set_driver_login(uuid, text) to authenticated;

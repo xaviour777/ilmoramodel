@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 // Principal and owner menu: sidebar on desktop, bottom bar on phones
 // (design/Sidebar.dc.html and design/Mobile.dc.html).
-export type PItem = { id: string; href: string; label: string; tile: string; icon: string; also?: string[] };
-export type PGroup = { label: string; items: PItem[] };
+import { PRINCIPAL_GROUPS, type PGroup, type PItem } from "./principal-groups";
+export type { PGroup, PItem };
 
 const I: Record<string, string> = {
   home: "M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -27,32 +27,6 @@ const I: Record<string, string> = {
   check2: "M20 6L9 17l-5-5",
   pl: "M3 3v18h18M7 15l4-4 3 3 5-6",
 };
-
-export const PRINCIPAL_GROUPS: PGroup[] = [
-  { label: "Daily", items: [
-    { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
-    { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
-    { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
-    { id: "wa", href: "/whatsapp", label: "WhatsApp", tile: "t-g", icon: "notices" },
-    { id: "ask", href: "/principal/approvals", label: "Ask the owner", tile: "t-o", icon: "staff" },
-    { id: "care", href: "/principal/care", label: "Complaints & transport", tile: "t-y", icon: "staff" },
-  ] },
-  { label: "Academics", items: [
-    { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },
-    { id: "exams", href: "/principal/exams", label: "Exams", tile: "t-v", icon: "exams" },
-    { id: "ai", href: "/principal/ai", label: "AI tools", tile: "t-y", icon: "ai", also: ["/teacher/paper-check", "/teacher/tutor-report"] },
-  ] },
-  { label: "People", items: [
-    { id: "students", href: "/principal/students", label: "Students", tile: "t-g", icon: "students" },
-    { id: "staff", href: "/principal/staff", label: "Staff & pay", tile: "t-b", icon: "staff" },
-    { id: "adm", href: "/principal/admissions", label: "Admissions", tile: "t-p", icon: "adm" },
-  ] },
-  { label: "Money", items: [
-    { id: "fees", href: "/accounts", label: "Fees", tile: "t-o", icon: "fees" },
-    { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
-    { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile"] },
-  ] },
-];
 
 const ALL = PRINCIPAL_GROUPS.flatMap((g) => g.items);
 

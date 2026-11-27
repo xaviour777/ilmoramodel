@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-// Announcements from the Ilmora platform (super admin → Announcements), shown to school staff.
+// Announcements from the Prinqo AI platform (super admin → Announcements), shown to school staff.
 export async function PlatformBanner() {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("my_announcements");

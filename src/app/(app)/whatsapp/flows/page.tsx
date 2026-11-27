@@ -18,7 +18,7 @@ export default async function Flows({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><div className="kick">WhatsApp module</div><h1 className="h1">Auto flows</h1><p className="muted text-base">Decide which message goes when: fee reminders before and after the due date, absences, results, birthdays.</p></div>
+        <div><div className="kick">Messages</div><h1 className="h1">Auto flows</h1><p className="muted text-base">Decide which message goes when: fee reminders before and after the due date, absences, results, birthdays.</p></div>
         <WaTabs current="flows" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}{sp.saved && <div className="notice-ok">Saved.</div>}

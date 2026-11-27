@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate, time } from "@/lib/format";
+import { moduleOn } from "@/lib/modules";
 import { band, KIND_ICON, practiceToday, say, trendSentence, type Kid } from "@/lib/learning";
 import { kidToday, milestones } from "@/lib/kid-today";
 import { HomeworkSubmit } from "./homework-submit";
@@ -13,6 +14,7 @@ const TONE: Record<string, string> = { green: "var(--green)", blue: "var(--blue)
 export async function LearningSpace({ kid, ur }: { kid: Kid; ur: boolean }) {
   const t = say(ur);
   const supabase = await createClient();
+  const passport = await moduleOn("passport");
   const d = await kidToday(supabase, kid);
   const tips = await practiceToday(supabase, kid, d.subjects, ur, "/student/progress#practice");
   const ach = d.items.filter((i) => i.status === "approved" && ["achievement", "certificate", "milestone", "skill"].includes(i.kind)).slice(0, 4);
@@ -95,6 +97,7 @@ export async function LearningSpace({ kid, ur }: { kid: Kid; ur: boolean }) {
           {ach.length === 0 ? <p className="muted">{t("Achievements your teachers approve appear here.", "اساتذہ کی منظور شدہ کامیابیاں یہاں نظر آئیں گی۔")}</p>
             : ach.map((i) => <div key={i.id} className="flex gap-2 text-sm font-bold"><span aria-hidden>{KIND_ICON[i.kind]}</span><span className="flex-1">{i.title}<span className="muted text-xs"> · {shortDate(i.happened_on)}</span></span></div>)}
         </section>
+        {passport && <>
         <section className="card">
           <h2 className="h2">{t("My projects", "میرے پروجیکٹ")}</h2>
           {projects.length === 0 ? <p className="muted">{t("Add a project you are proud of to your passport.", "کوئی پروجیکٹ جس پر آپ کو فخر ہے پاسپورٹ میں شامل کریں۔")}</p>
@@ -105,8 +108,9 @@ export async function LearningSpace({ kid, ur }: { kid: Kid; ur: boolean }) {
           {goals.length === 0 ? <p className="muted">{t("Set a small goal in your passport.", "پاسپورٹ میں ایک چھوٹا ہدف رکھیں۔")}</p>
             : goals.map((g) => <div key={g.id} className="text-sm font-bold">🎯 {g.goal}{g.target_on ? <span className="muted text-xs"> · {shortDate(g.target_on)}</span> : null}</div>)}
         </section>
+        </>}
       </div>
-      <Link href="/student/passport" className="btn self-start">{t("Open my Model Passport", "میرا ماڈل پاسپورٹ کھولیں")}</Link>
+      {passport && <Link href="/student/passport" className="btn self-start">{t("Open my Model Passport", "میرا ماڈل پاسپورٹ کھولیں")}</Link>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// The AI features Ilmora offers a school (design/AITools.dc.html), grouped by who they help.
+// The AI features Prinqo offers a school (design/AITools.dc.html), grouped by who they help.
 export type AiFeature = { id: string; cat: string; name: string; short: string; win: string; where: string; href: string; tile: string; long: string; saves: string; approver: string };
 
 export const AI_CATEGORIES = [["all", "All"], ["Principal", "For the principal"], ["Teaching", "For teachers"], ["Students and parents", "For students and parents"], ["Communication", "Messages"], ["Money", "Money"], ["Exams", "Exams"]] as const;

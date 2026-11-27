@@ -53,6 +53,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   const lowIds = en.filter((s) => (avg(s.id) ?? 1) < 0.5).map((s) => s.id);
   const atRisk = new Set([...absentIds, ...lowIds]);
   const { data: nextId } = await supabase.rpc("peek_student_code");
+  const { count: signups } = await supabase.from("signup_requests").select("id", { count: "exact", head: true }).eq("status", "pending");
   const { count: leftThisSession } = await supabase.from("students").select("id", { count: "exact", head: true }).neq("status", "enrolled").gte("left_on", sessionStart);
 
   // a phone number finds the family's children too
@@ -102,6 +103,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHead kick="People" title="Students" sub="Every student's marks, attendance and fees in one profile.">
+        <Link href="/principal/students/requests" className="btn-ghost">Sign-up requests{signups ? ` · ${signups}` : ""}</Link>
         <Link href="/principal/students/board" className="btn-ghost">Board registration</Link>
         <Link href="#add" className="btn">Add student</Link>
       </PageHead>

@@ -1,4 +1,4 @@
--- Checks for the Report Center, student 360 and transport (20261126000001..3). Run on a LOCAL Postgres only, never on live:
+-- Checks for the Report Center, student 360 and transport (20261129000001..3). Run on a LOCAL Postgres only, never on live:
 -- the Supabase shim, every migration, seed.sql + seed_demo_all.sql, demo_users.sql (session_replication_role = replica), then this file.
 -- Each check prints ok = t or a NOTICE "ok: ..."; any ERROR or ok = f is a failure.
 \set ON_ERROR_STOP 1
@@ -98,7 +98,7 @@ select pg_temp.as_user((select principal from ids));
 insert into transport_routes (id, name, monthly_fee_paisa) values ('00000000-0000-0000-0000-00000000aa01', 'Route T', 300000);
 insert into transport_stops (id, route_id, name, sort, lat, lng) values ('00000000-0000-0000-0000-00000000aa02', '00000000-0000-0000-0000-00000000aa01', 'Stop 1', 1, 31.47, 74.27);
 insert into profiles (id, campus_id, role, full_name, phone) values ('00000000-0000-0000-0000-00000000aa03', app.my_campus(), 'driver', 'Test Driver', '03009998877');
-select 'T1 driver login' as test, public.set_driver_login('00000000-0000-0000-0000-00000000aa03', 'driver-pass-1') = '03009998877@phone.ilmora.pk' as ok;
+select 'T1 driver login' as test, public.set_driver_login('00000000-0000-0000-0000-00000000aa03', 'driver-pass-1') = 'm923009998877@phone.prinqo.app' as ok;
 insert into vans (id, name, seats, route_id, driver_profile_id) values ('00000000-0000-0000-0000-00000000aa04', 'Van T', 12, '00000000-0000-0000-0000-00000000aa01', '00000000-0000-0000-0000-00000000aa03');
 insert into vans (id, name, seats) values ('00000000-0000-0000-0000-00000000aa05', 'Van Other', 12);
 create temp table rider as select s.id, s.family_id from students s join family_guardians g on g.family_id = s.family_id where g.profile_id = (select parent_profile from ids) and s.status = 'enrolled' limit 1;

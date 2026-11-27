@@ -10,7 +10,7 @@ const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"]
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBranding();
   return {
-    title: brand?.name ?? "Ilmora",
+    title: brand?.name ?? "Prinqo AI",
     description: brand ? `${brand.name} · school app` : "School management for Pakistani schools",
     icons: { icon: brand?.logo_url ?? "/icon-192.png", apple: "/icon-192.png" },
   };
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const brand = await getBranding();
   const c = brand?.primary_color;
-  // the school's colour replaces Ilmora green on buttons, logo tiles and links
+  // the school's colour replaces Prinqo green on buttons, logo tiles and links
   const theme = c ? { ["--brand" as string]: c, ["--brand-lip" as string]: shade(c) } : undefined;
   return (
     <html lang="en" className={nunito.variable} style={theme}>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Ilmora look: bright, chunky and friendly, in the spirit of Duolingo. */
+/* Prinqo look: bright, chunky and friendly, in the spirit of Duolingo. */
 :root {
   --green: var(--brand, #58cc02);
   --green-lip: var(--brand-lip, #46a302);
@@ -29,7 +29,7 @@
 }
 
 
-/* Stitch "Ilmora OS" tokens (principal screens). Used as Tailwind classes:
+/* Stitch "Prinqo OS" tokens (principal screens). Used as Tailwind classes:
    bg-primary, text-on-surface-variant, text-headline-lg, p-space-md ... */
 @theme {
   --color-primary: #002622;
@@ -215,7 +215,7 @@ body {
 
 @layer components {
 /* ---------------------------------------------------------------------------
-   Ilmora principal look (design/ilmora.css): bright, chunky, rounded.
+   Prinqo principal look (design/ilmora.css): bright, chunky, rounded.
    Everything under .ilm: the principal and owner screens. The shared classes
    (card, btn, pill, tbl ...) and the colour variables are re-set here, so
    older pages pick up the look without changing their markup.

@@ -32,7 +32,7 @@ export function positions<T extends { total: number }>(rows: T[]) {
 export const ordinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 export const dayLabel = (d: string) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
-// Rough minutes for each exam job, done by hand vs. in Ilmora. Shown as an estimate, with the
+// Rough minutes for each exam job, done by hand vs. in Prinqo. Shown as an estimate, with the
 // assumptions next to it, so a principal can see where the time goes.
 export const TIME_MODEL = [
   { id: "sheet", job: "Date sheet", unit: "once", byHand: 90, ilmora: 2, how: "typed, checked for clashes and holidays, photocopied" },

@@ -11,6 +11,9 @@ const demo = [
   ["Student", "student@demo.ilmora.pk"],
 ];
 
+// Demo logins are shown only when SHOW_DEMO_LOGINS=1 is set (e.g. on a test deploy), never on a school's own address.
+const showDemo = process.env.SHOW_DEMO_LOGINS === "1";
+
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const brand = await getBranding();
@@ -22,30 +25,31 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           // eslint-disable-next-line @next/next/no-img-element
           ? <img src={brand.logo_url} alt={brand.name} className="mb-3 h-20 w-20 rounded-[20px] object-contain" />
           : brand && <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-[20px] text-4xl font-black text-white" style={{ background: color, boxShadow: `0 5px 0 ${shade(color)}` }}>{brand.name[0]}</div>}
-        <div className="text-5xl font-black tracking-tight" style={{ color }}>{brand?.name ?? "ilmora"}</div>
+        <div className="text-5xl font-black tracking-tight" style={{ color }}>{brand?.name ?? "Prinqo AI"}</div>
         <p className="muted mt-2 text-base">{brand ? "Sign in to continue" : "Sign in to your school"}</p>
       </div>
       <form action={signIn} className="card">
         {error && (
           <div className="notice-bad">
             {error === "no-profile" ? "This login isn't linked to anyone at a school yet."
-              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Ilmora${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
-              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Ilmora to turn it back on."
+              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Prinqo${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
+              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Prinqo to turn it back on."
               : error === "wrong-school" ? `This login belongs to another school. Use your own school's address${brand ? `, not ${brand.name}'s` : ""}.` : error}
           </div>
         )}
-        <label className="field">Email (drivers: mobile number)
-          <input className="input" name="email" type="text" inputMode="email" required autoComplete="username" />
+        <label className="field">Email or mobile number
+          <input className="input" name="email" type="text" inputMode="email" required autoComplete="username" placeholder="you@school.pk or 03xx xxxxxxx" />
         </label>
         <label className="field">Password
           <input className="input" name="password" type="password" required autoComplete="current-password" />
         </label>
         <button className="btn" type="submit" style={brand ? { background: color, boxShadow: `0 4px 0 ${shade(color)}` } : undefined}>Sign in</button>
+        {brand && <p className="muted text-center text-sm">New parent or student? <a href="/register" className="font-black underline" style={{ color }}>Ask for a login</a></p>}
         {["wrong-school", "trial-ended", "school-suspended"].includes(error ?? "") && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
       </form>
       {brand ? (
         brand.support_email && <p className="muted text-center text-sm">Trouble signing in? Write to <a className="underline" href={`mailto:${brand.support_email}`}>{brand.support_email}</a></p>
-      ) : (
+      ) : showDemo && (
         <div className="card">
           <div className="eyebrow">Demo logins · tap one to sign in</div>
           <p className="muted text-sm">Password for all: <code className="rounded bg-[#f1f5f9] px-1.5 py-0.5 font-black text-[#1f2937]">Ilmora@2026</code> (capital I, small lmora)</p>

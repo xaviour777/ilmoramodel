@@ -4,13 +4,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBranding } from "@/lib/branding";
 
+// A typed mobile number (03xx…, +92 3xx…) signs in as the phone login the super admin made
+// for it (see app.phone_login in the database). Anything with an @ is an email.
+function loginName(raw: string) {
+  const v = raw.trim();
+  if (v.includes("@")) return v;
+  const d = v.replace(/\D/g, "").replace(/^0092/, "").replace(/^92(3\d{9})$/, "$1").replace(/^0(3\d{9})$/, "$1");
+  return /^3\d{9}$/.test(d) ? `m92${d}@phone.prinqo.app` : v;
+}
+
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
-  // drivers sign in with their mobile number
-  const typed = String(formData.get("email") ?? "").trim();
-  const mobile = typed.replace(/[\s-]/g, "");
   const { data: auth, error } = await supabase.auth.signInWithPassword({
-    email: /^03\d{9}$/.test(mobile) ? `${mobile}@phone.ilmora.pk` : typed,
+    email: loginName(String(formData.get("email") ?? "")),
     password: String(formData.get("password") ?? "").trim(),
   });
   if (error) redirect("/login?error=" + encodeURIComponent(error.message));

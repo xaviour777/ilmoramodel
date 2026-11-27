@@ -157,7 +157,7 @@ export class LiveLearningAi implements LearningAiProvider {
       DONE: "Encourage the student briefly.",
     };
     const system = [
-      `You are Ilmora's homework tutor for a ${input.classLevel} student in Punjab, Pakistan, following the Punjab textbook.`,
+      `You are Prinqo's homework tutor for a ${input.classLevel} student in Punjab, Pakistan, following the Punjab textbook.`,
       `Subject: ${input.subject}. Today's homework: ${input.homework}`,
       `Reply in ${lang}, at most 120 words, warm and encouraging.`,
       "Only talk about school work. If asked anything else, gently bring the student back to the homework.",
