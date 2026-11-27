@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireSuper } from "@/lib/super";
+import { tempPassword, type LoginState } from "@/lib/temp-password";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const fail = (path: string, msg: string): never => redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
@@ -141,17 +142,8 @@ export async function endAnnouncement(f: FormData) {
 }
 
 // ---- Logins ----
-// A fresh password the super admin can read out on the phone: two words of letters and digits.
-function tempPassword() {
-  const abc = "abcdefghjkmnpqrstuvwxyz", num = "23456789";
-  const pick = (set: string, n: number) => Array.from(crypto.getRandomValues(new Uint32Array(n)), (x) => set[x % set.length]).join("");
-  return `${pick(abc, 4)}-${pick(num, 4)}`;
-}
-
-export type ResetState = { ok?: boolean; error?: string; login?: string; password?: string; name?: string } | null;
-
 // Shown once on screen; nothing stores it.
-export async function resetLogin(_prev: ResetState, f: FormData): Promise<ResetState> {
+export async function resetLogin(_prev: LoginState, f: FormData): Promise<LoginState> {
   await requireSuper();
   const supabase = await createClient();
   const password = tempPassword();

@@ -6,7 +6,9 @@ import { StaffTabs } from "@/components/staff-tabs";
 import { PhotoUpload } from "@/components/photo-upload";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { advanceState, PAY_MODE } from "@/lib/payroll";
-import { giveAdvance, saveStaffBasic, saveStaffDetails } from "../actions";
+import { giveAdvance, giveLogin, saveStaffBasic, saveStaffDetails } from "../actions";
+import { LoginButton } from "@/components/login-button";
+import { showLogin } from "@/lib/temp-password";
 
 const ROLE: Record<string, string> = { principal: "Principal", teacher: "Teacher", accountant: "Accountant", owner: "Owner" };
 const rs = (p: number | null | undefined) => (p ? String(Math.round(Number(p) / 100)) : "");
@@ -74,9 +76,15 @@ export default async function StaffRecord({ params, searchParams }: { params: Pr
                 <label className="field">Role<select className="input" name="role" defaultValue={p.role}><option value="teacher">Teacher</option><option value="accountant">Accountant</option></select></label>
               )}
               <label className="flex items-center gap-2.5 text-sm font-extrabold"><input type="checkbox" name="is_active" defaultChecked={p.is_active} className="h-5 w-5" /> Working here now</label>
-              <p className="muted">{p.user_id ? "Can log in." : "No login yet."}</p>
               <button className="btn self-start" type="submit">Save</button>
             </form>
+          )}
+          {admin && p.role !== "principal" && p.role !== "owner" && (
+            <section className="card flex flex-col gap-2">
+              <h2 className="h2">Login</h2>
+              <p className="muted">{p.user_id ? "Can log in. Reset if they forgot the password." : p.email || p.phone ? `No login yet. They will sign in with ${p.email || showLogin(p.phone ?? "")}.` : "Add an email or mobile number above first."}</p>
+              {(p.user_id || p.email || p.phone) && <LoginButton action={giveLogin} fields={{ profile_id: id }} name={p.full_name} hasLogin={!!p.user_id} />}
+            </section>
           )}
           <form action={saveStaffDetails} className="card">
             <h2 className="h2">Personal</h2>

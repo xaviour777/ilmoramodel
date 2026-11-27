@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { shortDate } from "@/lib/format";
+import { showLogin } from "@/lib/temp-password";
 import { PageHead, Row, Empty } from "@/components/ilm";
-import { ResetLogin } from "./reset";
+import { LoginButton } from "@/components/login-button";
+import { resetLogin } from "../../actions";
 
 type Person = { id: string; name: string; role: string; campus: string; email: string | null; phone: string | null; active: boolean;
   login: string | null; last_login: string | null; can_phone: boolean };
@@ -26,7 +28,7 @@ export default async function SchoolLogins({ params, searchParams }: { params: P
   const total = Object.values(d.counts).reduce((a, b) => a + Number(b), 0);
   const withLogin = d.people.filter((p) => p.login).length;
   const href = (r: string) => `/super/${id}/logins?${new URLSearchParams({ ...(q ? { q } : {}), ...(r ? { role: r } : {}) })}`;
-  const shownLogin = (l: string) => { const m = l.match(/^m92(\d{10})@phone\.prinqo\.app$/); return m ? `0${m[1]} (mobile)` : l; };
+  const shownLogin = (l: string) => (l.endsWith("@phone.prinqo.app") ? `${showLogin(l)} (mobile)` : l);
 
   return (
     <>
@@ -56,7 +58,7 @@ export default async function SchoolLogins({ params, searchParams }: { params: P
                 {p.login && ` · ${p.last_login ? `last login ${shortDate(p.last_login.slice(0, 10))}` : "never signed in"}`}
               </div>
             </div>
-            {(p.login || p.email || p.can_phone) && <ResetLogin schoolId={id} profileId={p.id} name={p.name} hasLogin={!!p.login} />}
+            {(p.login || p.email || p.can_phone) && <LoginButton action={resetLogin} fields={{ school_id: id, profile_id: p.id }} name={p.name} hasLogin={!!p.login} />}
           </Row>
         ))}
       </div>

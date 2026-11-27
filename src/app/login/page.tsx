@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           // eslint-disable-next-line @next/next/no-img-element
           ? <img src={brand.logo_url} alt={brand.name} className="mb-3 h-20 w-20 rounded-[20px] object-contain" />
           : brand && <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-[20px] text-4xl font-black text-white" style={{ background: color, boxShadow: `0 5px 0 ${shade(color)}` }}>{brand.name[0]}</div>}
-        <div className="text-5xl font-black tracking-tight" style={{ color }}>{site ? "My Model" : brand?.name ?? "ilmora"}</div>
+        <div className="text-5xl font-black tracking-tight" style={{ color }}>{site ? "My Model" : brand?.name ?? "Prinqo AI"}</div>
         <p className="muted mt-2 text-base">{site ? `${site.name} · parents, students and staff sign in here` : brand ? "Sign in to continue" : "Sign in to your school"}</p>
       </div>
       <form action={signIn} className="card">
@@ -47,6 +47,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <input className="input" name="password" type="password" required autoComplete="current-password" />
         </label>
         <button className="btn" type="submit" style={brand ? { background: color, boxShadow: `0 4px 0 ${shade(color)}` } : undefined}>Sign in</button>
+        {brand && <p className="muted text-center text-sm">New parent or student? <a href="/register" className="font-black underline" style={{ color }}>Ask for a login</a></p>}
         {["wrong-school", "trial-ended", "school-suspended"].includes(error ?? "") && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
       </form>
       {brand ? (

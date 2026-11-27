@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
 import { getBranding } from "@/lib/branding";
 import { PlatformBanner } from "@/components/platform-banner";
+import { Guide } from "@/components/guide";
 
 const STAFF: Role[] = ["principal", "owner", "accountant", "teacher"];
 
@@ -82,7 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="mx-auto flex max-w-[1440px] flex-col gap-6 p-4 lg:flex-row lg:items-start lg:p-6">
       <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
         <div className="flex items-center justify-between lg:block">
-          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "ilmora"}</div>
+          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "Prinqo AI"}</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
@@ -99,6 +100,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col gap-5">{STAFF.includes(me.role) && <PlatformBanner />}{children}</main>
+      <Guide role={me.role} />
     </div>
   );
 }
@@ -146,6 +148,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
         <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12"><PlatformBanner />{children}</main>
       </div>
       <PrincipalBottomBar badges={badges} groups={owner ? OWNER_GROUPS : undefined} tabs={owner ? OWNER_TABS : undefined} />
+      <Guide role={me.role} />
     </div>
   );
 }

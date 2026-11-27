@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/me";
 import { todayPK } from "@/lib/format";
 import { cnic } from "@/lib/board-form";
 import { advanceState, salaryFor, PAY_MODE } from "@/lib/payroll";
+import { tempPassword, type LoginState } from "@/lib/temp-password";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const paisa = (f: FormData, k: string) => Math.max(0, Math.round(Number(str(f, k).replace(/,/g, "")) * 100) || 0);
@@ -133,4 +134,17 @@ export async function paySalary(f: FormData) {
     status: "paid", paid_on: str(f, "paid_on") || todayPK(), pay_mode: mode, reference: str(f, "reference") || null,
   }).eq("id", str(f, "salary_id")).eq("status", "due");
   go(back, error?.message, "paid");
+}
+
+// ---------- Logins ----------
+// The principal makes or resets a login for a teacher or office person (email, else mobile).
+// The new password is shown once on screen and never kept.
+export async function giveLogin(_prev: LoginState, f: FormData): Promise<LoginState> {
+  await requireRole("principal", "owner");
+  const supabase = await createClient();
+  const password = tempPassword();
+  const { data, error } = await supabase.rpc("school_set_login", { p_profile: str(f, "profile_id"), p_password: password });
+  if (error) return { error: error.message };
+  revalidatePath("/principal/staff");
+  return { ok: true, login: String(data ?? ""), password, name: str(f, "name") };
 }
