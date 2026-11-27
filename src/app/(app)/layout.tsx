@@ -32,10 +32,12 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/settings", label: "Settings", icon: "gear", also: ["/profile", "/principal/ai"] },
   ],
   owner: [],
+  driver: [{ href: "/driver", label: "Trip board", icon: "home" }],
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
     { href: "/accounts/messages", label: "Messages", icon: "chat", also: ["/whatsapp"] },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
+    { href: "/principal/reports", label: "Reports", icon: "star" },
   ],
   teacher: [
     { href: "/teacher", label: "Attendance", icon: "check", also: ["/teacher/scan"] },
@@ -55,6 +57,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/parent/exams", label: "Exams & report card", icon: "star" },
     { href: "/parent/board", label: "Board exam prep", icon: "book" },
     { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
+    { href: "/parent/bus", label: "School van", icon: "door" },
     { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
@@ -70,7 +73,7 @@ NAV.owner = NAV.principal;
 
 const ROLE_LABEL: Record<Role, string> = {
   owner: "Owner", principal: "Principal", accountant: "Accountant",
-  teacher: "Teacher", parent: "Parent", student: "Student",
+  teacher: "Teacher", parent: "Parent", student: "Student", driver: "Driver",
 };
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -97,7 +100,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col gap-5">{STAFF.includes(me.role) && <PlatformBanner />}{children}</main>
-      <Guide role={me.role} />
+      {me.role !== "driver" && <Guide role={me.role} />}
     </div>
   );
 }

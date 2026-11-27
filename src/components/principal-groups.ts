@@ -9,7 +9,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
     { id: "wa", href: "/accounts/messages", label: "Messages", tile: "t-g", icon: "notices", also: ["/whatsapp"] },
     { id: "ask", href: "/principal/approvals", label: "Ask the owner", tile: "t-o", icon: "staff" },
-    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
+    { id: "care", href: "/principal/care", label: "Complaints & transport", tile: "t-y", icon: "staff" },
   ] },
   { label: "Academics", items: [
     { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },

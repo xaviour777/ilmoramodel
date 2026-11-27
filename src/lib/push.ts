@@ -21,3 +21,19 @@ export async function pushTo(to: { profiles?: string[]; students?: string[]; sec
     return res.filter((r) => r.status === "fulfilled").length;
   } catch { return 0; }
 }
+
+type Target = { endpoint: string; p256dh: string; auth: string };
+
+// Sends to devices a database function chose (for drivers, who may not look up anyone themselves).
+export async function pushVia(rpc: "sos_push_targets" | "custody_push_targets", args: Record<string, string>, msg: { title: string; body: string; url?: string }) {
+  if (!pushReady()) return 0;
+  try {
+    const sb = await createClient();
+    const { data } = await sb.rpc(rpc, args);
+    if (!data?.length) return 0;
+    webpush.setVapidDetails("mailto:support@ilmora.pk", process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!, process.env.VAPID_PRIVATE_KEY!);
+    const payload = JSON.stringify({ title: msg.title, body: msg.body.slice(0, 300), url: msg.url ?? "/" });
+    const res = await Promise.allSettled((data as Target[]).map((d) => webpush.sendNotification({ endpoint: d.endpoint, keys: { p256dh: d.p256dh, auth: d.auth } }, payload, { TTL: 3600, urgency: "high" })));
+    return res.filter((r) => r.status === "fulfilled").length;
+  } catch { return 0; }
+}

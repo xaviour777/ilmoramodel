@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBranding } from "@/lib/branding";
 
-export type Role = "owner" | "principal" | "accountant" | "teacher" | "parent" | "student";
+export type Role = "owner" | "principal" | "accountant" | "teacher" | "parent" | "student" | "driver";
 
 export type Me = {
   id: string;
@@ -67,5 +67,7 @@ export function homeFor(role: Role): string {
       return "/parent";
     case "student":
       return "/student";
+    case "driver":
+      return "/driver";
   }
 }

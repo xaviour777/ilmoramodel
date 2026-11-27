@@ -38,31 +38,6 @@ export async function addObservation(f: FormData) {
   go("observe", error?.message);
 }
 
-export async function saveVan(f: FormData) {
-  await requireRole("principal", "owner");
-  const sb = await createClient();
-  const row = { name: str(f, "name"), plate: str(f, "plate") || null, driver_name: str(f, "driver_name") || null, driver_phone: str(f, "driver_phone") || null, route: str(f, "route") || null, seats: num(f, "seats"), monthly_fee_paisa: Math.round((num(f, "fee") ?? 0) * 100) };
-  const id = str(f, "id");
-  const { error } = id ? await sb.from("vans").update(row).eq("id", id) : await sb.from("vans").insert(row);
-  go("transport", error?.message);
-}
-
-export async function assignVan(f: FormData) {
-  await requireRole("principal", "owner");
-  const sb = await createClient();
-  const van = str(f, "van_id"), sid = str(f, "student_id");
-  const { error } = van ? await sb.from("van_students").upsert({ van_id: van, student_id: sid, stop: str(f, "stop") || null }) : await sb.from("van_students").delete().eq("student_id", sid);
-  go("transport", error?.message);
-}
-
-export async function markTrip(f: FormData) {
-  await requireRole("principal", "owner", "accountant", "teacher");
-  const sb = await createClient();
-  const all = f.getAll("all").map(String), here = new Set(f.getAll("here").map(String));
-  const { error } = await sb.from("van_trips").upsert({ van_id: str(f, "van_id"), date: str(f, "date"), leg: str(f, "leg"), missing: all.filter((s) => !here.has(s)) }, { onConflict: "van_id,date,leg" });
-  go("transport", error?.message);
-}
-
 export async function saveBrief(f: FormData) {
   const me = await requireRole("principal", "owner");
   const sb = await createClient();

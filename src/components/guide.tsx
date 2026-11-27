@@ -10,8 +10,8 @@ const write = (k: string, v: string) => { try { localStorage.setItem(k, v); } ca
 
 // First visit: a welcome video, then a short tour that points at the real menu items.
 // The ? button brings either back. Seen-state is kept on this device only.
-export function Guide({ role }: { role: Role }) {
-  const steps = TOURS[role] ?? [];
+export function Guide({ role }: { role: string }) {
+  const steps = TOURS[role as Role] ?? [];
   const [mode, setMode] = useState<"off" | "video" | "tour" | "menu">("off");
   const [i, setI] = useState(0);
 
