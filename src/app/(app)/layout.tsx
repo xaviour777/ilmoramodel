@@ -34,6 +34,8 @@ const NAV: Record<Role, NavItem[]> = {
   owner: [],
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
+    { href: "/principal/families", label: "Families", icon: "people" },
+    { href: "/principal/staff/gate", label: "Staff gate", icon: "check" },
     { href: "/accounts/messages", label: "Messages", icon: "chat", also: ["/whatsapp"] },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],

@@ -265,27 +265,72 @@ const childDetails = (f: FormData) => ({
   previous_school: str(f, "previous_school") || null, last_class_passed: str(f, "last_class_passed") || null,
 });
 
+const SOURCES = ["walk_in", "referral", "sibling", "facebook", "whatsapp", "banner", "website", "other"];
+const ADMISSION_STATUSES = ["inquiry", "test", "offered", "declined"];
+// the admissions page sends back the stage it was showing, so the desk stays where it was
+const admissionsBack = (f: FormData) => (str(f, "back").startsWith("/principal/admissions") ? str(f, "back") : "/principal/admissions");
+const plusDays = (n: number) => new Date(Date.now() + 5 * 3600000 + n * 86400000).toISOString().slice(0, 10);
+
 export async function addInquiry(f: FormData) {
   const me = await requireRole("principal", "owner", "accountant");
   const supabase = await createClient();
+  const path = admissionsBack(f);
   const reminder = str(f, "reminder_phone");
-  if (reminder && !mobilePK(reminder)) return back("/principal/admissions", "The reminder number is not a mobile number. Write it like 03001234567.");
+  if (reminder && !mobilePK(reminder)) return back(path, "The reminder number is not a mobile number. Write it like 03001234567.");
+  // who sent them: found by that family's phone number
+  let referrer: string | null = null;
+  const refPhone = str(f, "referrer_phone").replace(/[^\d]/g, "");
+  if (refPhone) {
+    const { data } = await supabase.from("families").select("id").or(`phone.eq.${refPhone},reminder_phone.eq.${refPhone}`).limit(1);
+    if (!data?.length) return back(path, "No family in school has the referrer's phone number. Leave it empty or check the number.");
+    referrer = data[0].id;
+  }
+  const source = SOURCES.includes(str(f, "source")) ? str(f, "source") : (referrer ? "referral" : null);
   const { error } = await supabase.from("admissions").insert({
     campus_id: me.campus_id, child_name: str(f, "child_name"), guardian_name: str(f, "guardian_name"),
     phone: str(f, "phone"), applying_class_id: str(f, "class_id") || null, notes: str(f, "notes") || null,
     reminder_phone: reminder || null, reminder_channel: channelChoice(f), ...childDetails(f),
+    source, referred_by_family_id: referrer, follow_up_on: str(f, "follow_up_on") || plusDays(2),
     photo_url: str(f, "photo_url").startsWith("http") ? str(f, "photo_url") : null,
   });
-  back("/principal/admissions", error?.message, "inquiry");
+  back(path, error?.message, "inquiry");
 }
 
+// Moves a child to the next step (or declines / brings back). An optional note is added to the notes,
+// and the next call-back date follows the step: the test day, or two days after an offer.
 export async function moveAdmission(f: FormData) {
   await requireRole("principal", "owner", "accountant");
   const supabase = await createClient();
-  const { error } = await supabase.from("admissions")
-    .update({ status: str(f, "status"), test_on: str(f, "test_on") || undefined })
-    .eq("id", str(f, "admission_id"));
-  back("/principal/admissions", error?.message, "moved");
+  const path = admissionsBack(f);
+  const status = str(f, "status");
+  if (!ADMISSION_STATUSES.includes(status)) return back(path, "Unknown step.");
+  const id = str(f, "admission_id");
+  const note = str(f, "note");
+  const { data: cur } = await supabase.from("admissions").select("notes").eq("id", id).single();
+  const testOn = str(f, "test_on");
+  if (status === "test" && !testOn) return back(path, "Pick the test date first.");
+  const { error } = await supabase.from("admissions").update({
+    status, stage_since: new Date().toISOString(),
+    ...(testOn ? { test_on: testOn } : {}),
+    ...(note ? { notes: [cur?.notes, note].filter(Boolean).join(" · ") } : {}),
+    follow_up_on: status === "test" ? testOn : status === "offered" ? plusDays(2) : status === "inquiry" ? plusDays(1) : null,
+  }).eq("id", id);
+  back(path, error?.message, "moved");
+}
+
+// "Call back on": sets the next call date, with an optional note of what the parent said.
+export async function setFollowUp(f: FormData) {
+  await requireRole("principal", "owner", "accountant");
+  const supabase = await createClient();
+  const path = admissionsBack(f);
+  const id = str(f, "admission_id");
+  const note = str(f, "note");
+  const { data: cur } = await supabase.from("admissions").select("notes").eq("id", id).single();
+  const { error } = await supabase.from("admissions").update({
+    follow_up_on: str(f, "follow_up_on") || null,
+    ...(note ? { notes: [cur?.notes, note].filter(Boolean).join(" · ") } : {}),
+  }).eq("id", id);
+  back(path, error?.message, "followup");
 }
 
 // Admit: creates the family (or uses one with the same phone) and the student, then links the admission.
@@ -299,6 +344,7 @@ export async function admitStudent(f: FormData) {
     const res = await supabase.from("families").insert({
       campus_id: me.campus_id, name: `${a.guardian_name} family`, phone: a.phone,
       reminder_phone: a.reminder_phone, reminder_channel: a.reminder_channel ?? "auto",
+      referred_by_family_id: a.referred_by_family_id ?? null,
     }).select("id").single();
     if (res.error) return back("/principal/admissions", res.error.message);
     fam = res.data;
@@ -317,7 +363,7 @@ export async function admitStudent(f: FormData) {
     address: a.address, previous_school: a.previous_school, last_class_passed: a.last_class_passed, photo_url: a.photo_url ?? null,
   }).select("id").single();
   if (e2) return back("/principal/admissions", e2.message);
-  const { error: e3 } = await supabase.from("admissions").update({ status: "admitted", student_id: stu.id }).eq("id", a.id);
+  const { error: e3 } = await supabase.from("admissions").update({ status: "admitted", student_id: stu.id, stage_since: new Date().toISOString(), follow_up_on: null }).eq("id", a.id);
   if (e3) return back("/principal/admissions", e3.message);
   if (f.get("first_challan") === "on") {
     const c = await firstChallan(supabase, me, { familyId: fam.id, studentId: stu.id, studentName: a.child_name, sectionId: str(f, "section_id") });

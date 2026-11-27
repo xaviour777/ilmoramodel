@@ -17,6 +17,7 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
   ] },
   { label: "People", items: [
     { id: "students", href: "/principal/students", label: "Students", tile: "t-g", icon: "students" },
+    { id: "fam", href: "/principal/families", label: "Families", tile: "t-o", icon: "fam" },
     { id: "staff", href: "/principal/staff", label: "Staff & pay", tile: "t-b", icon: "staff" },
     { id: "adm", href: "/principal/admissions", label: "Admissions", tile: "t-p", icon: "adm" },
   ] },
