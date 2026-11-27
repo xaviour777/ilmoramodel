@@ -1,6 +1,18 @@
 import { Tabs } from "./tabs";
-export function WaTabs({ current }: { current: "numbers" | "flows" | "log" }) {
-  return <Tabs current={current} tabs={[{ id: "numbers", label: "Numbers", href: "/whatsapp" }, { id: "flows", label: "Auto flows", href: "/whatsapp/flows" }, { id: "log", label: "Sent log", href: "/whatsapp/log" }]} />;
+import { getMe } from "@/lib/me";
+
+// Everything about messages to parents in one menu entry: the outbox with fee reminders,
+// the WhatsApp numbers and auto flows, the sent log, the principal's morning brief and the setup.
+export async function WaTabs({ current }: { current: "outbox" | "numbers" | "flows" | "log" | "brief" | "setup" }) {
+  const me = await getMe();
+  const admin = me.role === "principal" || me.role === "owner";
+  return <Tabs current={current} tabs={[
+    { id: "outbox", label: "Outbox & reminders", href: "/accounts/messages" },
+    { id: "numbers", label: "WhatsApp numbers", href: "/whatsapp" },
+    { id: "flows", label: "Auto flows", href: "/whatsapp/flows" },
+    { id: "log", label: "WhatsApp log", href: "/whatsapp/log" },
+    ...(admin ? [{ id: "brief", label: "Morning brief", href: "/whatsapp/brief" }, { id: "setup", label: "Setup", href: "/settings" }] : []),
+  ]} />;
 }
 
 export function ModuleOff() {

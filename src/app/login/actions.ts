@@ -31,7 +31,7 @@ export async function signIn(formData: FormData) {
       redirect("/login?error=wrong-school");
     }
   }
-  redirect("/portal");
+  redirect("/");
 }
 
 export async function signOut() {

@@ -1,6 +1,5 @@
 import { signIn, signOut } from "./actions";
 import { getBranding, DEFAULT_COLOR, shade } from "@/lib/branding";
-import { getSite } from "@/lib/site/load";
 
 const demo = [
   ["Owner (3 campuses)", "owner@demo.ilmora.pk"],
@@ -18,8 +17,6 @@ const showDemo = process.env.SHOW_DEMO_LOGINS === "1";
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const brand = await getBranding();
-  // on a school website's address the app is that school's "My Model" portal
-  const site = await getSite();
   const color = brand?.primary_color ?? DEFAULT_COLOR;
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4 py-10">
@@ -28,8 +25,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           // eslint-disable-next-line @next/next/no-img-element
           ? <img src={brand.logo_url} alt={brand.name} className="mb-3 h-20 w-20 rounded-[20px] object-contain" />
           : brand && <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-[20px] text-4xl font-black text-white" style={{ background: color, boxShadow: `0 5px 0 ${shade(color)}` }}>{brand.name[0]}</div>}
-        <div className="text-5xl font-black tracking-tight" style={{ color }}>{site ? "My Model" : brand?.name ?? "Prinqo AI"}</div>
-        <p className="muted mt-2 text-base">{site ? `${site.name} · parents, students and staff sign in here` : brand ? "Sign in to continue" : "Sign in to your school"}</p>
+        <div className="text-5xl font-black tracking-tight" style={{ color }}>{brand?.name ?? "Prinqo AI"}</div>
+        <p className="muted mt-2 text-base">{brand ? "Sign in to continue" : "Sign in to your school"}</p>
       </div>
       <form action={signIn} className="card">
         {error && (

@@ -1,9 +1,11 @@
+import { requireModule } from "@/lib/modules";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { BoardPrep } from "@/components/board-prep";
 
 export default async function ParentBoard() {
   await requireRole("parent");
+  await requireModule("board", "/parent");
   const sb = await createClient();
   const { data } = await sb.from("students").select("id, full_name, sections(name, classes(name))").eq("status", "enrolled").order("full_name");
   return (

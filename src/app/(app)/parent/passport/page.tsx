@@ -1,3 +1,4 @@
+import { requireModule } from "@/lib/modules";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { PassportView } from "@/components/passport-view";
@@ -7,6 +8,7 @@ import { Flash } from "@/components/flash";
 
 export default async function ParentPassport({ searchParams }: { searchParams: Promise<{ child?: string; saved?: string; error?: string }> }) {
   const me = await requireRole("parent");
+  await requireModule("passport", "/parent");
   const sp = await searchParams;
   const ur = await familyUrdu(me.role);
   const supabase = await createClient();

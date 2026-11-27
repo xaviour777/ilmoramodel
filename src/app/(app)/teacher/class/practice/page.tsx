@@ -1,3 +1,4 @@
+import { moduleOn } from "@/lib/modules";
 import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -17,7 +18,7 @@ export default async function PracticeRules({ searchParams }: { searchParams: Pr
   const sec = sections.find((s) => s.id === sp.section) ?? sections[0];
   if (!sec) return <><h1 className="h1">My class</h1><p className="muted">You don&apos;t teach any section yet.</p></>;
   const tabs = [["grades", "Gradebook"], ["analysis", "Test analysis"], ["remedial", "Remedial"], ["message", "Message parents"]]
-    .map(([t, label]) => ({ id: t, label, href: `/teacher/class?section=${sec.id}&tab=${t}` })).concat(classExtraTabs(sec.id));
+    .map(([t, label]) => ({ id: t, label, href: `/teacher/class?section=${sec.id}&tab=${t}` })).concat(classExtraTabs(sec.id, await moduleOn("passport")));
   const supabase = await createClient();
   const back = `/teacher/class/practice?section=${sec.id}`;
   const [{ data: rules }, { data: subs }] = await Promise.all([

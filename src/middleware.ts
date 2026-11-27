@@ -29,9 +29,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   // the login page and the public result check need no login
   const path = request.nextUrl.pathname;
-  // the school's public website (each page shows nothing on an address with no website)
-  const isSite = SITE_PATHS.has(path) || path.startsWith("/admissions/") || path === "/site-preview" || path === "/sitemap.xml" || path === "/robots.txt";
-  const isLogin = isSite || path.startsWith("/login") || path === "/register" || path === "/results" || path.startsWith("/results/") || path.startsWith("/verify/") || path.startsWith("/passport/") || path.startsWith("/api/cron/") || path.startsWith("/api/pay/") || path === "/manifest.webmanifest" || path.endsWith(".png") || path === "/sw.js" || path.startsWith("/icon");
+  const isLogin = path === "/robots.txt" || path.startsWith("/login") || path === "/register" || path === "/results" || path.startsWith("/results/") || path.startsWith("/verify/") || path.startsWith("/passport/") || path.startsWith("/api/cron/") || path.startsWith("/api/pay/") || path === "/manifest.webmanifest" || path.endsWith(".png") || path === "/sw.js" || path.startsWith("/icon");
   if (!user && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -39,8 +37,6 @@ export async function middleware(request: NextRequest) {
   }
   return response;
 }
-
-const SITE_PATHS = new Set(["/", "/about", "/leadership", "/academics", "/future-skills", "/student-life", "/achievements", "/admissions", "/contact", "/privacy", "/child-safety"]);
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],

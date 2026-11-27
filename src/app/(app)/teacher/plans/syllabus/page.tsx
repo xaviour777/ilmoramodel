@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { aiStatus } from "@/lib/ai";
 import { pct, shortDate, todayPK } from "@/lib/format";
-import { UnderTabs } from "@/components/classes-tabs";
+import { LessonTabs } from "@/components/lesson-tabs";
 import { Bar, Empty, Insight, Stat, Stats } from "@/components/ilm";
 import { contentsText, plannedBy, progressOf, statusOf, STATUS, type Chapter } from "@/lib/syllabus";
 import { SyllabusSetup } from "./setup";
@@ -53,7 +53,7 @@ export default async function SyllabusPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <div><h1 className="h1">Lesson plans</h1><p className="muted text-base">The whole book planned to the last period, with targets for 3 months, the next exam and the finish.</p></div>
-      <UnderTabs current="syllabus" tabs={[{ id: "week", label: "Weekly plans", href: "/teacher/plans" }, { id: "syllabus", label: "Whole-year syllabus", href: "/teacher/plans/syllabus" }]} />
+      <LessonTabs current="syllabus" />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">{SAVED[sp.saved] ?? "Saved."}</div>}
       {pairs.length === 0 && <Empty>No subjects are assigned to you yet. The principal assigns them in Classes → Subjects.</Empty>}

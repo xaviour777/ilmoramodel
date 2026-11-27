@@ -228,3 +228,31 @@ begin
 end $$;
 revoke all on function public.signup_reject(uuid, text) from public, anon;
 grant execute on function public.signup_reject(uuid, text) to authenticated;
+
+-- "Ask the owner" only makes sense when the school has an owner who is not the person asking.
+create or replace function public.school_has_owner() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from profiles p join campuses c on c.id = p.campus_id
+    where c.school_id = app.my_school() and p.role = 'owner' and p.is_active
+      and p.id is distinct from app.me()
+      and p.user_id is distinct from auth.uid())
+$$;
+revoke all on function public.school_has_owner() from public, anon;
+grant execute on function public.school_has_owner() to authenticated;
+
+-- Optional modules the principal switches on in Settings → Extra modules (premium ones stay with the platform admin).
+create or replace function public.school_set_module(p_module text, p_on boolean) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not app.is_admin() then raise exception 'Only the principal or owner can do this.'; end if;
+  if p_module not in ('passport', 'board') then raise exception 'This module is switched on by Prinqo.'; end if;
+  update schools set modules = case when p_on then array(select distinct unnest(modules || p_module)) else array_remove(modules, p_module) end
+  where id = app.my_school();
+end $$;
+revoke all on function public.school_set_module(text, boolean) from public, anon;
+grant execute on function public.school_set_module(text, boolean) to authenticated;
+
+-- The demo school keeps Passport and Board prep on so demos show them; new schools start with them off.
+update schools set modules = array(select distinct unnest(modules || array['passport', 'board']))
+where id = 'ab6b26e6-4a08-430e-afb7-7ca360656abe';
