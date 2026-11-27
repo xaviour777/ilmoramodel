@@ -62,7 +62,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 ))}
               </div>
               <div className="mt-3 flex flex-wrap gap-2.5"><Link href="/settings/year" className="btn">School year and promotion</Link><Link href="/principal/classes" className="btn-ghost">Boards on classes</Link></div>
-              <p className="muted mt-2 text-[13px]">The school and campus names are set when the school is created. Ask Ilmora support to change them.</p>
+              <p className="muted mt-2 text-[13px]">The school and campus names are set when the school is created. Ask Prinqo support to change them.</p>
             </div>
           )}
           {sec === "roles" && (

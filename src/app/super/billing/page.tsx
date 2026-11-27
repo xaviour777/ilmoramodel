@@ -35,7 +35,7 @@ export default async function Billing({ searchParams }: { searchParams: Promise<
 
   return (
     <>
-      <PageHead kick="Business" title="Billing and invoices" sub="What each school owes Ilmora, what came in and who is late. Paid by cash, JazzCash or Easypaisa." />
+      <PageHead kick="Business" title="Billing and invoices" sub="What each school owes Prinqo, what came in and who is late. Paid by cash, JazzCash or Easypaisa." />
       {(sp.error || iv.error) && <div className="notice-bad">{sp.error ?? iv.error?.message}</div>}
       {sp.saved && <div className="notice-ok">{sp.saved.startsWith("billed-") ? `${sp.saved.slice(7)} invoice(s) created.` : "Saved."}</div>}
       <Stats>

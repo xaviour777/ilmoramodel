@@ -37,7 +37,7 @@ export default async function SuperOverview() {
 
   return (
     <>
-      <PageHead kick="Platform" title="Platform overview" sub="Every school on Ilmora: growth, money, usage and health.">
+      <PageHead kick="Platform" title="Platform overview" sub="Every school on Prinqo: growth, money, usage and health.">
         <Link href="/super/new" className="btn">Add a school</Link>
       </PageHead>
       {(sc.error || ov.error) && <div className="notice-bad">{sc.error?.message ?? ov.error?.message}</div>}

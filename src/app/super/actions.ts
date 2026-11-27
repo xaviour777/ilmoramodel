@@ -139,3 +139,24 @@ export async function endAnnouncement(f: FormData) {
   revalidatePath("/", "layout");
   redirect("/super/announcements?saved=ended");
 }
+
+// ---- Logins ----
+// A fresh password the super admin can read out on the phone: two words of letters and digits.
+function tempPassword() {
+  const abc = "abcdefghjkmnpqrstuvwxyz", num = "23456789";
+  const pick = (set: string, n: number) => Array.from(crypto.getRandomValues(new Uint32Array(n)), (x) => set[x % set.length]).join("");
+  return `${pick(abc, 4)}-${pick(num, 4)}`;
+}
+
+export type ResetState = { ok?: boolean; error?: string; login?: string; password?: string; name?: string } | null;
+
+// Shown once on screen; nothing stores it.
+export async function resetLogin(_prev: ResetState, f: FormData): Promise<ResetState> {
+  await requireSuper();
+  const supabase = await createClient();
+  const password = tempPassword();
+  const { data, error } = await supabase.rpc("super_set_password", { p_profile: str(f, "profile_id"), p_password: password });
+  if (error) return { error: error.message };
+  revalidatePath(`/super/${str(f, "school_id")}/logins`);
+  return { ok: true, login: String(data ?? ""), password, name: str(f, "name") };
+}

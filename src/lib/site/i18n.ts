@@ -42,7 +42,7 @@ const UI = {
   portals: ["Portals", "پورٹل"],
   parentsLogin: ["Parents, students and staff: sign in to My Model", "والدین، طلبہ اور اساتذہ: مائی ماڈل میں لاگ اِن کریں"],
   footerLine: ["MODEL SCHOOL — Building Tomorrow, Together.", "ماڈل سکول — مل کر کل کی تعمیر"],
-  poweredBy: ["Digital School Experience powered by ILMORA", "ڈیجیٹل سکول تجربہ: ILMORA"],
+  poweredBy: ["Digital School Experience powered by PRINQO AI", "ڈیجیٹل سکول تجربہ: PRINQO AI"],
   followUs: ["Follow us", "ہمیں فالو کریں"],
   admissionsOpen: ["Admissions open", "داخلے جاری ہیں"],
   admissionsClosed: ["Admissions are closed for now. You can still send us a question.", "فی الحال داخلے بند ہیں۔ آپ پھر بھی ہمیں سوال بھیج سکتے ہیں۔"],

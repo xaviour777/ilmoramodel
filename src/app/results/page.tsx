@@ -39,7 +39,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
   const qr = ok ? await QRCode.toDataURL(verifyUrl, { margin: 1, width: 180 }) : "";
   const pct = ok && card!.total ? (Number(card!.obtained) / Number(card!.total)) * 100 : 0;
   const share = ok ? `https://wa.me/?text=${encodeURIComponent(`${card!.student} (${card!.roll}) · ${card!.exam} result: ${Number(card!.obtained)}/${card!.total} (${pct.toFixed(1)}%, grade ${grade(pct)}). Verify: ${verifyUrl}`)}` : "";
-  const school = brand?.name ?? (ok ? card!.school : "Ilmora");
+  const school = brand?.name ?? (ok ? card!.school : "Prinqo AI");
 
   return (
     <div className="ilm min-h-screen" style={{ background: "#f7f9fc" }}>

@@ -13,7 +13,7 @@ export function ModuleOff() {
         <li>Messages rotate across numbers with human-like pauses and a daily cap per number.</li>
         <li>Drag-and-drop auto flows: fee reminders before and after the due date, absence alerts, results, birthdays.</li>
       </ul>
-      <p className="muted text-sm">Ask Ilmora to switch it on for your school.</p>
+      <p className="muted text-sm">Ask Prinqo to switch it on for your school.</p>
     </section>
   );
 }

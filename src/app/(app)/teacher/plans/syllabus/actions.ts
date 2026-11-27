@@ -70,7 +70,7 @@ async function writeLessons(supabase: SupabaseClient, book: { id: string; campus
   return "";
 }
 
-// Teacher gives the book; AI (or the typed list) gives the chapters; Ilmora plans every period.
+// Teacher gives the book; AI (or the typed list) gives the chapters; Prinqo plans every period.
 export async function createSyllabus(f: FormData) {
   const me = await staff();
   const supabase = await createClient();

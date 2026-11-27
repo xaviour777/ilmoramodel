@@ -4,7 +4,7 @@ import { useState } from "react";
 import { noteSent } from "@/app/(app)/accounts/actions";
 import { CHANNEL_LABEL, sendLink, type Channel } from "@/lib/messages";
 
-// Opens WhatsApp or the SMS app with the message ready, and notes in Ilmora that it went out.
+// Opens WhatsApp or the SMS app with the message ready, and notes in Prinqo that it went out.
 // It is a real link, so it works even if the note fails, and on a phone it opens the app directly.
 export function SendButton({ channel, phone, body, kind, familyId, messageId, primary, label }: {
   channel: Channel; phone: string; body: string; kind: string;

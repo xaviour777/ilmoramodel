@@ -214,7 +214,7 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
 
   const label = from === to ? shortDate(from) : `${shortDate(from)} – ${shortDate(to)}${period === "term" && term ? ` · ${term.name}` : ""}`;
   const q = (o: Partial<Search>) => "/principal/attendance?" + new URLSearchParams(Object.entries({ period, from: period === "custom" ? from : undefined, to: period === "custom" ? to : undefined, cls: sp.cls, gender: gender || undefined, cmp, sort, ...o }).filter(([, v]) => v) as [string, string][]);
-  const remindText = (s: Sec) => `Assalamu Alaikum ${s.profiles?.full_name ?? ""}, attendance for ${s.classes.name}-${s.name} isn't marked yet today (${shortDate(today)}). Please mark it in the Ilmora app. Thank you.`;
+  const remindText = (s: Sec) => `Assalamu Alaikum ${s.profiles?.full_name ?? ""}, attendance for ${s.classes.name}-${s.name} isn't marked yet today (${shortDate(today)}). Please mark it in the Prinqo app. Thank you.`;
   const wa = (phone: string | null | undefined, text: string) => phone ? `https://wa.me/${phone.replace(/\D/g, "").replace(/^0/, "92")}?text=${encodeURIComponent(text)}` : null;
   const empty = now.length === 0;
 

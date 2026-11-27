@@ -24,7 +24,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <PageHead kick="Platform" title="Onboarding and trials" sub="From a new school to one that uses Ilmora every day.">
+      <PageHead kick="Platform" title="Onboarding and trials" sub="From a new school to one that uses Prinqo every day.">
         <Link href="/super/new" className="btn">Add a school</Link>
       </PageHead>
       {(sp.error || error) && <div className="notice-bad">{sp.error ?? error?.message}</div>}

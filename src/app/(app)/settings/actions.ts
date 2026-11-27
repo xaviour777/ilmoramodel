@@ -50,7 +50,7 @@ export async function sendTest(f: FormData) {
   const config = await loadMessagingConfig(supabase);
   if (!config) back(`error=${encodeURIComponent("Save the settings first.")}`);
   try {
-    await sendOne(config!, which, to!, "Ilmora test: yeh message school ke system se aaya hai. Connection theek hai.");
+    await sendOne(config!, which, to!, "Prinqo test: yeh message school ke system se aaya hai. Connection theek hai.");
   } catch (e) {
     back(`error=${encodeURIComponent(`Test failed: ${(e as Error).message}`)}`);
   }

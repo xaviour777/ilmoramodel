@@ -122,7 +122,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   const owner = me.role === "owner";
   if (owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
   const brand = await getBranding();
-  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
+  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Prinqo AI";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
     <div className="ilm min-h-screen">

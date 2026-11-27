@@ -58,7 +58,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         <section className="card xl:w-[400px]">
           <h2 className="h2">Fee reminders</h2>
-          <p className="muted">{recs.length} families have fees due. Ilmora picks the channel for each one:</p>
+          <p className="muted">{recs.length} families have fees due. Prinqo picks the channel for each one:</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="tile"><span className="muted">WhatsApp</span><b>{count("whatsapp")}</b><span className="muted text-xs">free, read sooner</span></div>
             <div className="tile"><span className="muted">SMS</span><b>{count("sms")}</b><span className="muted text-xs">asked for SMS, or WhatsApp got no payment in {SWITCH_AFTER_DAYS} days</span></div>

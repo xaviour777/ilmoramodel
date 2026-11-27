@@ -35,13 +35,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         {error && (
           <div className="notice-bad">
             {error === "no-profile" ? "This login isn't linked to anyone at a school yet."
-              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Ilmora${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
-              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Ilmora to turn it back on."
+              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Prinqo${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
+              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Prinqo to turn it back on."
               : error === "wrong-school" ? `This login belongs to another school. Use your own school's address${brand ? `, not ${brand.name}'s` : ""}.` : error}
           </div>
         )}
-        <label className="field">Email
-          <input className="input" name="email" type="email" required autoComplete="email" />
+        <label className="field">Email or mobile number
+          <input className="input" name="email" type="text" inputMode="email" required autoComplete="username" placeholder="you@school.pk or 03xx xxxxxxx" />
         </label>
         <label className="field">Password
           <input className="input" name="password" type="password" required autoComplete="current-password" />

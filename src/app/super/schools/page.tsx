@@ -72,7 +72,7 @@ export default async function SuperSchools({ searchParams }: { searchParams: Pro
         </table></div>
         {list.length === 0 && <Empty>No school matches.</Empty>}
       </section>
-      <div className="max-w-[720px]"><Insight title="Health score">Attendance marked on school days (40) + fees collected in the app this month (20) + paying Ilmora on time (20) + someone signed in this week (10) + WhatsApp, SMS or AI used this month (10). Below 60: call the school this week.</Insight></div>
+      <div className="max-w-[720px]"><Insight title="Health score">Attendance marked on school days (40) + fees collected in the app this month (20) + paying Prinqo on time (20) + someone signed in this week (10) + WhatsApp, SMS or AI used this month (10). Below 60: call the school this week.</Insight></div>
     </>
   );
 }
