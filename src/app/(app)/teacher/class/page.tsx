@@ -1,3 +1,4 @@
+import { moduleOn } from "@/lib/modules";
 import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -54,7 +55,7 @@ export default async function TeacherClass({ searchParams }: { searchParams: Pro
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="h1">My class</h1><p className="muted text-base">Gradebook, test analysis, remedial list and messages to parents.</p></div>
-        <Tabs current={tab} tabs={[...[["grades", "Gradebook"], ["analysis", "Test analysis"], ["remedial", "Remedial"], ["message", "Message parents"]].map(([id, label]) => ({ id, label, href: base({ tab: id }) })), ...classExtraTabs(sec.id)]} />
+        <Tabs current={tab} tabs={[...[["grades", "Gradebook"], ["analysis", "Test analysis"], ["remedial", "Remedial"], ["message", "Message parents"]].map(([id, label]) => ({ id, label, href: base({ tab: id }) })), ...classExtraTabs(sec.id, await moduleOn("passport"))]} />
       </div>
       <div className="flex flex-wrap gap-2">{sections.map((s) => <Link key={s.id} href={`/teacher/class?section=${s.id}&tab=${tab}`} className="chip" style={s.id === sec.id ? { borderColor: "var(--blue-ring)", background: "var(--blue-soft)" } : undefined}>{s.label}</Link>)}</div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}

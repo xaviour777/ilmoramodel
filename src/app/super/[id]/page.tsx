@@ -129,7 +129,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
 
       <section className="flex flex-wrap items-start gap-5">
         <div className="card min-w-0 flex-[3_1_480px]">
-          <h2 className="h2">Principal and office logins</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="h2">Principal and office logins</h2><Link href={`/super/${s.id}/logins`} className="btn-ghost" style={btn}>All logins and resets →</Link></div>
           {d.people.length === 0 && <div className="mt-2"><Empty>No principal or office staff yet.</Empty></div>}
           {d.people.map((p) => (
             <Row key={p.id}>

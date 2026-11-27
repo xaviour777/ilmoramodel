@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireSuper } from "@/lib/super";
+import { tempPassword, type LoginState } from "@/lib/temp-password";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const fail = (path: string, msg: string): never => redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
@@ -151,4 +152,16 @@ export async function setOwnerMode(f: FormData) {
   if (error) fail(`/super/${id}`, error.message);
   revalidatePath("/super", "layout");
   redirect(`/super/${id}?saved=1`);
+}
+
+// ---- Logins ----
+// Shown once on screen; nothing stores it.
+export async function resetLogin(_prev: LoginState, f: FormData): Promise<LoginState> {
+  await requireSuper();
+  const supabase = await createClient();
+  const password = tempPassword();
+  const { data, error } = await supabase.rpc("super_set_password", { p_profile: str(f, "profile_id"), p_password: password });
+  if (error) return { error: error.message };
+  revalidatePath(`/super/${str(f, "school_id")}/logins`);
+  return { ok: true, login: String(data ?? ""), password, name: str(f, "name") };
 }

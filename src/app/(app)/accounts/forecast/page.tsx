@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
-import { FeesTabs } from "@/components/fees-tabs";
 import { allRows } from "@/lib/outbox";
 import { mobilePK, whatsappLink } from "@/lib/messages";
 import { pct, rupees, shortDate, todayPK } from "@/lib/format";
@@ -50,9 +50,8 @@ export default async function Forecast() {
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><div className="kick">Money</div><h1 className="h1">Late fee forecast</h1>
+        <div><Link href={me.role === "accountant" ? "/accounts" : "/principal/reports"} className="kick underline">← {me.role === "accountant" ? "Fees" : "Reports"}</Link><h1 className="h1">Late fee forecast</h1>
           <p className="muted text-base">Families likely to pay late this month, from their last six months. Remind them before the due date.</p></div>
-        <FeesTabs current="forecast" salaries={me.role === "accountant"} />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="tile"><span className="muted">Likely late</span><b>{rows.length}</b></div>

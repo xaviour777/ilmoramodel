@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { FamilyExams } from "@/components/family-exams";
+import { FamilyRoad } from "@/components/family-road";
 
 export default async function StudentExams() {
   const me = await requireRole("student");
@@ -9,6 +10,7 @@ export default async function StudentExams() {
   return (
     <>
       <div><h1 className="h1">My exams</h1><p className="muted text-base">Your date sheet, admit card and report card.</p></div>
+      <FamilyRoad kids={(kids ?? []) as never} tutor="/student/tutor" />
       <FamilyExams kids={(kids ?? []) as never} />
     </>
   );

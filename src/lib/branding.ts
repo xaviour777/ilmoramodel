@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 // The school for the domain this page was opened on (set by middleware).
 // On a domain that isn't any school's (the vercel.app address, localhost)
-// it is null and the app shows the plain Ilmora look.
+// it is null and the app shows the plain Prinqo look.
 export type Branding = { id: string; name: string; logo_url: string | null; primary_color: string | null; support_email: string | null };
 
 export const DEFAULT_COLOR = "#16a34a";

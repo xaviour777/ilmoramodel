@@ -22,7 +22,7 @@ export default async function WhatsAppNumbers({ searchParams }: { searchParams: 
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><div className="kick">WhatsApp module</div><h1 className="h1">WhatsApp numbers</h1><p className="muted text-base">Your own numbers, linked by QR. Messages are shared across them.</p></div>
+        <div><div className="kick">Messages</div><h1 className="h1">WhatsApp numbers</h1><p className="muted text-base">Your own numbers, linked by QR. Messages are shared across them.</p></div>
         <WaTabs current="numbers" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}{sp.saved && <div className="notice-ok">Saved.</div>}

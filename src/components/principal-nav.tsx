@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { combinedGroups } from "./owner-nav";
 
 // Principal and owner menu: sidebar on desktop, bottom bar on phones
 // (design/Sidebar.dc.html and design/Mobile.dc.html).
-export type PItem = { id: string; href: string; label: string; tile: string; icon: string; also?: string[] };
-export type PGroup = { label: string; items: PItem[] };
+import { PRINCIPAL_GROUPS, type PGroup, type PItem } from "./principal-groups";
+export type { PGroup, PItem };
 
 const I: Record<string, string> = {
   home: "M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -35,39 +34,6 @@ const I: Record<string, string> = {
   director: "M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.5 6.5 19.5l1-6.3L3 8.9 9 8z",
 };
 
-// "" = always-open top group (no header), "_bottom" = pinned above the profile.
-// Every other group folds; the group holding the current page opens by itself.
-export const PRINCIPAL_GROUPS: PGroup[] = [
-  { label: "", items: [
-    { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
-    { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
-    { id: "fees", href: "/accounts", label: "Fees", tile: "t-o", icon: "fees" },
-    { id: "ask", href: "/principal/approvals", label: "Director requests", tile: "t-o", icon: "check2" },
-  ] },
-  { label: "Academics", items: [
-    { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },
-    { id: "exams", href: "/principal/exams", label: "Exams", tile: "t-v", icon: "exams" },
-    { id: "ai", href: "/principal/ai", label: "AI tools", tile: "t-y", icon: "ai", also: ["/teacher/paper-check", "/teacher/tutor-report"] },
-  ] },
-  { label: "People", items: [
-    { id: "students", href: "/principal/students", label: "Students", tile: "t-g", icon: "students" },
-    { id: "staff", href: "/principal/staff", label: "Staff & pay", tile: "t-b", icon: "staff" },
-    { id: "adm", href: "/principal/admissions", label: "Admissions", tile: "t-p", icon: "adm" },
-  ] },
-  { label: "School", items: [
-    { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
-    { id: "care", href: "/principal/care", label: "Complaints", tile: "t-y", icon: "chat" },
-    { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
-  ] },
-  { label: "Services", items: [
-    { id: "vans", href: "/principal/transport", label: "Vans", tile: "t-b", icon: "van" },
-    { id: "shop", href: "/principal/shop", label: "Book shop", tile: "t-g", icon: "shop" },
-  ] },
-  { label: "_bottom", items: [
-    { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile", "/whatsapp"] },
-  ] },
-];
-
 const ALL = PRINCIPAL_GROUPS.flatMap((g) => g.items);
 
 function currentId(path: string, all: PItem[] = ALL) {
@@ -90,10 +56,9 @@ const fmt = (n: number) => (n > 999 ? "999+" : String(n));
 const groupTitle = (l: string) => (l === "" ? "Main" : l === "_bottom" ? "Settings" : l);
 const sum = (items: PItem[], badges: Record<string, number>) => items.reduce((t, i) => t + (badges[i.id] > 0 ? badges[i.id] : 0), 0);
 
-export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials, groups: given, combined }: {
-  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string; groups?: PGroup[]; combined?: boolean;
+export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials, groups = PRINCIPAL_GROUPS }: {
+  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string; groups?: PGroup[];
 }) {
-  const groups = given ?? (combined ? combinedGroups(PRINCIPAL_GROUPS) : PRINCIPAL_GROUPS);
   const all = groups.flatMap((g) => g.items);
   const path = usePathname();
   const cur = currentId(path, all);
@@ -149,8 +114,9 @@ export function PrincipalSidebar({ badges, school, logo, campus, year, name, rol
           {hits.length === 0 && <div className="px-3 py-2 text-[13px] font-bold text-[#6b7280]">No page called &ldquo;{q}&rdquo;</div>}
           {hits.map(({ i, g }) => link(i, g))}
         </div>
-      ) : groups.filter((g) => g.label !== "_bottom").map((g) => {
-        if (g.label === "") return <div key="main" className="flex flex-col gap-0.5">{g.items.map((i) => link(i))}</div>;
+      ) : groups.filter((g) => g.label !== "_bottom").map((g, n) => {
+        // the first group (Daily) always stays open; the others fold
+        if (n === 0) return <div key={g.label || "main"} className="flex flex-col gap-0.5">{g.label && <div className="ilm-grp">{g.label}</div>}{g.items.map((i) => link(i))}</div>;
         const here = g.items.some((i) => i.id === cur);
         const isOpen = here || (open[g.label] ?? g.label !== "Director");
         const waiting = sum(g.items, badges);
@@ -178,8 +144,7 @@ export function PrincipalSidebar({ badges, school, logo, campus, year, name, rol
 
 const TABS = ["home", "classes", "exams", "staff"];
 
-export function PrincipalBottomBar({ badges, groups: given, tabs = TABS, combined }: { badges: Record<string, number>; groups?: PGroup[]; tabs?: string[]; combined?: boolean }) {
-  const groups = given ?? (combined ? combinedGroups(PRINCIPAL_GROUPS) : PRINCIPAL_GROUPS);
+export function PrincipalBottomBar({ badges, groups = PRINCIPAL_GROUPS, tabs = TABS }: { badges: Record<string, number>; groups?: PGroup[]; tabs?: string[] }) {
   const path = usePathname();
   const ALL = groups.flatMap((g) => g.items);
   const TABS = tabs;

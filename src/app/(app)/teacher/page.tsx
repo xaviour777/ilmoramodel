@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/me";
+import { AttendanceTabs } from "@/components/attendance-tabs";
 import { createClient } from "@/lib/supabase/server";
 import { mySections } from "@/lib/teacher";
 import { SectionPicker } from "@/components/section-picker";
@@ -65,6 +66,7 @@ export default async function TeacherAttendance({ searchParams }: { searchParams
           <button className="btn-ghost" type="submit">Go</button>
         </form>
       </div>
+      <AttendanceTabs current="mark" />
 
       {ask?.status === "pending" && <TimetableAsk ack={ask} compact />}
       {subs.length > 0 && (

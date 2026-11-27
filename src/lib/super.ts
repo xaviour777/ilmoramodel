@@ -38,7 +38,7 @@ export function stateOf(s: { status: string; trial_ends_on: string | null }, tod
 }
 
 // Health score 0–100 from what the school actually does in the app.
-// Attendance marking (40) + fee collection in the app (20) + paying Ilmora on time (20)
+// Attendance marking (40) + fee collection in the app (20) + paying Prinqo on time (20)
 // + someone signed in this week (10) + messages or AI used this month (10).
 export type HealthIn = { status: string; attendance_days_30?: number; payments_month?: number; overdue?: number; people_7d?: number; extras_month?: number };
 export function healthOf(s: HealthIn) {

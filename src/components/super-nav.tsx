@@ -36,7 +36,7 @@ export function SuperSidebar({ email, badges }: { email: string; badges: Record<
     <nav aria-label="Main" className="ilm-side">
       <Link href="/super" className="flex items-center gap-2.5 px-1.5 pt-1 pb-3">
         <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[14px] bg-[#0f172a] text-[22px] font-black text-white shadow-[0_4px_0_#000]">i</span>
-        <span className="min-w-0"><span className="block text-[17px] font-black">Ilmora platform</span><span className="block text-[12px] font-bold text-[#6b7280]">Super admin</span></span>
+        <span className="min-w-0"><span className="block text-[17px] font-black">Prinqo AI platform</span><span className="block text-[12px] font-bold text-[#6b7280]">Super admin</span></span>
       </Link>
       {SUPER_GROUPS.map((g) => (
         <div key={g.label} className="flex flex-col gap-1">

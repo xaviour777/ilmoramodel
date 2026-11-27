@@ -9,10 +9,13 @@ import { requireRole } from "@/lib/me";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const num = (f: FormData, k: string) => (str(f, k) ? Number(str(f, k)) : null);
+// observations live under Staff & pay and the brief under Messages; the rest on this page
+const PAGE: Record<string, string> = { observe: "/principal/staff/observe", brief: "/whatsapp/brief" };
 const go = (tab: string, error?: string): never => {
-  const base = tab === "transport" ? "/principal/transport" : "/principal/care";
-  revalidatePath(base);
-  redirect(`${base}?tab=${tab}${error ? `&error=${encodeURIComponent(error)}` : "&saved=1"}`);
+  const page = tab === "transport" ? "/principal/transport" : PAGE[tab];
+  revalidatePath(page ?? "/principal/care");
+  const q = error ? `error=${encodeURIComponent(error)}` : "saved=1";
+  redirect(page ? `${page}?${q}` : `/principal/care?tab=${tab}&${q}`);
 };
 
 export async function replyFeedback(f: FormData) {

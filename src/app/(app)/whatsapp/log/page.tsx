@@ -17,7 +17,7 @@ export default async function WaLog() {
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><div className="kick">WhatsApp module</div><h1 className="h1">Sent log</h1><p className="muted text-base">The last 100 WhatsApp messages, and which number sent each one.</p></div>
+        <div><div className="kick">Messages</div><h1 className="h1">Sent log</h1><p className="muted text-base">The last 100 WhatsApp messages, and which number sent each one.</p></div>
         <WaTabs current="log" />
       </div>
       <section className="card">

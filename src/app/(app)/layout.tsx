@@ -1,4 +1,4 @@
-import { OWNER_GROUPS, OWNER_TABS } from "@/components/owner-nav";
+import { OWNER_GROUPS, OWNER_TABS, combinedGroups } from "@/components/owner-nav";
 import { PushToggle } from "@/components/push-toggle";
 import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
@@ -11,6 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 import { todayPK } from "@/lib/format";
 import { getBranding } from "@/lib/branding";
 import { PlatformBanner } from "@/components/platform-banner";
+import { Guide } from "@/components/guide";
+import { moduleOn } from "@/lib/modules";
+import { PRINCIPAL_GROUPS } from "@/components/principal-groups";
 
 const STAFF: Role[] = ["principal", "owner", "accountant", "teacher"];
 
@@ -19,33 +22,28 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/principal", label: "Today", icon: "home" },
     { href: "/principal/classes", label: "Classes", icon: "classes", also: ["/principal/students"] },
     { href: "/principal/exams", label: "Exams", icon: "star" },
-    { href: "/teacher/paper-check", label: "Paper checking", icon: "pencil" },
-    { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
     { href: "/principal/approvals", label: "Director requests", icon: "coin" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
-    { href: "/settings", label: "Settings", icon: "gear", also: ["/accounts/messages", "/profile"] },
+    { href: "/accounts/messages", label: "Messages", icon: "chat", also: ["/whatsapp"] },
+    { href: "/settings", label: "Settings", icon: "gear", also: ["/profile", "/principal/ai"] },
   ],
   owner: [],
   accountant: [
     { href: "/accounts", label: "Fee desk", icon: "coin", also: ["/accounts/setup", "/principal/staff/salaries"] },
-    { href: "/accounts/messages", label: "WhatsApp & SMS", icon: "chat" },
-    { href: "/whatsapp/flows", label: "Auto flows", icon: "chat" },
+    { href: "/accounts/messages", label: "Messages", icon: "chat", also: ["/whatsapp"] },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
   ],
   teacher: [
-    { href: "/teacher", label: "Attendance", icon: "check" },
-    { href: "/teacher/scan", label: "Scan cards", icon: "check" },
+    { href: "/teacher", label: "Attendance", icon: "check", also: ["/teacher/scan"] },
     { href: "/teacher/homework", label: "Homework", icon: "book" },
     { href: "/teacher/marks", label: "Marks", icon: "star" },
     { href: "/teacher/class", label: "My class", icon: "people" },
-    { href: "/teacher/plans", label: "Lesson plans", icon: "book" },
-    { href: "/teacher/paper-check", label: "Paper checking", icon: "check" },
-    { href: "/teacher/tutor-report", label: "Tutor report", icon: "chat" },
-    { href: "/teacher/diary", label: "Diary & notes", icon: "pencil" },
+    { href: "/teacher/plans", label: "Lessons", icon: "book", also: ["/teacher/diary"] },
+    { href: "/teacher/paper-check", label: "Papers & AI", icon: "pencil", also: ["/teacher/tutor-report"] },
     { href: "/teacher/leave", label: "Leave & pay", icon: "clock" },
     { href: "/teacher/requests", label: "Parents' requests", icon: "people" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
@@ -84,13 +82,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="mx-auto flex max-w-[1440px] flex-col gap-6 p-4 lg:flex-row lg:items-start lg:p-6">
       <aside className="flex flex-col gap-2 lg:sticky lg:top-6 lg:w-56 lg:shrink-0">
         <div className="flex items-center justify-between lg:block">
-          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "ilmora"}</div>
+          <div className="px-3 pb-2 text-3xl font-black tracking-tight lg:pb-4" style={{ color: "var(--green)" }}>{(await getBranding())?.name ?? "Prinqo AI"}</div>
           <div className="flex items-center gap-1 lg:hidden">
             <Link href="/profile" aria-label="My profile" className="p-1"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
             <form action={signOut}><button className="muted px-3 py-2 underline" type="submit">Sign out</button></form>
           </div>
         </div>
-        <Nav items={NAV[me.role]} />
+        <Nav items={(await moduleOn("board")) ? NAV[me.role] : NAV[me.role].filter((i) => !i.href.endsWith("/board"))} />
         <div className="flex flex-wrap items-center gap-2 px-3">{(me.role === "parent" || me.role === "student") && <UrduSwitch urduFirst={me.role === "parent"} />}<PushToggle /></div>
         <div className="mt-4 hidden border-t-2 px-3 pt-3 text-[13px] font-bold lg:block" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
           <Link href="/profile" className="flex items-center gap-2.5 hover:underline">
@@ -101,6 +99,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col gap-5">{STAFF.includes(me.role) && <PlatformBanner />}{children}</main>
+      <Guide role={me.role} />
     </div>
   );
 }
@@ -122,15 +121,19 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
   const badges: Record<string, number> = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
   const owner = me.role === "owner";
-  const groups = owner ? OWNER_GROUPS : undefined;
   if (me.is_owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
+  // owner is also the principal: one menu with their own Approvals and a Director group;
+  // otherwise "Director requests" only where the school has a separate owner
+  const { data: hasOwner, error: ownerErr } = owner || me.combined ? { data: true, error: null } : await supabase.rpc("school_has_owner");
+  const groups = owner ? OWNER_GROUPS : me.combined ? combinedGroups(PRINCIPAL_GROUPS) : hasOwner || ownerErr ? PRINCIPAL_GROUPS
+    : PRINCIPAL_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "ask") }));
   const brand = await getBranding();
-  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Ilmora";
+  const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Prinqo AI";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
     <div className="ilm min-h-screen">
       <div className="hidden lg:block">
-        <PrincipalSidebar groups={groups} combined={me.combined} badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={me.combined ? "Principal and director" : ROLE_LABEL[me.role]} initials={initials} />
+        <PrincipalSidebar groups={groups} badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={me.combined ? "Principal and director" : ROLE_LABEL[me.role]} initials={initials} />
       </div>
       {/* phone header */}
       <header className="sticky top-0 z-30 flex items-center gap-2.5 border-b-2 border-[#e5e7eb] bg-white px-4 pt-4 pb-2.5 lg:hidden">
@@ -148,7 +151,8 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
         </div>
         <main className="mx-auto flex w-full max-w-[1220px] min-w-0 flex-col gap-5 px-4 pt-4 pb-28 lg:px-7 lg:pt-2 lg:pb-12"><PlatformBanner />{children}</main>
       </div>
-      <PrincipalBottomBar badges={badges} groups={groups} combined={me.combined} tabs={owner ? OWNER_TABS : undefined} />
+      <PrincipalBottomBar badges={badges} groups={groups} tabs={owner ? OWNER_TABS : undefined} />
+      <Guide role={me.role} />
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { pct, rupees, shortDate, time, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Chips, Insight, Empty, Bar, Row } from "@/components/ilm";
 import { addStaff, assignSubstitute, decideLeave, saveStaffAttendance } from "../actions";
+import { giveLogin } from "./actions";
+import { LoginButton } from "@/components/login-button";
 
 type Search = { saved?: string; error?: string; date?: string; tab?: string; period?: string; from?: string; to?: string };
 const DAY = 86400000;
@@ -209,6 +211,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
                   <span className={`tagx ${s.role === "teacher" ? "b" : s.role === "principal" ? "v" : "y"}`}>{ROLE[s.role] ?? s.role}</span>
                   <Link href={`/principal/staff/${s.id}`} className="flex-1 font-black hover:underline">{s.full_name}{s.employee_code && <span className="muted ml-2 text-[12px] font-bold">{s.employee_code}</span>}</Link>
                   <span className="muted text-[12px]">{s.user_id ? "can log in" : "no login yet"}</span>
+                  {s.role !== "principal" && <LoginButton action={giveLogin} fields={{ profile_id: s.id }} name={s.full_name} hasLogin={!!s.user_id} />}
                 </Row>
               ))}
             </div>
@@ -221,7 +224,7 @@ export default async function StaffPage({ searchParams }: { searchParams: Promis
               </div>
               <label className="field">Email for login<input className="input" name="email" type="email" /></label>
               <button className="btn self-start" type="submit">Add</button>
-              <p className="muted text-[13px]">They can sign in once a login is created for this email (see the README).</p>
+              <p className="muted text-[13px]">Then press <b>Create login</b> next to their name. They sign in with this email, or with their mobile number if there is no email.</p>
             </form>
           </section>
         </>

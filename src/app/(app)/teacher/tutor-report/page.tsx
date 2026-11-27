@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/me";
+import { PaperTabs } from "@/components/paper-tabs";
 import { createClient } from "@/lib/supabase/server";
 import { checkableSections } from "@/lib/paper-check/data";
 
@@ -33,6 +34,7 @@ export default async function TutorReportPage() {
         <h1 className="h1">Homework tutor report</h1>
         <p className="muted text-base">Last 7 days. Topics where many students needed the full answer are worth explaining again in class.</p>
       </div>
+      <PaperTabs current="tutor" />
       <section className="card">
         {topics.length === 0 && <p className="muted">No student in your classes used the tutor this week.</p>}
         {topics.map((t) => (
