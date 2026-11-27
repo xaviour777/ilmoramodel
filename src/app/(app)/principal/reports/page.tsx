@@ -46,6 +46,7 @@ export default async function PrincipalReports({ searchParams }: { searchParams:
           </Link>
         ))}
       </section>
+      <p className="muted -mt-2 text-[13px] font-extrabold">More: <Link href="/principal/attendance" className="text-[#0369a1] underline">Attendance trend and analysis</Link> · <Link href="/accounts/forecast" className="text-[#0369a1] underline">Who may pay late (forecast)</Link> · <Link href="/accounts/calls" className="text-[#0369a1] underline">Defaulters</Link></p>
       <section className="card flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <h2 className="h2">{cur.n} · {from === to ? shortDate(from) : `${shortDate(from)} – ${shortDate(to)}`}</h2>

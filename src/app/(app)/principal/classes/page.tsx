@@ -352,7 +352,7 @@ async function TimetableTab({ sectionId }: { sectionId?: string }) {
           <label className="field">Teacher<select className="input" name="teacher_id"><option value="">None</option>{teachers.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}</select></label>
           <button className="btn" type="submit">Set period</button>
         </form>
-        <p className="muted">Ilmora stops you if a teacher is already booked in that period.</p>
+        <p className="muted">Prinqo stops you if a teacher is already booked in that period.</p>
         <form action={autoFillSection} className="flex flex-wrap items-center gap-3 rounded-xl p-3" style={{ background: "var(--page)" }}>
           <input type="hidden" name="section_id" value={section.id} />
           <div className="flex-1 text-sm font-bold">Fill the free periods from this section&apos;s subject teachers, without clashes. Periods you already set stay as they are.</div>

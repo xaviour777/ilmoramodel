@@ -1,9 +1,11 @@
+import { requireModule } from "@/lib/modules";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { BoardPrep } from "@/components/board-prep";
 
 export default async function StudentBoard() {
   const me = await requireRole("student");
+  await requireModule("board", "/student");
   const sb = await createClient();
   const { data } = await sb.from("students").select("id, full_name, sections(name, classes(name))").eq("profile_id", me.id).maybeSingle();
   return (

@@ -59,7 +59,7 @@ export default async function PrintSheetsPage({ params }: { params: Promise<{ id
               </div>
             );
           })}
-          <div className="absolute" style={{ left: mm(22), bottom: mm(9), fontSize: "7pt", color: "#555" }}>ilmora answer sheet · checked by your teacher</div>
+          <div className="absolute" style={{ left: mm(22), bottom: mm(9), fontSize: "7pt", color: "#555" }}>Prinqo answer sheet · checked by your teacher</div>
         </div>
       ))}
     </div>

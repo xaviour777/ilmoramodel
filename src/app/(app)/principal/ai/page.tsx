@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SettingsTabs } from "@/components/settings-tabs";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { pct, rupees, todayPK } from "@/lib/format";
@@ -71,6 +72,7 @@ export default async function PrincipalAiTools({ searchParams }: { searchParams:
 
   return (
     <>
+      <SettingsTabs current="aifeatures" />
       <section className="card flex flex-row flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-[1_1_360px]">
           <div className="kick">AI for your school</div>

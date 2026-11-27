@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/me";
+import { LessonTabs } from "@/components/lesson-tabs";
 import { createClient } from "@/lib/supabase/server";
 import { mySections } from "@/lib/teacher";
 import { shortDate } from "@/lib/format";
@@ -24,6 +25,7 @@ export default async function DiaryPage({ searchParams }: { searchParams: Promis
         <h1 className="h1">Lesson diary and student notes</h1>
         <p className="muted text-base">What you taught today, and praise or concerns about a student.</p>
       </div>
+      <LessonTabs current="diary" />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       <div className="grid gap-5 xl:grid-cols-2">
         <form action={addDiary} className="card">

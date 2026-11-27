@@ -186,7 +186,7 @@ export async function sendResults(f: FormData) {
       const ms = per.get(k.id)!; const s = sec.get(k.section_id)!; const total = sum(ms);
       const lines = ms.map((m) => `${m.subjects.name}: ${m.is_absent ? "Absent" : `${Number(m.obtained)}/${out}`}`);
       return `\n${k.full_name} (${s.className}-${s.name})\n${lines.join("\n")}\nTotal ${total}/${out * ms.length} (${Math.round((total / (out * ms.length)) * 100)}%) · ${ordinal(pos.get(k.id) ?? 0)} in class`;
-    }), "\nFull report card: open the Ilmora parent app."].join("\n"),
+    }), "\nFull report card: open the Prinqo parent app."].join("\n"),
   });
   if (q.error) back(flowBack(f), q.error);
   const d = await deliverQueued(supabase);

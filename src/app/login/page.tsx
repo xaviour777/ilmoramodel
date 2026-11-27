@@ -1,6 +1,5 @@
 import { signIn, signOut } from "./actions";
 import { getBranding, DEFAULT_COLOR, shade } from "@/lib/branding";
-import { getSite } from "@/lib/site/load";
 
 const demo = [
   ["Owner (3 campuses)", "owner@demo.ilmora.pk"],
@@ -18,8 +17,6 @@ const showDemo = process.env.SHOW_DEMO_LOGINS === "1";
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const brand = await getBranding();
-  // on a school website's address the app is that school's "My Model" portal
-  const site = await getSite();
   const color = brand?.primary_color ?? DEFAULT_COLOR;
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4 py-10">
@@ -28,25 +25,26 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           // eslint-disable-next-line @next/next/no-img-element
           ? <img src={brand.logo_url} alt={brand.name} className="mb-3 h-20 w-20 rounded-[20px] object-contain" />
           : brand && <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-[20px] text-4xl font-black text-white" style={{ background: color, boxShadow: `0 5px 0 ${shade(color)}` }}>{brand.name[0]}</div>}
-        <div className="text-5xl font-black tracking-tight" style={{ color }}>{site ? "My Model" : brand?.name ?? "ilmora"}</div>
-        <p className="muted mt-2 text-base">{site ? `${site.name} · parents, students and staff sign in here` : brand ? "Sign in to continue" : "Sign in to your school"}</p>
+        <div className="text-5xl font-black tracking-tight" style={{ color }}>{brand?.name ?? "Prinqo AI"}</div>
+        <p className="muted mt-2 text-base">{brand ? "Sign in to continue" : "Sign in to your school"}</p>
       </div>
       <form action={signIn} className="card">
         {error && (
           <div className="notice-bad">
             {error === "no-profile" ? "This login isn't linked to anyone at a school yet."
-              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Ilmora${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
-              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Ilmora to turn it back on."
+              : error === "trial-ended" ? `Your school's free trial has ended. Your data is safe; contact Prinqo${brand?.support_email ? ` or ${brand.support_email}` : ""} to continue.`
+              : error === "school-suspended" ? "Your school's account is paused. Your data is safe; contact Prinqo to turn it back on."
               : error === "wrong-school" ? `This login belongs to another school. Use your own school's address${brand ? `, not ${brand.name}'s` : ""}.` : error}
           </div>
         )}
-        <label className="field">Email
-          <input className="input" name="email" type="email" required autoComplete="email" />
+        <label className="field">Email or mobile number
+          <input className="input" name="email" type="text" inputMode="email" required autoComplete="username" placeholder="you@school.pk or 03xx xxxxxxx" />
         </label>
         <label className="field">Password
           <input className="input" name="password" type="password" required autoComplete="current-password" />
         </label>
         <button className="btn" type="submit" style={brand ? { background: color, boxShadow: `0 4px 0 ${shade(color)}` } : undefined}>Sign in</button>
+        {brand && <p className="muted text-center text-sm">New parent or student? <a href="/register" className="font-black underline" style={{ color }}>Ask for a login</a></p>}
         {["wrong-school", "trial-ended", "school-suspended"].includes(error ?? "") && <button formAction={signOut} formNoValidate className="muted text-sm underline" type="submit">Sign out of the other school</button>}
       </form>
       {brand ? (

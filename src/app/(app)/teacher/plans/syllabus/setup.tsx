@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { createSyllabus } from "./actions";
 
 const WAYS = [
-  { id: "pdf", label: "📄 Book PDF", help: "Choose the book's PDF. Ilmora reads its first pages (the contents) on this phone or computer; the PDF itself is not uploaded." },
+  { id: "pdf", label: "📄 Book PDF", help: "Choose the book's PDF. Prinqo reads its first pages (the contents) on this phone or computer; the PDF itself is not uploaded." },
   { id: "photo", label: "📷 Photo of contents", help: "Take a clear photo of the contents page. The AI reads chapters, topics and page numbers from it." },
   { id: "typed", label: "⌨️ Type the contents", help: "One chapter per line, topics under it. Page numbers are optional. No AI needed." },
   { id: "ai", label: "✨ AI knows the book", help: "For Punjab textbooks: the AI lists the chapters it knows. Check them after." },

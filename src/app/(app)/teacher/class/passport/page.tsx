@@ -1,3 +1,4 @@
+import { requireModule } from "@/lib/modules";
 import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +15,7 @@ type Item = { id: string; kind: string; title: string; body: string | null; happ
 // Model Passport for a section: approve what students and parents add, and add school achievements and certificates.
 export default async function ClassPassport({ searchParams }: { searchParams: Promise<{ section?: string; saved?: string; error?: string }> }) {
   const me = await requireRole("teacher", "principal", "owner");
+  await requireModule("passport", "/teacher/class");
   const sp = await searchParams;
   const sections = await classSections(me);
   const sec = sections.find((s) => s.id === sp.section) ?? sections[0];

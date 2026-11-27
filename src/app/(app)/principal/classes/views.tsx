@@ -455,7 +455,7 @@ export async function GapsTab() {
           </Insight>
         )}
         <div className="card">
-          <h2 className="h2">Checks Ilmora runs</h2>
+          <h2 className="h2">Checks Prinqo runs</h2>
           {CHECKS.map(([id, l]) => { const n = gaps.filter((g) => g.check === id).length; return (
             <Row key={id}><span className="flex-1 font-bold">{l}</span><span className={`tagx ${n ? (id === "capacity" || id === "subject" || id === "path" ? "r" : "y") : "g"}`}>{n ? n : "OK"}</span></Row>
           ); })}

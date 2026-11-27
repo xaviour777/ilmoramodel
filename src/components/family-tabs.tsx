@@ -1,21 +1,24 @@
 import Link from "next/link";
 import { UnderTabs } from "./classes-tabs";
 import type { Kid } from "@/lib/learning";
+import { moduleOn } from "@/lib/modules";
 
 // Tabs on the student and parent home screens (new screens are tabs, not new menu items).
-export function StudentTabs({ current, ur }: { current: "today" | "passport"; ur: boolean }) {
+export async function StudentTabs({ current, ur }: { current: "today" | "passport"; ur: boolean }) {
+  if (!(await moduleOn("passport"))) return null;
   return <UnderTabs current={current} tabs={[
     { id: "today", label: ur ? "میری سیکھنے کی جگہ" : "My Learning Space", href: "/student" },
     { id: "passport", label: ur ? "ماڈل پاسپورٹ" : "Model Passport", href: "/student/passport" },
   ]} />;
 }
 
-export function ParentTabs({ current, child, ur }: { current: "today" | "details" | "passport"; child?: string; ur: boolean }) {
+export async function ParentTabs({ current, child, ur }: { current: "today" | "details" | "passport"; child?: string; ur: boolean }) {
   const q = child ? `?child=${child}` : "";
+  const passport = await moduleOn("passport");
   return <UnderTabs current={current} tabs={[
     { id: "today", label: ur ? "آج میرا بچہ" : "My Child Today", href: `/parent${q}` },
     { id: "details", label: ur ? "پوری تفصیل" : "Full details", href: `/parent/details${q}` },
-    { id: "passport", label: ur ? "ماڈل پاسپورٹ" : "Model Passport", href: `/parent/passport${q}` },
+    ...(passport ? [{ id: "passport", label: ur ? "ماڈل پاسپورٹ" : "Model Passport", href: `/parent/passport${q}` }] : []),
   ]} />;
 }
 

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { mySections } from "@/lib/teacher";
 import { shortDate, todayPK } from "@/lib/format";
 import { saveLessonPlan } from "../class/actions";
-import { UnderTabs } from "@/components/classes-tabs";
+import { LessonTabs } from "@/components/lesson-tabs";
 
 const monday = (d: string) => { const t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7)); return t.toISOString().slice(0, 10); };
 const addDays = (d: string, n: number) => { const t = new Date(d + "T00:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
@@ -38,7 +38,7 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
           <Link className="btn-ghost min-h-10 px-3" href={`/teacher/plans?week=${addDays(week, 7)}`}>›</Link>
         </div>
       </div>
-      <UnderTabs current="week" tabs={[{ id: "week", label: "Weekly plans", href: "/teacher/plans" }, { id: "syllabus", label: "Whole-year syllabus", href: "/teacher/plans/syllabus" }]} />
+      <LessonTabs current="week" />
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Plan saved.</div>}
       {pairs.length === 0 && <p className="muted">No subjects are assigned to you yet.</p>}

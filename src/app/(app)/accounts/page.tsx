@@ -157,7 +157,7 @@ export default async function FeeDesk({ searchParams }: { searchParams: Promise<
                 <div className="flex flex-col gap-2.5 rounded-2xl border-2 p-3.5" style={{ borderColor: "var(--line)" }}>
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h3 className="font-black">Fee reminder</h3>
-                    {rec.channel && <span className="pill pill-green">Ilmora suggests {CHANNEL_LABEL[rec.channel]}</span>}
+                    {rec.channel && <span className="pill pill-green">Prinqo suggests {CHANNEL_LABEL[rec.channel]}</span>}
                   </div>
                   <p className="muted">{rec.reason}{rec.phone ? ` To ${showPhone(rec.phone)}.` : ""}</p>
                   {rec.recentlySent && <p className="text-sm font-extrabold" style={{ color: "var(--orange-ink)" }}>{rec.recentlySent}</p>}

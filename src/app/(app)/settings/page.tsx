@@ -35,7 +35,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     accountant: ["Accounts", "y", "Fees, expenses, salaries, reports"], teacher: ["Teacher", "b", "Own classes: attendance, marks, diary"],
   };
   const MENU: [string, string, string][] = [["school", "School and campus", "/settings?s=school"], ["roles", "People and permissions", "/settings?s=roles"], ["msg", "Messages and automation", "/settings"], ["pay", "Payments", "/settings?s=pay"], ["rules", "Attendance and grading", "/settings?s=rules"]];
-  const MORE: [string, string][] = [["Website", "/settings/website"], ["AI", "/settings/ai"], ["School year and promotion", "/settings/year"], ["Messages sent", "/accounts/messages"], ["My profile", "/profile"]];
+  const MORE: [string, string][] = [["AI key and budget", "/settings/ai"], ["AI features", "/principal/ai"], ["School year and promotion", "/settings/year"], ["Extra modules (Passport, Board prep)", "/settings/modules"], ["Messages outbox", "/accounts/messages"], ["My profile", "/profile"]];
   const teachers = (people ?? []).filter((p) => p.role === "teacher");
   return (
     <>
@@ -62,7 +62,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 ))}
               </div>
               <div className="mt-3 flex flex-wrap gap-2.5"><Link href="/settings/year" className="btn">School year and promotion</Link><Link href="/principal/classes" className="btn-ghost">Boards on classes</Link></div>
-              <p className="muted mt-2 text-[13px]">The school and campus names are set when the school is created. Ask Ilmora support to change them.</p>
+              <p className="muted mt-2 text-[13px]">The school and campus names are set when the school is created. Ask Prinqo support to change them.</p>
             </div>
           )}
           {sec === "roles" && (
