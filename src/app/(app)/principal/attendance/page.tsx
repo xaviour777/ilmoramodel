@@ -214,7 +214,7 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
 
   const label = from === to ? shortDate(from) : `${shortDate(from)} – ${shortDate(to)}${period === "term" && term ? ` · ${term.name}` : ""}`;
   const q = (o: Partial<Search>) => "/principal/attendance?" + new URLSearchParams(Object.entries({ period, from: period === "custom" ? from : undefined, to: period === "custom" ? to : undefined, cls: sp.cls, gender: gender || undefined, cmp, sort, ...o }).filter(([, v]) => v) as [string, string][]);
-  const remindText = (s: Sec) => `Assalamu Alaikum ${s.profiles?.full_name ?? ""}, attendance for ${s.classes.name}-${s.name} isn't marked yet today (${shortDate(today)}). Please mark it in the Ilmora app. Thank you.`;
+  const remindText = (s: Sec) => `Assalamu Alaikum ${s.profiles?.full_name ?? ""}, attendance for ${s.classes.name}-${s.name} isn't marked yet today (${shortDate(today)}). Please mark it in the Prinqo app. Thank you.`;
   const wa = (phone: string | null | undefined, text: string) => phone ? `https://wa.me/${phone.replace(/\D/g, "").replace(/^0/, "92")}?text=${encodeURIComponent(text)}` : null;
   const empty = now.length === 0;
 
@@ -226,6 +226,45 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
         <a href={`/principal/attendance/export.csv?from=${from}&to=${to}${cls ? `&cls=${cls.id}` : ""}`} className="btn-ghost">Excel</a>
       </PageHead>
 
+      {notMarked.length > 0 && (
+        <section className="card warm flex flex-row flex-wrap items-start gap-4" style={{ background: "#fffbeb", borderColor: "#fcd34d", boxShadow: "0 4px 0 #fcd34d" }}>
+          <span className="ilm-tile t-o" style={{ width: 48, height: 48, borderRadius: 14 }}><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 8v5M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg></span>
+          <div className="min-w-0 flex-[1_1_300px]">
+            <div className="text-[17px] font-black">Today: {notMarked.length} section{notMarked.length === 1 ? "" : "s"} not marked yet</div>
+            <div className="muted text-[13px]">{notMarked.slice(0, 8).map((s) => `${s.classes.name}-${s.name} (${s.profiles?.full_name ?? "no class teacher"})`).join(", ")}{notMarked.length > 8 ? ` and ${notMarked.length - 8} more` : ""}. {marked.size ? `${marked.size} of ${secs.length} sections have marked.` : `It is ${nowHM}.`}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {notMarked.slice(0, 6).map((s) => {
+                const link = wa(s.profiles?.phone, remindText(s));
+                return link ? <a key={s.id} href={link} target="_blank" rel="noreferrer" className="btn" style={{ minHeight: 32, padding: "0 12px", fontSize: 11 }}>Remind {s.profiles?.full_name?.split(" ")[0]}</a> : null;
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!empty && (
+        <div className="card">
+          <div className="flex items-center justify-between gap-2"><h2 className="h2">Chronic absentees</h2><span className="tagx r">below 80%</span></div>
+          {chronic.length === 0 && <div className="mt-2"><Empty>Nobody is below 80% this period.</Empty></div>}
+          {chronic.slice(0, 12).map(([id, c]) => {
+            const s = info.get(id); const sec = secById.get(c.section);
+            const phone = s?.families?.reminder_phone || s?.families?.phone;
+            return (
+              <Row key={id}>
+                <div className="min-w-0 flex-1">
+                  <Link href={`/principal/students/${id}`} className="font-black">{s?.full_name ?? "Student"}{sec ? ` · ${sec.classes.name.replace("Class ", "")}-${sec.name}` : ""}</Link>
+                  <div className="muted text-[12px]">{pct(c.p / c.n)} · {c.absent} absent{c.mondays >= 2 ? ` (${c.mondays} Mondays)` : ""}{c.late ? ` · late ${c.late} time${c.late === 1 ? "" : "s"}` : ""}</div>
+                </div>
+                {phone ? <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="btn-ghost" style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }}>Call</a> : <span className="muted text-[12px]">no phone</span>}
+              </Row>
+            );
+          })}
+          {chronic.length > 12 && <Link href="/principal/students?f=absent" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">See all {chronic.length}</Link>}
+        </div>
+      )}
+      <details className="card" open={Boolean(sp.period || sp.cls || sp.gender || sp.cmp || sp.sort)}>
+        <summary className="h2 cursor-pointer">Analysis: trend, classes, weekdays, boys vs girls, teachers on time</summary>
+        <div className="mt-4 flex flex-col gap-5">
       <form className="card flex flex-row flex-wrap items-end gap-3">
         <div className="flex-[1_1_100%]">
           <Chips label="Period" current={period} items={[["week", "This week"], ["month", "This month"], ["term", "This term"], ["custom", "Custom"]].map(([id, l]) => ({ id, label: l, href: q({ period: id, from: undefined, to: undefined }) }))} />
@@ -260,22 +299,6 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
           );
         })}
       </section>
-
-      {notMarked.length > 0 && (
-        <section className="card warm flex flex-row flex-wrap items-start gap-4" style={{ background: "#fffbeb", borderColor: "#fcd34d", boxShadow: "0 4px 0 #fcd34d" }}>
-          <span className="ilm-tile t-o" style={{ width: 48, height: 48, borderRadius: 14 }}><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 8v5M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg></span>
-          <div className="min-w-0 flex-[1_1_300px]">
-            <div className="text-[17px] font-black">Today: {notMarked.length} section{notMarked.length === 1 ? "" : "s"} not marked yet</div>
-            <div className="muted text-[13px]">{notMarked.slice(0, 8).map((s) => `${s.classes.name}-${s.name} (${s.profiles?.full_name ?? "no class teacher"})`).join(", ")}{notMarked.length > 8 ? ` and ${notMarked.length - 8} more` : ""}. {marked.size ? `${marked.size} of ${secs.length} sections have marked.` : `It is ${nowHM}.`}</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {notMarked.slice(0, 6).map((s) => {
-                const link = wa(s.profiles?.phone, remindText(s));
-                return link ? <a key={s.id} href={link} target="_blank" rel="noreferrer" className="btn" style={{ minHeight: 32, padding: "0 12px", fontSize: 11 }}>Remind {s.profiles?.full_name?.split(" ")[0]}</a> : null;
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {empty ? <Empty>No attendance is marked for {label}{cls ? ` in ${cls.name}` : ""}{gender ? ` for ${gender === "male" ? "boys" : "girls"}` : ""}. Pick another period, or check that teachers are marking in their app.</Empty> : (
         <section className="flex flex-wrap items-start gap-5">
@@ -368,25 +391,6 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
             </div>
 
             <div className="card">
-              <div className="flex items-center justify-between gap-2"><h2 className="h2">Chronic absentees</h2><span className="tagx r">below 80%</span></div>
-              {chronic.length === 0 && <div className="mt-2"><Empty>Nobody is below 80% this period.</Empty></div>}
-              {chronic.slice(0, 12).map(([id, c]) => {
-                const s = info.get(id); const sec = secById.get(c.section);
-                const phone = s?.families?.reminder_phone || s?.families?.phone;
-                return (
-                  <Row key={id}>
-                    <div className="min-w-0 flex-1">
-                      <Link href={`/principal/students/${id}`} className="font-black">{s?.full_name ?? "Student"}{sec ? ` · ${sec.classes.name.replace("Class ", "")}-${sec.name}` : ""}</Link>
-                      <div className="muted text-[12px]">{pct(c.p / c.n)} · {c.absent} absent{c.mondays >= 2 ? ` (${c.mondays} Mondays)` : ""}{c.late ? ` · late ${c.late} time${c.late === 1 ? "" : "s"}` : ""}</div>
-                    </div>
-                    {phone ? <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="btn-ghost" style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }}>Call</a> : <span className="muted text-[12px]">no phone</span>}
-                  </Row>
-                );
-              })}
-              {chronic.length > 12 && <Link href="/principal/students?f=absent" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">See all {chronic.length}</Link>}
-            </div>
-
-            <div className="card">
               <h2 className="h2">Teachers marking on time</h2>
               <p className="muted text-[13px]">First save before 9:00 am on the day, this period</p>
               {onTimeRows.map((t) => (
@@ -401,6 +405,8 @@ export default async function PrincipalAttendance({ searchParams }: { searchPara
           </div>
         </section>
       )}
+        </div>
+      </details>
     </>
   );
 }

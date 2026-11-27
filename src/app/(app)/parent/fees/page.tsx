@@ -3,8 +3,12 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { sendPaymentClaim } from "./actions";
+import { JazzPay } from "@/components/jazz-pay";
+import { jazzReady, jazzSandbox } from "@/lib/jazzcash";
 
-type Search = { sent?: string; error?: string };
+const PAY_MSG: Record<string, string> = { paid: "Paid. Your receipt is below.", failed: "The payment did not go through. No money was taken.", bad: "We could not confirm that payment. If money was taken, contact the office.", setup: "Online payment isn't fully set up yet. Please contact the office.", error: "Payment received but not recorded. Please contact the office with your JazzCash reference." };
+
+type Search = { sent?: string; error?: string; pay?: string };
 const MODE: Record<string, string> = { cash: "Cash", jazzcash: "JazzCash", easypaisa: "Easypaisa" };
 
 // The family's fee record: every challan with what is paid, the next fee, receipts, and paying by wallet.
@@ -62,6 +66,7 @@ export default async function ParentFees({ searchParams }: { searchParams: Promi
         <p className="muted text-base"><Link href="/parent" className="font-extrabold">Back to my children</Link></p>
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
+      {sp.pay && <div className={sp.pay === "paid" ? "notice-ok" : "notice-bad"}>{PAY_MSG[sp.pay] ?? "Payment was not completed."}</div>}
       {sp.sent && <div className="notice-ok">Sent. The school office will check it and send your receipt, usually the same day.</div>}
 
       <div className="grid gap-5 xl:grid-cols-2">
@@ -71,7 +76,7 @@ export default async function ParentFees({ searchParams }: { searchParams: Promi
           {latest && due > 0 && <div className="muted">Challan {latest.challan_no} · last date {shortDate(latest.due_on)}</div>}
           {due < 0 && <div className="muted">You have paid {rupees(-due)} in advance.</div>}
           {pending > 0 && <div className="muted">{rupees(pending)} sent by wallet is waiting for the office to confirm.</div>}
-          {due > 0 && <a href="#pay" className="btn self-start">Pay now</a>}
+          {due > 0 && (jazzReady() ? <JazzPay invoiceId={latest?.id ?? null} amountPaisa={due} sandbox={jazzSandbox()} /> : <a href="#pay" className="btn self-start">Pay now</a>)}
         </section>
         <section className="card">
           <h2 className="h2">Next fee · {new Date(nextMonth + "-01T00:00:00Z").toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })}</h2>

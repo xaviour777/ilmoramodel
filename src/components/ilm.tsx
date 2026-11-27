@@ -2,7 +2,7 @@ import Link from "next/link";
 
 // Building blocks for the principal pages (design/ilmora.css).
 
-export function PageHead({ kick, title, sub, children }: { kick: string; title: string; sub?: React.ReactNode; children?: React.ReactNode }) {
+export function PageHead({ kick, title, sub, children }: { kick: React.ReactNode; title: string; sub?: React.ReactNode; children?: React.ReactNode }) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">

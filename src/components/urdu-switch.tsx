@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import { UR } from "@/lib/urdu";
 
-const read = () => { try { return document.cookie.includes("lang=ur"); } catch { return false; } };
+// Parents get Urdu unless they chose English; students get English unless they chose Urdu.
+const read = (urduFirst: boolean) => {
+  try { const c = document.cookie; return c.includes("lang=ur") || (urduFirst && !c.includes("lang=en")); } catch { return urduFirst; }
+};
 
 // Swaps known English phrases on the family screens for Urdu, and keeps doing so as pages change.
-export function UrduSwitch() {
+export function UrduSwitch({ urduFirst = false }: { urduFirst?: boolean }) {
   const [on, setOn] = useState(false);
-  useEffect(() => setOn(read()), []);
+  useEffect(() => setOn(read(urduFirst)), [urduFirst]);
   useEffect(() => {
     if (!on) return;
     const root = document.body;

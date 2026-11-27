@@ -10,7 +10,7 @@ import { deletePaper, mcqTestFromPaper, replaceItem } from "../../bank-actions";
 const SECTION: Record<string, string> = { A: "Section A: MCQs", B: "Section B: Short questions", C: "Section C: Long questions" };
 
 // One made paper: check it, swap any question, print it with or without the answer key.
-export default async function PaperDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
+export default async function PaperDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; ai?: string }> }) {
   const me = await requireRole("teacher", "principal", "owner");
   const { id } = await params;
   const sp = await searchParams;
@@ -41,6 +41,7 @@ export default async function PaperDetail({ params, searchParams }: { params: Pr
         <PaperTabs current="papers" />
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
+      {sp.ai && <div className="notice-ok">AI made this paper. Read every question and answer; tap Replace on any you don&apos;t like. Then print.</div>}
       <section className="card flex flex-row flex-wrap items-center gap-2">
         <Link className="btn" href={`/print/question-paper/${paper.id}`} target="_blank">Print paper</Link>
         <Link className="btn-ghost" href={`/print/question-paper/${paper.id}?key=1`} target="_blank">Print answer key</Link>

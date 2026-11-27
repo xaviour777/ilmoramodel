@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { stateOf } from "@/lib/super";
+import { stateOf, type Plan } from "@/lib/super";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Row, Empty } from "@/components/ilm";
-import { setPassword, setStatus, updateSchool } from "../actions";
+import { setModule, setPassword, setStatus, updateSchool } from "../actions";
 
 type Detail = {
   school: { id: string; name: string; city: string | null; custom_domain: string | null; logo_url: string | null; primary_color: string | null; support_email: string | null;
@@ -19,7 +19,8 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("super_school", { p_school: id });
+  const [{ data, error }, pl] = await Promise.all([supabase.rpc("super_school", { p_school: id }), supabase.rpc("super_plans")]);
+  const plans = (pl.data ?? []) as Plan[];
   const d = data as Detail | null;
   if (error) return <div className="notice-bad">{error.message}</div>;
   if (!d?.school) notFound();
@@ -59,7 +60,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
             <label className="field">Support email<input className="input" name="support_email" type="email" defaultValue={s.support_email ?? ""} /></label>
             <label className="field">Logo link<input className="input" name="logo_url" type="url" defaultValue={s.logo_url ?? ""} /></label>
             <label className="field">Brand colour<input className="input" name="primary_color" type="color" defaultValue={s.primary_color ?? "#16a34a"} /></label>
-            <label className="field">Plan<select className="input" name="plan" defaultValue={s.plan}><option value="basic">Basic</option><option value="standard">Standard</option><option value="premium">Premium</option></select></label>
+            <label className="field">Plan<select className="input" name="plan" defaultValue={s.plan}>{plans.map((p) => <option key={p.id} value={p.id}>{p.name}{p.price_paisa ? ` · ${rupees(p.price_paisa)}` : ""}</option>)}{!plans.some((p) => p.id === s.plan) && <option value={s.plan}>{s.plan}</option>}</select></label>
             <label className="field">Student limit<input className="input" name="max_students" type="number" min={1} defaultValue={s.max_students ?? ""} /></label>
           </div>
           <label className="field">Notes (only you see these)<textarea className="input min-h-20 py-2" name="notes" defaultValue={s.notes ?? ""} /></label>
@@ -86,6 +87,16 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
             </div>
           </div>
 
+          <div className="card flex flex-col gap-2.5">
+            <h2 className="h2">Premium modules</h2>
+            {(() => { const on = ((s as unknown as { modules?: string[] }).modules ?? []).includes("whatsapp"); return (
+              <form action={setModule} className="flex flex-wrap items-center justify-between gap-2">
+                <input type="hidden" name="school_id" value={s.id} /><input type="hidden" name="module" value="whatsapp" /><input type="hidden" name="on" value={on ? "0" : "1"} />
+                <div><b>WhatsApp automation</b><div className="muted text-[13px]">QR-linked numbers with rotation, and drag-and-drop auto flows.</div></div>
+                <button className={on ? "btn-ghost" : "btn"} style={btn} type="submit">{on ? "On · switch off" : "Switch on"}</button>
+              </form>); })()}
+          </div>
+
           <div className="card">
             <h2 className="h2">Connect the domain</h2>
             {!s.custom_domain ? <p className="muted mt-1 text-[13px]">Set a domain on the left first.</p> : (
@@ -105,7 +116,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
 
       <section className="flex flex-wrap items-start gap-5">
         <div className="card min-w-0 flex-[3_1_480px]">
-          <h2 className="h2">Principal and office logins</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="h2">Principal and office logins</h2><Link href={`/super/${s.id}/logins`} className="btn-ghost" style={btn}>All logins and resets →</Link></div>
           {d.people.length === 0 && <div className="mt-2"><Empty>No principal or office staff yet.</Empty></div>}
           {d.people.map((p) => (
             <Row key={p.id}>
@@ -129,7 +140,7 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
           {d.audit.map((a, i) => (
             <Row key={i}><span className="flex-1 font-bold">{a.action}</span><span className="muted text-[12px]">{new Date(a.at).toLocaleString("en-GB", { timeZone: "Asia/Karachi", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span></Row>
           ))}
-          <Link href="/super/activity" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">All activity →</Link>
+          <Link href="/super/security" className="mt-2 inline-block text-[13px] font-black text-[#0369a1]">All activity →</Link>
         </div>
       </section>
     </>

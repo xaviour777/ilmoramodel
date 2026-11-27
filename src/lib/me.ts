@@ -56,6 +56,7 @@ export async function requireRole(...roles: Role[]): Promise<Me> {
 export function homeFor(role: Role): string {
   switch (role) {
     case "owner":
+      return "/owner";
     case "principal":
       return "/principal";
     case "accountant":

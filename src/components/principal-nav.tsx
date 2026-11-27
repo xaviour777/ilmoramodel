@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 // Principal and owner menu: sidebar on desktop, bottom bar on phones
 // (design/Sidebar.dc.html and design/Mobile.dc.html).
-export type PItem = { id: string; href: string; label: string; tile: string; icon: string; also?: string[] };
-export type PGroup = { label: string; items: PItem[] };
+import { PRINCIPAL_GROUPS, type PGroup, type PItem } from "./principal-groups";
+export type { PGroup, PItem };
 
 const I: Record<string, string> = {
   home: "M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -24,38 +24,16 @@ const I: Record<string, string> = {
   reports: "M4 20V10M10 20V4M16 20v-7M22 20H2",
   settings: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4",
   more: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+  campus: "M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6",
+  check2: "M20 6L9 17l-5-5",
+  pl: "M3 3v18h18M7 15l4-4 3 3 5-6",
 };
-
-export const PRINCIPAL_GROUPS: PGroup[] = [
-  { label: "Daily", items: [
-    { id: "home", href: "/principal", label: "Home", tile: "t-g", icon: "home" },
-    { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
-    { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
-    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
-  ] },
-  { label: "Academics", items: [
-    { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },
-    { id: "exams", href: "/principal/exams", label: "Exams", tile: "t-v", icon: "exams" },
-    { id: "ai", href: "/principal/ai", label: "AI tools", tile: "t-y", icon: "ai", also: ["/teacher/paper-check", "/teacher/tutor-report"] },
-  ] },
-  { label: "People", items: [
-    { id: "students", href: "/principal/students", label: "Students", tile: "t-g", icon: "students" },
-    { id: "fam", href: "/principal/families", label: "Families", tile: "t-o", icon: "fam" },
-    { id: "staff", href: "/principal/staff", label: "Staff & pay", tile: "t-b", icon: "staff" },
-    { id: "adm", href: "/principal/admissions", label: "Admissions", tile: "t-p", icon: "adm" },
-  ] },
-  { label: "Money", items: [
-    { id: "fees", href: "/accounts", label: "Fees", tile: "t-o", icon: "fees" },
-    { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
-    { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile"] },
-  ] },
-];
 
 const ALL = PRINCIPAL_GROUPS.flatMap((g) => g.items);
 
-function currentId(path: string) {
+function currentId(path: string, all: PItem[] = ALL) {
   // the longest matching link is the current page
-  return ALL.flatMap((i) => [i.href, ...(i.also ?? [])].map((p) => ({ id: i.id, p })))
+  return all.flatMap((i) => [i.href, ...(i.also ?? [])].map((p) => ({ id: i.id, p })))
     .filter(({ p }) => path === p || path.startsWith(p + "/"))
     .sort((a, b) => b.p.length - a.p.length)[0]?.id;
 }
@@ -70,10 +48,10 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
 
 const fmt = (n: number) => (n > 999 ? "999+" : String(n));
 
-export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials }: {
-  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string;
+export function PrincipalSidebar({ badges, school, logo, campus, year, name, role, initials, groups = PRINCIPAL_GROUPS }: {
+  badges: Record<string, number>; school: string; logo?: string | null; campus: string; year?: string | null; name: string; role: string; initials: string; groups?: PGroup[];
 }) {
-  const cur = currentId(usePathname());
+  const cur = currentId(usePathname(), groups.flatMap((g) => g.items));
   return (
     <nav aria-label="Main" className="ilm-side">
       <div className="flex items-center gap-2.5 px-1.5 pt-1 pb-3">
@@ -86,7 +64,7 @@ export function PrincipalSidebar({ badges, school, logo, campus, year, name, rol
           <div className="truncate text-[12px] font-bold text-[#6b7280]">{[campus, year].filter(Boolean).join(" · ")}</div>
         </div>
       </div>
-      {PRINCIPAL_GROUPS.map((g) => (
+      {groups.map((g) => (
         <div key={g.label} className="flex flex-col gap-1">
           <div className="ilm-grp">{g.label}</div>
           {g.items.map((i) => (
@@ -108,9 +86,11 @@ export function PrincipalSidebar({ badges, school, logo, campus, year, name, rol
 
 const TABS = ["home", "classes", "exams", "staff"];
 
-export function PrincipalBottomBar({ badges }: { badges: Record<string, number> }) {
+export function PrincipalBottomBar({ badges, groups = PRINCIPAL_GROUPS, tabs = TABS }: { badges: Record<string, number>; groups?: PGroup[]; tabs?: string[] }) {
   const path = usePathname();
-  const cur = currentId(path);
+  const ALL = groups.flatMap((g) => g.items);
+  const TABS = tabs;
+  const cur = currentId(path, ALL);
   const [more, setMore] = useState(false);
   useEffect(() => setMore(false), [path]);
   const inMore = !!cur && !TABS.includes(cur);
@@ -119,7 +99,7 @@ export function PrincipalBottomBar({ badges }: { badges: Record<string, number> 
     <>
       {more && (
         <div className="fixed inset-x-0 top-0 bottom-[76px] z-40 overflow-y-auto bg-[#f7f9fc] p-4" role="dialog" aria-label="All pages">
-          {PRINCIPAL_GROUPS.map((g) => (
+          {groups.map((g) => (
             <div key={g.label} className="mb-3">
               <div className="kick mt-1 mb-2">{g.label}</div>
               <div className="grid grid-cols-3 gap-2.5">
@@ -142,7 +122,7 @@ export function PrincipalBottomBar({ badges }: { badges: Record<string, number> 
           return (
             <Link key={id} href={i.href} className="ilm-tb" aria-current={on ? "page" : undefined}>
               <span className="ic"><Icon name={i.icon} size={22} />{badges[id] > 0 && <span className="ilm-badge">{fmt(badges[id])}</span>}</span>
-              {id === "staff" ? "Staff" : i.label}
+              {id === "staff" ? "Staff" : i.label.split(" ")[0]}
             </Link>
           );
         })}

@@ -9,7 +9,7 @@ import { closeDay } from "../money-actions";
 
 type Search = { date?: string; cashier?: string; saved?: string; error?: string };
 
-// The cashier counts the drawer at the end of the day; Ilmora says what should be there.
+// The cashier counts the drawer at the end of the day; Prinqo says what should be there.
 export default async function DayClose({ searchParams }: { searchParams: Promise<Search> }) {
   const me = await requireRole("accountant", "principal", "owner");
   const sp = await searchParams;
@@ -36,7 +36,7 @@ export default async function DayClose({ searchParams }: { searchParams: Promise
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="kick">Money</div><h1 className="h1">Day close</h1>
-          <p className="muted text-base">Count the cash at the end of the day. Ilmora shows what should be in the drawer and keeps the record.</p>
+          <p className="muted text-base">Count the cash at the end of the day. Prinqo shows what should be in the drawer and keeps the record.</p>
         </div>
         <FeesTabs current="close" salaries={me.role === "accountant"} />
       </div>

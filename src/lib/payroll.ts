@@ -1,4 +1,4 @@
-// Salary sums. Money is in paisa, like the rest of Ilmora.
+// Salary sums. Money is in paisa, like the rest of Prinqo.
 
 export type Advance = { id: string; amount_paisa: number; monthly_cut_paisa: number; given_on: string };
 

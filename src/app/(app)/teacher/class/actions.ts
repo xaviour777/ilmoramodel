@@ -1,5 +1,7 @@
 "use server";
 
+import { pushTo } from "@/lib/push";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -37,6 +39,7 @@ export async function noticeToSection(f: FormData) {
   const supabase = await createClient();
   if (!str(f, "title") || !str(f, "body")) go(str(f, "back"), "Write a title and the message.");
   const { error } = await supabase.from("notices").insert({ campus_id: me.campus_id, title: str(f, "title"), body: str(f, "body"), audience: "section", section_id: str(f, "section_id"), created_by: me.id });
+  if (!error) await pushTo({ sections: [str(f, "section_id")] }, { title: str(f, "title"), body: str(f, "body") });
   go(str(f, "back"), error?.message, "notice");
 }
 

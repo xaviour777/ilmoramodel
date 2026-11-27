@@ -3,9 +3,9 @@ import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { PaperTabs } from "@/components/paper-tabs";
 import { PRESETS, totalMarks, type Pattern } from "@/lib/question-paper";
-import { makeQuestionPaper } from "../bank-actions";
+import { aiQuickPaper, makeQuestionPaper } from "../bank-actions";
 
-type Search = { class?: string; subject?: string; preset?: string; error?: string };
+type Search = { class?: string; subject?: string; preset?: string; title?: string; error?: string };
 
 // Make a board-style paper from the question bank, and the papers made so far.
 export default async function Papers({ searchParams }: { searchParams: Promise<Search> }) {
@@ -47,9 +47,26 @@ export default async function Papers({ searchParams }: { searchParams: Promise<S
         <button className="btn-ghost" type="submit">Show</button>
       </form>
       {cls && subject && (
+        <form action={aiQuickPaper} className="card flex flex-col gap-2" style={{ borderColor: "#c4b5fd", background: "#faf5ff" }}>
+          <input type="hidden" name="class_id" value={cls.id} /><input type="hidden" name="subject_id" value={subject.id} />
+          <div>
+            <h2 className="h2">✨ Whole paper with AI, in about a minute</h2>
+            <p className="muted text-[13px]">Write the syllabus, pick the pattern. AI writes {cls.name} {subject.name} questions in board style and makes the paper. You check it and replace any question. The questions also stay in your bank.</p>
+          </div>
+          <div className="grid items-end gap-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
+            <label className="field" style={{ gridColumn: "span 2" }}>Syllabus<input className="input" name="syllabus" required placeholder="Chapters 1 to 3, or: Kinematics and Dynamics" dir="auto" /></label>
+            <label className="field">Pattern<select className="input" name="preset" defaultValue="monthly">{PRESETS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}</select></label>
+            <label className="field">Language<select className="input" name="language"><option value="en">English</option><option value="ur">Urdu</option></select></label>
+            <label className="field">Title<input className="input" name="title" defaultValue={sp.title ?? `${subject.name} ${cls.name}`} /></label>
+            <button className="btn" type="submit">Make paper with AI</button>
+          </div>
+          <p className="muted text-[12px]">Uses the school&apos;s AI from Settings → AI (a few rupees a paper). Always read the paper before printing.</p>
+        </form>
+      )}
+      {cls && subject && (
         chapters.length === 0 ? (
           <section className="card">
-            <p className="muted">{cls.name} {subject.name} has no questions in the bank yet.</p>
+            <p className="muted">{cls.name} {subject.name} has no questions in the bank yet. Use AI above, or add questions in the bank.</p>
             <Link className="btn self-start" href={`/teacher/paper-check/bank?class=${cls.id}&subject=${subject.id}`}>Open Question bank</Link>
           </section>
         ) : (

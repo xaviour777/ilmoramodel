@@ -4,7 +4,7 @@ export type Channel = "whatsapp" | "sms";
 export type ChannelChoice = Channel | "auto";
 
 export const CHANNEL_LABEL: Record<Channel, string> = { whatsapp: "WhatsApp", sms: "SMS" };
-export const CHOICE_LABEL: Record<ChannelChoice, string> = { auto: "Let Ilmora choose", whatsapp: "WhatsApp", sms: "SMS" };
+export const CHOICE_LABEL: Record<ChannelChoice, string> = { auto: "Let Prinqo choose", whatsapp: "WhatsApp", sms: "SMS" };
 
 // A Pakistani mobile in international form (923001234567), or null when it isn't one.
 // Accepts 03001234567, 3001234567, +92 300 1234567 and 0092-300-1234567.

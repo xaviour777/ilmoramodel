@@ -1,5 +1,7 @@
 "use server";
 
+import { pushTo } from "@/lib/push";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -27,6 +29,8 @@ export async function saveAttendance(formData: FormData) {
   if (error) redirect(`/teacher${q}&error=${encodeURIComponent(error.message)}`);
   // parents of absent children get a message; a failure here must not lose the attendance
   const { data: queued } = await supabase.rpc("queue_absent_messages", { p_section: sectionId, p_date: date });
+  const absent = rows.filter((r) => r.status === "absent").map((r) => r.student_id);
+  if (absent.length && date === new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Karachi" })) await pushTo({ students: absent }, { title: "Absent today", body: "Your child was marked absent today. If this is wrong, please contact the class teacher.", url: "/" });
   revalidatePath("/teacher");
   redirect(`/teacher${q}&saved=1&alerts=${Number(queued) || 0}`);
 }
@@ -46,6 +50,7 @@ export async function createHomework(formData: FormData) {
     notify_parents: formData.get("notify_parents") === "on",
   });
   if (error) redirect(`/teacher/homework?error=${encodeURIComponent(error.message)}`);
+  await pushTo({ sections: [str(formData, "section_id")] }, { title: `Homework: ${str(formData, "title")}`, body: `Due ${str(formData, "due_on")}. ${str(formData, "instructions")}`, url: "/" });
   revalidatePath("/teacher/homework");
   redirect("/teacher/homework?saved=1");
 }
