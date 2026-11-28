@@ -14,6 +14,9 @@ import { PlatformBanner } from "@/components/platform-banner";
 import { Guide } from "@/components/guide";
 import { moduleOn } from "@/lib/modules";
 import { PRINCIPAL_GROUPS } from "@/components/principal-groups";
+import { cookies } from "next/headers";
+import { switchMode } from "./mode-actions";
+import { CampusSwitch } from "@/components/campus-switch";
 
 const STAFF: Role[] = ["principal", "owner", "accountant", "teacher"];
 
@@ -118,30 +121,44 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   // only count unmarked sections once the school day has started (someone has marked)
   const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
   const badges: Record<string, number> = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
-  const owner = me.role === "owner";
+  // owner who is also the principal: header button switches between Principal and Director mode
+  const director = me.combined && (await cookies()).get("prinqo_mode")?.value === "director";
+  const owner = me.role === "owner" || director;
   if (owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
   // "Ask the owner" only where the owner is someone other than the principal
   const { data: hasOwner, error: ownerErr } = owner ? { data: true, error: null } : await supabase.rpc("school_has_owner");
-  const groups = owner ? OWNER_GROUPS : hasOwner || ownerErr ? PRINCIPAL_GROUPS
+  const groups = director ? OWNER_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "o-campus") }))
+    : owner ? OWNER_GROUPS : hasOwner || ownerErr ? PRINCIPAL_GROUPS
     : PRINCIPAL_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "ask") }));
+  const campusList = me.combined ? ((await supabase.from("campuses").select("id, name").eq("school_id", me.school_id ?? "").order("name")).data ?? []) : [];
   const brand = await getBranding();
   const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Prinqo AI";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
   return (
     <div className="ilm min-h-screen">
       <div className="hidden lg:block">
-        <PrincipalSidebar groups={groups} badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={ROLE_LABEL[me.role]} initials={initials} />
+        <PrincipalSidebar groups={groups} badges={badges} school={schoolName} logo={brand?.logo_url} campus={me.campus_name} year={year.data?.name} name={me.full_name} role={director ? "Director" : me.combined ? "Principal and director" : ROLE_LABEL[me.role]} initials={initials} />
       </div>
       {/* phone header */}
       <header className="sticky top-0 z-30 flex items-center gap-2.5 border-b-2 border-[#e5e7eb] bg-white px-4 pt-4 pb-2.5 lg:hidden">
         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl text-xl font-black text-white" style={{ background: "var(--brand, #16a34a)", boxShadow: "0 3px 0 var(--brand-lip, #15803d)" }}>{schoolName[0].toUpperCase()}</div>
         <div className="min-w-0 flex-1"><div className="truncate text-[17px] font-black">{schoolName}</div>
           <div className="truncate text-[12px] font-bold text-[#6b7280]">{me.campus_name}{year.data?.name ? ` · ${year.data.name}` : ""}</div></div>
+        {me.combined && <CampusSwitch campuses={campusList} current={me.campus_id} />}
+        {me.combined && (
+            <form action={switchMode}><input type="hidden" name="to" value={director ? "principal" : "director"} />
+              <button type="submit" className="cursor-pointer rounded-full border-2 border-[#0369a1] px-2.5 py-1 text-[12px] font-extrabold text-[#0369a1] hover:bg-[#e0f2fe]">{director ? "Principal" : "Director"}</button></form>
+          )}
         <Link href="/profile" aria-label="My profile"><Avatar name={me.full_name} url={me.avatar_url} size={36} /></Link>
         <form action={signOut}><button type="submit" className="text-[12px] font-extrabold text-[#0369a1] underline">Sign out</button></form>
       </header>
       <div className="lg:pl-[264px]">
         <div className="hidden justify-end gap-3 px-7 pt-4 text-[13px] font-extrabold lg:flex">
+          {me.combined && <CampusSwitch campuses={campusList} current={me.campus_id} />}
+          {me.combined && (
+            <form action={switchMode}><input type="hidden" name="to" value={director ? "principal" : "director"} />
+              <button type="submit" className="cursor-pointer rounded-full border-2 border-[#0369a1] px-3 py-1 text-[12px] font-extrabold text-[#0369a1] hover:bg-[#e0f2fe]">{director ? "Switch to Principal mode" : "Switch to Director mode"}</button></form>
+          )}
           <PushToggle />
           <Link href="/profile" className="text-[#0369a1] hover:underline">My profile</Link>
           <form action={signOut}><button type="submit" className="cursor-pointer text-[#0369a1] hover:underline">Sign out</button></form>

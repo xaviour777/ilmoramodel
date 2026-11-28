@@ -4,11 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { stateOf, type Plan } from "@/lib/super";
 import { rupees, shortDate, todayPK } from "@/lib/format";
 import { PageHead, Stats, Stat, Row, Empty } from "@/components/ilm";
-import { setModule, setPassword, setStatus, updateSchool } from "../actions";
+import { setModule, setOwnerMode, setPassword, setStatus, updateSchool } from "../actions";
 
 type Detail = {
   school: { id: string; name: string; city: string | null; custom_domain: string | null; logo_url: string | null; primary_color: string | null; support_email: string | null;
-    status: string; trial_ends_on: string | null; plan: string; max_students: number | null; notes: string | null; created_at: string } | null;
+    status: string; trial_ends_on: string | null; plan: string; max_students: number | null; notes: string | null; created_at: string; owner_is_principal?: boolean } | null;
   campuses: { id: string; name: string; city: string | null; students: number; classes: number }[];
   people: { id: string; name: string; email: string | null; role: string; active: boolean; last_login: string | null }[];
   usage: { teachers: number; families: number; attendance_days_30: number; fees_month_paisa: number; messages_month: number; ai_calls_month: number };
@@ -84,6 +84,19 @@ export default async function SuperSchool({ params, searchParams }: { params: Pr
                 <button className="btn" style={btn} type="submit">Activate</button></form>}
               {s.status !== "suspended" && <form action={setStatus}><input type="hidden" name="school_id" value={s.id} /><input type="hidden" name="status" value="suspended" /><input type="hidden" name="label" value="suspended" />
                 <button className="btn-ghost" style={{ ...btn, color: "#b91c1c" }} type="submit">Suspend</button></form>}
+            </div>
+          </div>
+
+          <div className="card flex flex-col gap-2.5">
+            <h2 className="h2">Owner and principal</h2>
+            <p className="muted text-[13px]">{s.owner_is_principal
+              ? "Same person: the principal gets one dashboard with a Director section and approves requests themselves."
+              : "Separate people: the principal sends Director requests, and the owner approves them from their own director login."}</p>
+            <div className="flex flex-wrap gap-2">
+              {([[true, "Same person, one dashboard"], [false, "Separate logins"]] as const).map(([on, label]) => (
+                <form key={label} action={setOwnerMode}><input type="hidden" name="school_id" value={s.id} /><input type="hidden" name="on" value={on ? "1" : "0"} />
+                  <button className={!!s.owner_is_principal === on ? "btn" : "btn-ghost"} style={btn} type="submit" aria-pressed={!!s.owner_is_principal === on}>{label}</button></form>
+              ))}
             </div>
           </div>
 
