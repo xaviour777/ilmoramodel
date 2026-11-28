@@ -308,12 +308,21 @@ body {
 
 /* sidebar */
 .ilm-side { position: fixed; inset: 0 auto 0 0; z-index: 40; width: 264px; box-sizing: border-box; background: #fff; border-right: 2px solid #e5e7eb; padding: 18px 12px; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; }
-.ilm-it { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 5px 10px; border: 2px solid transparent; border-radius: 14px; font-weight: 800; font-size: 15px; color: #4b5563; }
+.ilm-it { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 3px 8px; border: 2px solid transparent; border-radius: 12px; font-weight: 800; font-size: 14px; color: #4b5563; }
 .ilm-it:hover { background: #f1f5f9; color: #1f2937; }
 .ilm-it[aria-current="page"] { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; box-shadow: 0 3px 0 #7dd3fc; }
 .ilm-tile { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
 .ilm-badge { margin-left: auto; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 99px; background: #ef4444; color: #fff; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; }
-.ilm-grp { font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #6b7280; padding: 14px 12px 6px; }
+.ilm-grp { display: flex; align-items: center; gap: 6px; width: 100%; font-weight: 900; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #6b7280; padding: 12px 10px 4px; border-radius: 8px; }
+button.ilm-grp:hover { color: #1f2937; }
+.ilm-chev { display: flex; transition: transform .15s; }
+.ilm-chev[data-open="true"] { transform: rotate(90deg); }
+.ilm-dot { width: 8px; height: 8px; border-radius: 99px; background: #ef4444; }
+.ilm-side .ilm-tile { width: 30px; height: 30px; border-radius: 9px; }
+.ilm-find { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; padding: 0 10px; height: 38px; border: 2px solid #e5e7eb; border-radius: 12px; color: #9ca3af; background: #f9fafb; }
+.ilm-find:focus-within { border-color: #7dd3fc; background: #fff; }
+.ilm-find input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-weight: 700; font-size: 14px; color: #1f2937; }
+.ilm-find kbd { font: 800 11px/1 inherit; padding: 3px 6px; border: 1.5px solid #e5e7eb; border-radius: 6px; color: #9ca3af; }
 .t-g { background: #dcfce7; color: #16a34a; } .t-o { background: #ffedd5; color: #ea580c; } .t-p { background: #fce7f3; color: #db2777; }
 .t-b { background: #e0f2fe; color: #0284c7; } .t-v { background: #ede9fe; color: #7c3aed; } .t-y { background: #fef9c3; color: #ca8a04; } .t-n { background: #f3f4f6; color: #4b5563; }
 

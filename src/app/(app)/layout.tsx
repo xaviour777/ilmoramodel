@@ -1,4 +1,4 @@
-import { OWNER_GROUPS, OWNER_TABS } from "@/components/owner-nav";
+import { OWNER_GROUPS, OWNER_TABS, combinedGroups } from "@/components/owner-nav";
 import { PushToggle } from "@/components/push-toggle";
 import { UrduSwitch } from "@/components/urdu-switch";
 import { getMe, type Role } from "@/lib/me";
@@ -28,7 +28,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/principal/staff", label: "Staff & leave", icon: "people" },
     { href: "/principal/admissions", label: "Admissions", icon: "door" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
-    { href: "/principal/approvals", label: "Ask the owner", icon: "coin" },
+    { href: "/principal/approvals", label: "Director requests", icon: "coin" },
     { href: "/principal/notices", label: "Notices", icon: "bell" },
     { href: "/accounts", label: "Fees", icon: "coin", also: ["/accounts/setup"] },
     { href: "/accounts/messages", label: "Messages", icon: "chat", also: ["/whatsapp"] },
@@ -58,6 +58,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/parent/exams", label: "Exams & report card", icon: "star" },
     { href: "/parent/board", label: "Board exam prep", icon: "book" },
     { href: "/parent/requests", label: "Leave & meetings", icon: "clock" },
+    { href: "/parent/shop", label: "Book shop", icon: "book" },
     { href: "/feedback", label: "Complaints & ideas", icon: "chat" },
   ],
   student: [
@@ -66,6 +67,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/student/progress", label: "My progress", icon: "star" },
     { href: "/student/exams", label: "My exams", icon: "star" },
     { href: "/student/board", label: "Board exam prep", icon: "book" },
+    { href: "/student/shop", label: "Book shop", icon: "book" },
     { href: "/feedback", label: "Suggestions", icon: "chat" },
   ],
 };
@@ -121,14 +123,15 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   // only count unmarked sections once the school day has started (someone has marked)
   const unmarked = markedSections > 0 ? Math.max(0, (sections.count ?? 0) - markedSections) : 0;
   const badges: Record<string, number> = { att: unmarked, staff: leave.count ?? 0, adm: admissions.count ?? 0, fees: owing.count ?? 0 };
-  // owner who is also the principal: header button switches between Principal and Director mode
+  // owner who is also the principal: header button switches between Principal and Director mode;
+  // in Principal mode they get one menu with their own Approvals and a Director group
   const director = me.combined && (await cookies()).get("prinqo_mode")?.value === "director";
   const owner = me.role === "owner" || director;
-  if (owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
-  // "Ask the owner" only where the owner is someone other than the principal
-  const { data: hasOwner, error: ownerErr } = owner ? { data: true, error: null } : await supabase.rpc("school_has_owner");
+  if (owner || me.is_owner) badges["o-approvals"] = (await supabase.from("approvals").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0;
+  // "Director requests" only where the owner is someone other than the principal
+  const { data: hasOwner, error: ownerErr } = owner || me.combined ? { data: true, error: null } : await supabase.rpc("school_has_owner");
   const groups = director ? OWNER_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "o-campus") }))
-    : owner ? OWNER_GROUPS : hasOwner || ownerErr ? PRINCIPAL_GROUPS
+    : owner ? OWNER_GROUPS : me.combined ? combinedGroups(PRINCIPAL_GROUPS) : hasOwner || ownerErr ? PRINCIPAL_GROUPS
     : PRINCIPAL_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "ask") }));
   const campusList = me.combined ? ((await supabase.from("campuses").select("id, name").eq("school_id", me.school_id ?? "").order("name")).data ?? []) : [];
   const brand = await getBranding();

@@ -25,3 +25,16 @@ export const OWNER_GROUPS: PGroup[] = [
   ] },
 ];
 export const OWNER_TABS = ["o-home", "o-approvals", "o-revenue", "o-pl"];
+
+// Owner and principal are the same person (super admin → school → "Owner is also the principal"):
+// one dashboard: "Director requests" becomes their own Approvals, plus a folding Director group.
+const DIRECTOR_IDS = ["o-home", "o-campuses", "o-revenue", "o-expenses", "o-pl", "o-people", "o-settings"];
+export function combinedGroups(principal: PGroup[]): PGroup[] {
+  const owner = OWNER_GROUPS.flatMap((g) => g.items);
+  const approvals = { ...owner.find((i) => i.id === "o-approvals")!, label: "Approvals" };
+  const director = owner.filter((i) => DIRECTOR_IDS.includes(i.id))
+    .map((i) => (i.id === "o-home" ? { ...i, label: "Director overview" } : i.id === "o-settings" ? { ...i, label: "Director settings" } : i));
+  const [main, academics, ...rest] = principal;
+  // daily work first: Academics, then the Director group
+  return [{ ...main, items: main.items.map((i) => (i.id === "ask" ? approvals : i)) }, academics, { label: "Director", items: director }, ...rest];
+}

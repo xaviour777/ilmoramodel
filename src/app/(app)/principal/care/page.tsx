@@ -2,15 +2,14 @@ import Link from "next/link";
 import { requireRole } from "@/lib/me";
 import { createClient } from "@/lib/supabase/server";
 import { rupees, shortDate, todayPK } from "@/lib/format";
-import { Tabs } from "@/components/tabs";
 import { assignVan, markTrip, replyFeedback, saveVan } from "./actions";
 
 type Search = { tab?: string; van?: string; saved?: string; error?: string };
 const STATUS: Record<string, string> = { open: "pill-orange", in_progress: "pill-blue", resolved: "pill-green" };
 
-// Complaints box and school vans.
+// Complaints box; /principal/transport shows the vans part on its own (Services → Vans).
 export default async function Care({ searchParams }: { searchParams: Promise<Search> }) {
-  const me = await requireRole("principal", "owner");
+  await requireRole("principal", "owner");
   const sp = await searchParams;
   const sb = await createClient();
   const tab = ["feedback", "transport"].includes(sp.tab ?? "") ? sp.tab! : "feedback";
@@ -64,7 +63,7 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
           <div className="tile"><span className="muted">Van fee / month</span><b>{rupees((vs ?? []).reduce((t, x) => t + Number((vans ?? []).find((v) => v.id === x.van_id)?.monthly_fee_paisa ?? 0), 0))}</b></div>
           <div className="tile"><span className="muted">Trips marked today</span><b>{(trips ?? []).length}</b></div>
         </div>
-        <div className="flex flex-wrap gap-2">{(vans ?? []).map((v) => <Link key={v.id} href={`/principal/care?tab=transport&van=${v.id}`} className={`pill ${v.id === van?.id ? "pill-blue" : "pill-gray"}`}>{v.name}</Link>)}</div>
+        <div className="flex flex-wrap gap-2">{(vans ?? []).map((v) => <Link key={v.id} href={`/principal/transport?tab=transport&van=${v.id}`} className={`pill ${v.id === van?.id ? "pill-blue" : "pill-gray"}`}>{v.name}</Link>)}</div>
         <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
           <form action={saveVan} className="card">
             <input type="hidden" name="id" value={van?.id ?? ""} />
@@ -78,7 +77,7 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
               <label className="field">Fee / month (Rs)<input className="input" type="number" name="fee" defaultValue={van ? van.monthly_fee_paisa / 100 : ""} /></label>
             </div>
             <label className="field">Route<input className="input" name="route" defaultValue={van?.route ?? ""} placeholder="Model Town → Faisal Town → School" /></label>
-            <div className="flex gap-2"><button className="btn" type="submit">Save</button>{van && <Link className="btn-ghost" href="/principal/care?tab=transport&van=new">New van</Link>}</div>
+            <div className="flex gap-2"><button className="btn" type="submit">Save</button>{van && <Link className="btn-ghost" href="/principal/transport?tab=transport&van=new">New van</Link>}</div>
           </form>
           {van && <section className="card">
             <h2 className="h2">{van.name} · {riders.length}{van.seats ? `/${van.seats}` : ""} students</h2>
@@ -113,8 +112,9 @@ export default async function Care({ searchParams }: { searchParams: Promise<Sea
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="h1">Complaints &amp; vans</h1><p className="muted text-base">The complaints box, and school vans with who rides them. Lesson observations are in Staff &amp; pay, the morning brief in Messages.</p></div>
-        <Tabs current={tab} tabs={[["feedback", "Complaints"], ["transport", "Vans"]].map(([id, label]) => ({ id, label, href: `/principal/care?tab=${id}` }))} />
+        {tab === "transport"
+          ? <div><h1 className="h1">Vans</h1><p className="muted text-base">Vans, drivers, routes, who rides where and today&apos;s trips.</p></div>
+          : <div><h1 className="h1">Complaints</h1><p className="muted text-base">The complaints box. Lesson observations are in Staff &amp; pay, the morning brief in Messages.</p></div>}
       </div>
       {sp.error && <div className="notice-bad">{sp.error}</div>}
       {sp.saved && <div className="notice-ok">Saved.</div>}

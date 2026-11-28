@@ -8,8 +8,8 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "att", href: "/principal/attendance", label: "Attendance", tile: "t-o", icon: "att" },
     { id: "notices", href: "/principal/notices", label: "Notices & holidays", tile: "t-p", icon: "notices" },
     { id: "wa", href: "/accounts/messages", label: "Messages", tile: "t-g", icon: "notices", also: ["/whatsapp"] },
-    { id: "ask", href: "/principal/approvals", label: "Ask the owner", tile: "t-o", icon: "staff" },
-    { id: "care", href: "/principal/care", label: "Complaints & vans", tile: "t-y", icon: "staff" },
+    { id: "ask", href: "/principal/approvals", label: "Director requests", tile: "t-o", icon: "check2" },
+    { id: "care", href: "/principal/care", label: "Complaints", tile: "t-y", icon: "chat" },
   ] },
   { label: "Academics", items: [
     { id: "classes", href: "/principal/classes", label: "Classes", tile: "t-b", icon: "classes" },
@@ -24,6 +24,10 @@ export const PRINCIPAL_GROUPS: PGroup[] = [
     { id: "fees", href: "/accounts", label: "Fees", tile: "t-o", icon: "fees" },
     { id: "reports", href: "/principal/reports", label: "Reports", tile: "t-v", icon: "reports" },
     { id: "settings", href: "/settings", label: "Settings", tile: "t-n", icon: "settings", also: ["/profile", "/principal/ai"] },
+  ] },
+  { label: "Services", items: [
+    { id: "vans", href: "/principal/transport", label: "Vans", tile: "t-b", icon: "van" },
+    { id: "shop", href: "/principal/shop", label: "Book shop", tile: "t-g", icon: "shop" },
   ] },
 ];
 

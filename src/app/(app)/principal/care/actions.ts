@@ -12,7 +12,7 @@ const num = (f: FormData, k: string) => (str(f, k) ? Number(str(f, k)) : null);
 // observations live under Staff & pay and the brief under Messages; the rest on this page
 const PAGE: Record<string, string> = { observe: "/principal/staff/observe", brief: "/whatsapp/brief" };
 const go = (tab: string, error?: string): never => {
-  const page = PAGE[tab];
+  const page = tab === "transport" ? "/principal/transport" : PAGE[tab];
   revalidatePath(page ?? "/principal/care");
   const q = error ? `error=${encodeURIComponent(error)}` : "saved=1";
   redirect(page ? `${page}?${q}` : `/principal/care?tab=${tab}&${q}`);
