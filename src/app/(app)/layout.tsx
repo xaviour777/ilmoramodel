@@ -16,6 +16,7 @@ import { moduleOn } from "@/lib/modules";
 import { PRINCIPAL_GROUPS } from "@/components/principal-groups";
 import { cookies } from "next/headers";
 import { switchMode } from "./mode-actions";
+import { CampusSwitch } from "@/components/campus-switch";
 
 const STAFF: Role[] = ["principal", "owner", "accountant", "teacher"];
 
@@ -129,6 +130,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
   const groups = director ? OWNER_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "o-campus") }))
     : owner ? OWNER_GROUPS : hasOwner || ownerErr ? PRINCIPAL_GROUPS
     : PRINCIPAL_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => i.id !== "ask") }));
+  const campusList = me.combined ? ((await supabase.from("campuses").select("id, name").eq("school_id", me.school_id ?? "").order("name")).data ?? []) : [];
   const brand = await getBranding();
   const schoolName = brand?.name || (campus.data?.schools as unknown as { name: string } | null)?.name || me.campus_name || "Prinqo AI";
   const initials = me.full_name.replace(/^(dr|mr|mrs|ms|miss)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("") || "?";
@@ -142,6 +144,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
         <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl text-xl font-black text-white" style={{ background: "var(--brand, #16a34a)", boxShadow: "0 3px 0 var(--brand-lip, #15803d)" }}>{schoolName[0].toUpperCase()}</div>
         <div className="min-w-0 flex-1"><div className="truncate text-[17px] font-black">{schoolName}</div>
           <div className="truncate text-[12px] font-bold text-[#6b7280]">{me.campus_name}{year.data?.name ? ` · ${year.data.name}` : ""}</div></div>
+        {me.combined && <CampusSwitch campuses={campusList} current={me.campus_id} />}
         {me.combined && (
             <form action={switchMode}><input type="hidden" name="to" value={director ? "principal" : "director"} />
               <button type="submit" className="cursor-pointer rounded-full border-2 border-[#0369a1] px-2.5 py-1 text-[12px] font-extrabold text-[#0369a1] hover:bg-[#e0f2fe]">{director ? "Principal" : "Director"}</button></form>
@@ -151,6 +154,7 @@ async function PrincipalShell({ me, children }: { me: Awaited<ReturnType<typeof 
       </header>
       <div className="lg:pl-[264px]">
         <div className="hidden justify-end gap-3 px-7 pt-4 text-[13px] font-extrabold lg:flex">
+          {me.combined && <CampusSwitch campuses={campusList} current={me.campus_id} />}
           {me.combined && (
             <form action={switchMode}><input type="hidden" name="to" value={director ? "principal" : "director"} />
               <button type="submit" className="cursor-pointer rounded-full border-2 border-[#0369a1] px-3 py-1 text-[12px] font-extrabold text-[#0369a1] hover:bg-[#e0f2fe]">{director ? "Switch to Principal mode" : "Switch to Director mode"}</button></form>
